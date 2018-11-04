@@ -13,6 +13,7 @@
         <module>nevercloud-lib</module>
         <module>nevercloud-api</module>
         <module>nevercloud-node</module>
+        <module>nevercloud-addons</module>
     </modules>
 
 
@@ -22,6 +23,12 @@
             <artifactId>lombok</artifactId>
             <version>1.18.2</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.31.Final</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
