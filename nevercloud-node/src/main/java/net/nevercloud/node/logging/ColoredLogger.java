@@ -10,9 +10,12 @@ import org.fusesource.jansi.AnsiConsole;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.logging.*;
 
 public class ColoredLogger extends Logger {
@@ -26,6 +29,10 @@ public class ColoredLogger extends Logger {
         this.consoleReader = consoleReader;
 
         AnsiConsole.systemInstall();
+
+        if (!Files.exists(Paths.get("logs"))) {
+            Files.createDirectory(Paths.get("logs"));
+        }
 
         FileHandler fileHandler = new FileHandler("logs/nevercloud.log", 7 ^ 10000000, 8, true);
         fileHandler.setFormatter(new LogFileFormatter());
@@ -47,6 +54,14 @@ public class ColoredLogger extends Logger {
             this.consoleReader.setPrompt(ConsoleColor.RESET.toString());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        return line;
+    }
+
+    public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage) {
+        String line;
+        while (!function.apply(line = this.readLine())) {
+            System.out.println(invalidInputMessage);
         }
         return line;
     }
