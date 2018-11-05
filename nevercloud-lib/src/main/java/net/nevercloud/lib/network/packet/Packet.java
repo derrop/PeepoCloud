@@ -13,6 +13,20 @@ public abstract class Packet {
     public abstract void write(ByteBuf byteBuf);
     public abstract void read(ByteBuf byteBuf);
 
+    protected void writeString(ByteBuf byteBuf, String string) {
+        byte[] bytes = string.getBytes();
+
+        byteBuf.writeInt(bytes.length);
+        byteBuf.writeBytes(bytes);
+    }
+
+    protected String readString(ByteBuf byteBuf) {
+        byte[] bytes = new byte[byteBuf.readInt()];
+        byteBuf.readBytes(bytes);
+
+        return new String(bytes);
+    }
+
     public int getId() {
         return id;
     }

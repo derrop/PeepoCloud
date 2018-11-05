@@ -6,7 +6,6 @@ package net.nevercloud.node;
 import com.google.common.base.Preconditions;
 import jline.console.ConsoleReader;
 import lombok.*;
-import net.md_5.bungee.http.HttpClient;
 import net.nevercloud.lib.json.SimpleJsonObject;
 import net.nevercloud.node.addons.AddonManager;
 import net.nevercloud.node.commands.CommandManager;
@@ -19,10 +18,7 @@ import net.nevercloud.node.defaultaddons.DefaultAddonManager;
 import net.nevercloud.node.logging.ColoredLogger;
 import net.nevercloud.node.logging.ConsoleColor;
 import net.nevercloud.node.nodeaddons.NodeAddon;
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
