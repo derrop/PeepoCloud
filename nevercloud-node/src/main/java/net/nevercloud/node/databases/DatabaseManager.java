@@ -4,12 +4,13 @@ package net.nevercloud.node.databases;
  */
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 public interface DatabaseManager {
 
     Database getDatabase(String name);
 
-    Collection<Database> getDatabases();
+    void getDatabases(Consumer<Collection<String>> consumer);
 
     void deleteDatabase(String name);
 
@@ -18,5 +19,7 @@ public interface DatabaseManager {
     int getDefaultPort();
 
     void connect(DatabaseConfig config);
+
+    void shutdown();
 
 }

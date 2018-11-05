@@ -69,13 +69,15 @@ public class AddonManager<Addon extends IAddon> {
                             configuration.getString("name"),
                             configuration.getString("version"),
                             configuration.getString("author"),
-                            configuration.getString("main")
+                            configuration.getString("main"),
+                            path.getFileName().toString()
                     );
 
                     try {
                         System.out.println("&eLoading addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &eversion &b" + config.getVersion() + "&e...");
                         Addon addon = addonLoader.loadAddon(config, this.classOfAddon);
                         if (addon != null) {
+                            this.loadedAddons.put(config.getName(), addon);
                             addons.add(addon);
                             addon.onLoad();
                         }
@@ -137,6 +139,19 @@ public class AddonManager<Addon extends IAddon> {
         addon.enabled = true;
         addon.onEnable();
         System.out.println("&aEnabled addon &9" + addon.getAddonConfig().getName() + " &aby &6" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion());
+    }
+
+    public Addon getAddonByName(String name) {
+        return this.loadedAddons.get(name);
+    }
+
+    public Addon getAddonByFileName(String fileName) {
+        for (Addon addon : this.loadedAddons.values()) {
+            if (addon.getAddonConfig().getFileName().equalsIgnoreCase(fileName)) {
+                return addon;
+            }
+        }
+        return null;
     }
 
     public Map<String, Addon> getLoadedAddons() {

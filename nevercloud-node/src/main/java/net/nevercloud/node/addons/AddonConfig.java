@@ -14,4 +14,5 @@ public class AddonConfig {
     private String version;
     private String author;
     private String main;
+    private String fileName;
 }

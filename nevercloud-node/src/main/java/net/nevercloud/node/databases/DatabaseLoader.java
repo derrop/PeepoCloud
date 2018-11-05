@@ -37,6 +37,10 @@ public class DatabaseLoader {
     void enableDatabase(DatabaseAddon addon, DatabaseManager databaseManager) {
         System.out.println("&eLoading database &9" + databaseManager.getClass().getSimpleName() + " &eby &6" + addon.getAddonConfig().getAuthor() + "&e...");
 
+        if (NeverCloudNode.getInstance().getDatabaseManager() != null) {
+            NeverCloudNode.getInstance().getDatabaseManager().shutdown();
+        }
+
         NeverCloudNode.getInstance().setDatabaseManager(databaseManager);
         databaseManager.connect(loadConfig(databaseManager));
         System.out.println("&aSuccessfully loaded database &9" + databaseManager.getClass().getSimpleName() + " &eby &6" + addon.getAddonConfig().getAuthor());
@@ -44,11 +48,11 @@ public class DatabaseLoader {
 
     public DatabaseManager loadDatabaseManager(NeverCloudNode node) {
         if (!node.getInternalConfig().contains("databaseManager")) {
-            System.out.println("Please specify the database type you want to use: MYSQL, ARANGODB, MONGODB");
+            System.out.println("Please specify the database that you want to use: MYSQL, ARANGODB, MONGODB");
             String line = node.getLogger().readLineUntil(s -> s.equalsIgnoreCase("mysql") ||
                             s.equalsIgnoreCase("arangodb") ||
                             s.equalsIgnoreCase("mongodb"),
-                    "Invalid input, please specify one of the following and if you want more databases than those, make suggestions or write your own: MYSQL, ARANGODB, MONGODB");
+                    "Invalid input, please choose one of the following and if you want more databases than those, make suggestions or write your own: MYSQL, ARANGODB, MONGODB");
             node.getInternalConfig().append("databaseManager", line.toLowerCase());
             node.saveInternalConfigFile();
         }
@@ -59,14 +63,17 @@ public class DatabaseLoader {
             case "mysql": {
                 databaseManager = new MySQLDatabaseManager();
             }
+            break;
 
             case "arangodb": {
                 databaseManager = new ArangoDatabaseManager();
             }
+            break;
 
             case "mongodb": {
                 databaseManager = new MongoDatabaseManager();
             }
+            break;
         }
 
         if (databaseManager == null) {
@@ -75,6 +82,7 @@ public class DatabaseLoader {
 
         DatabaseConfig config = loadConfig(databaseManager);
 
+        System.out.println("&eTrying to connect to database &7@" + config.getHost() + ":" + config.getPort());
         databaseManager.connect(config);
 
         return databaseManager;
@@ -118,7 +126,14 @@ public class DatabaseLoader {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("Your database configuration file was created, please configure it and restart the Cloud");
+            System.out.println("&4Your database configuration file was created, please configure it and restart the Cloud");
+            System.out.println("&aThe System will exit in 5 seconds...");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.exit(0);
         }
 
         return config;
