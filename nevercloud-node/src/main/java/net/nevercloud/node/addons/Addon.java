@@ -10,9 +10,9 @@ import net.nevercloud.node.NeverCloudNode;
 
 @RequiredArgsConstructor
 @Getter
-public abstract class IAddon {
+public abstract class Addon {
 
-    public IAddon() {
+    public Addon() {
         this(null, null);
     }
 

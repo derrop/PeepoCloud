@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class AddonManager<Addon extends IAddon> {
+public class AddonManager<Addon extends net.nevercloud.node.addons.Addon> {
 
     private Map<String, Addon> loadedAddons = new HashMap<>();
     private Class<Addon> classOfAddon;

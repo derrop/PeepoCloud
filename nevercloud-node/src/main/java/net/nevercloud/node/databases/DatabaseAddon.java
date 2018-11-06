@@ -3,11 +3,11 @@ package net.nevercloud.node.databases;
  * Created by Mc_Ruben on 05.11.2018
  */
 
-import net.nevercloud.node.addons.IAddon;
+import net.nevercloud.node.addons.Addon;
 
-public class DatabaseAddon extends IAddon {
+public class DatabaseAddon extends Addon {
 
-    DatabaseLoader databaseLoader;
+    protected DatabaseLoader databaseLoader;
 
     @Override
     protected void onLoad() {

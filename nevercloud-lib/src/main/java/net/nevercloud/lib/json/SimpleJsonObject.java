@@ -140,7 +140,7 @@ public class SimpleJsonObject {
             }
         }
 
-        try (OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path, StandardOpenOption.CREATE), "UTF-8")) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path, StandardOpenOption.CREATE), StandardCharsets.UTF_8)) {
             GSON.toJson(this.jsonObject, writer);
         } catch (IOException e) {
             e.printStackTrace();
@@ -154,7 +154,7 @@ public class SimpleJsonObject {
     public static SimpleJsonObject load(Path path) {
         if (!Files.exists(path))
             return new SimpleJsonObject();
-        try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(path), "UTF-8")) {
+        try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8)) {
             return new SimpleJsonObject(reader);
         } catch (IOException e) {
             e.printStackTrace();
