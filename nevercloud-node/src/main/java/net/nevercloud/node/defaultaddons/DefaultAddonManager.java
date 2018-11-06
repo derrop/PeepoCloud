@@ -52,7 +52,8 @@ public class DefaultAddonManager {
 
         if (!HttpClient.downloadFile(defaultAddonConfig.getDownloadLink(), path))
             return InstallAddonResult.DOWNLOAD_FAILED;
-        //TODO nach dem installieren und updaten müssen die neuen addons geladen und aktiviert werden
+        if (!NeverCloudNode.getInstance().getNodeAddonManager().loadAndEnableAddon(path))
+            return InstallAddonResult.ADDON_LOAD_FAILED;
         return InstallAddonResult.SUCCESS;
     }
 
@@ -85,15 +86,6 @@ public class DefaultAddonManager {
             return UpdateAddonResult.ADDON_UP_TO_DATE;
 
         {
-            Path path = Paths.get("nodeAddons/" + defaultAddonConfig.getName() + "-" + defaultAddonConfig.getVersion() + ".jar");
-            if (Files.exists(path))
-                return UpdateAddonResult.ADDON_ALREADY_INSTALLED;
-
-            if (!HttpClient.downloadFile(defaultAddonConfig.getDownloadLink(), path))
-                return UpdateAddonResult.DOWNLOAD_FAILED;
-        }
-
-        {
             NeverCloudNode.getInstance().getNodeAddonManager().unloadAddon(addon);
             Path path = Paths.get("nodeAddons/" + addon.getAddonConfig().getFileName());
             if (Files.exists(path)) {
@@ -103,6 +95,18 @@ public class DefaultAddonManager {
                     e.printStackTrace();
                 }
             }
+        }
+
+        {
+            Path path = Paths.get("nodeAddons/" + defaultAddonConfig.getName() + "-" + defaultAddonConfig.getVersion() + ".jar");
+            if (Files.exists(path))
+                return UpdateAddonResult.ADDON_ALREADY_INSTALLED;
+
+            if (!HttpClient.downloadFile(defaultAddonConfig.getDownloadLink(), path))
+                return UpdateAddonResult.DOWNLOAD_FAILED;
+
+            if (!NeverCloudNode.getInstance().getNodeAddonManager().loadAndEnableAddon(path))
+                return UpdateAddonResult.ADDON_LOAD_FAILED;
         }
 
         return UpdateAddonResult.SUCCESS;
@@ -115,6 +119,7 @@ public class DefaultAddonManager {
         ADDON_UP_TO_DATE("&cThe specified addon is already on the newest version"),
         DOWNLOAD_FAILED("&cThe download of the addon %s-%s from %s failed, please report this message to the support that we can fix this issue"),
         ADDON_ALREADY_INSTALLED("&cThe specified addon is already installed"),
+        ADDON_LOAD_FAILED("&cAn error occurred while loading and enabling the addon"),
         SUCCESS("&aThe addon was successfully updated");
 
         private String message;
@@ -134,6 +139,7 @@ public class DefaultAddonManager {
         NO_DOWNLOAD_LINK("&aThe specified addon has no download link"),
         ADDON_ALREADY_INSTALLED("&cThe specified addon is already installed"),
         DOWNLOAD_FAILED("&cThe download of the addon %s-%s from %s failed, please report this message to the support that we can fix this issue"),
+        ADDON_LOAD_FAILED("&cAn error occurred while loading and enabling the addon"),
         SUCCESS("&aThe addon was successfully installed");
 
         private String message;

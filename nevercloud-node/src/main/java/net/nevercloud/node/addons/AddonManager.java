@@ -11,6 +11,7 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -57,39 +58,59 @@ public class AddonManager<Addon extends IAddon> {
         Collection<Addon> addons = new ArrayList<>();
 
         for (Path path : paths) {
-            AddonLoader addonLoader = new AddonLoader(path);
-
-            try (JarFile jarFile = new JarFile(path.toFile())) {
-                JarEntry jarEntry = jarFile.getJarEntry("addon.yml");
-                Preconditions.checkArgument(jarEntry != null, "addon " + path.toString() + " does not contain an addon.yml");
-
-                try (InputStreamReader reader = new InputStreamReader(jarFile.getInputStream(jarEntry), StandardCharsets.UTF_8)) {
-                    Configuration configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(reader);
-                    AddonConfig config = new AddonConfig(
-                            configuration.getString("name"),
-                            configuration.getString("version"),
-                            configuration.getString("author"),
-                            configuration.getString("main"),
-                            path.getFileName().toString()
-                    );
-
-                    try {
-                        System.out.println("&eLoading addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &eversion &b" + config.getVersion() + "&e...");
-                        Addon addon = addonLoader.loadAddon(config, this.classOfAddon);
-                        if (addon != null) {
-                            this.loadedAddons.put(config.getName(), addon);
-                            addons.add(addon);
-                            addon.onLoad();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+            Addon addon = loadAddon(path);
+            if (addon != null) {
+                addons.add(addon);
             }
-
         }
 
         return addons;
+    }
+
+    public Addon loadAddon(Path path) throws MalformedURLException {
+        AddonLoader addonLoader = new AddonLoader(path);
+
+        try (JarFile jarFile = new JarFile(path.toFile())) {
+            JarEntry jarEntry = jarFile.getJarEntry("addon.yml");
+            Preconditions.checkArgument(jarEntry != null, "addon " + path.toString() + " does not contain an addon.yml");
+
+            try (InputStreamReader reader = new InputStreamReader(jarFile.getInputStream(jarEntry), StandardCharsets.UTF_8)) {
+                Configuration configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(reader);
+                AddonConfig config = new AddonConfig(
+                        configuration.getString("name"),
+                        configuration.getString("version"),
+                        configuration.getString("author"),
+                        configuration.getString("main"),
+                        path.getFileName().toString()
+                );
+
+                System.out.println("&eLoading addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &eversion &b" + config.getVersion() + "&e...");
+                long start = System.nanoTime();
+                Addon addon = addonLoader.loadAddon(config, this.classOfAddon);
+                if (addon != null) {
+                    this.loadedAddons.put(config.getName(), addon);
+                    addon.onLoad();
+                    System.out.println("&aSuccessfully loaded addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &version &b" + config.getVersion() + "&a, took &c" + (System.nanoTime() - start));
+                    return addon;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean loadAndEnableAddon(Path path) {
+        try {
+            Addon addon = this.loadAddon(path);
+            if (addon != null) {
+                this.enableAddon(addon);
+                return true;
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void enableAddons() {

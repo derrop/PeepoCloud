@@ -35,7 +35,7 @@ public class CommandAddon extends Command {
                     sender.sendMessage(defaultAddonConfig.getName() + " by " + authors.substring(0, authors.length() - 2) + ":");
                     sender.sendMessage("  - newest version: " + defaultAddonConfig.getVersion());
                     sender.sendMessage("  - all versions: " + allVersions.substring(0, allVersions.length() - 2));
-                    sender.sendMessage("  - download available: " + (defaultAddonConfig.getDownloadLink() != null ? "yes" : "no"));
+                    sender.sendMessage("  - download available: " + (defaultAddonConfig.getDownloadLink() != null ? "&ayes" : "&cno"));
                     sender.sendMessage(" ");
                 }
             });
