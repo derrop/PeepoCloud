@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -122,10 +123,17 @@ public class SimpleJsonObject {
         return contains(key) ? get(key).getAsBigDecimal() : null;
     }
 
+    public <T> T getObject(String key, Class<T> tClass) {
+        return GSON.fromJson(this.get(key), tClass);
+    }
+
+    public Object getObject(String key, Type type) {
+        return GSON.fromJson(this.get(key), type);
+    }
+
     public JsonObject asJsonObject() {
         return jsonObject;
     }
-
 
     public void saveAsFile(Path path) {
         if (!Files.exists(path)) {

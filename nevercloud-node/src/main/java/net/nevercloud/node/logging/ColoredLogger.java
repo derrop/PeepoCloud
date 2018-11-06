@@ -34,7 +34,7 @@ public class ColoredLogger extends Logger {
             Files.createDirectory(Paths.get("logs"));
         }
 
-        FileHandler fileHandler = new FileHandler("logs/nevercloud.log", 7 ^ 10000000, 8, true);
+        FileHandler fileHandler = new FileHandler("logs/nevercloud.log", 7 * 10000000, 8, true);
         fileHandler.setFormatter(new LogFileFormatter());
         addHandler(fileHandler);
 

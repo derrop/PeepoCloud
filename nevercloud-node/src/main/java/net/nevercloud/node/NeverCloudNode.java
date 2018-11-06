@@ -105,6 +105,8 @@ public class NeverCloudNode {
 
     public void reloadModules() {
         this.nodeAddonManager.disableAndUnloadAddons();
+        this.commandManager.getCommands().clear();
+        this.initCommands(this.commandManager);
         try {
             this.nodeAddonManager.loadAddons("nodeAddons");
         } catch (IOException e) {
