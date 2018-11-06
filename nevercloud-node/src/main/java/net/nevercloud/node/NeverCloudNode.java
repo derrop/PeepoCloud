@@ -79,6 +79,8 @@ public class NeverCloudNode {
         this.databaseLoader.shutdown();
         this.databaseManager.shutdown();
 
+        this.nodeAddonManager.disableAndUnloadAddons();
+
         try {
             this.logger.getConsoleReader().print(ConsoleColor.RESET.toString());
             this.logger.getConsoleReader().drawLine();

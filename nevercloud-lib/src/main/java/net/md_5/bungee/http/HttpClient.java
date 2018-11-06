@@ -104,6 +104,11 @@ public class HttpClient {
 
             InputStream inputStream = connection.getInputStream();
 
+            Path parent = targetPath.getParent();
+            if (parent != null && !Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
+
             OutputStream outputStream = Files.newOutputStream(targetPath, StandardOpenOption.CREATE_NEW);
 
             byte[] buf = new byte[512];
@@ -111,6 +116,8 @@ public class HttpClient {
             while ((len = inputStream.read(buf)) != -1) {
                 outputStream.write(buf, 0, len);
             }
+
+            outputStream.close();
 
             return true;
         } catch (IOException e) {

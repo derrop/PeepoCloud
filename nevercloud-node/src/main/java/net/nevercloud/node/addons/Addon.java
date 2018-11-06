@@ -3,22 +3,28 @@ package net.nevercloud.node.addons;
  * Created by Mc_Ruben on 05.11.2018
  */
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import net.nevercloud.node.NeverCloudNode;
 
-@RequiredArgsConstructor
 @Getter
 public abstract class Addon {
 
-    public Addon() {
-        this(null, null);
+    private AddonLoader addonLoader;
+    private AddonConfig addonConfig;
+    boolean enabled = false;
+
+    public void setAddonConfig(AddonConfig addonConfig) {
+        Preconditions.checkArgument(this.addonConfig == null);
+        this.addonConfig = addonConfig;
     }
 
-    private final AddonLoader addonLoader;
-    private final AddonConfig addonConfig;
-    boolean enabled = false;
+    public void setAddonLoader(AddonLoader addonLoader) {
+        Preconditions.checkArgument(this.addonLoader == null);
+        this.addonLoader = addonLoader;
+    }
 
     protected abstract void onLoad();
 

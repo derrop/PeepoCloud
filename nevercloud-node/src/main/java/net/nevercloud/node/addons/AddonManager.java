@@ -86,11 +86,11 @@ public class AddonManager<Addon extends net.nevercloud.node.addons.Addon> {
 
                 System.out.println("&eLoading addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &eversion &b" + config.getVersion() + "&e...");
                 long start = System.nanoTime();
-                Addon addon = addonLoader.loadAddon(config, this.classOfAddon);
+                Addon addon = (Addon) addonLoader.loadAddon(config);
                 if (addon != null) {
                     this.loadedAddons.put(config.getName(), addon);
                     addon.onLoad();
-                    System.out.println("&aSuccessfully loaded addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &version &b" + config.getVersion() + "&a, took &c" + (System.nanoTime() - start));
+                    System.out.println("&aSuccessfully loaded addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &eversion &b" + config.getVersion() + "&a, took &c" + (System.nanoTime() - start) + "ns");
                     return addon;
                 }
             }

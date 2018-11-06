@@ -9,7 +9,7 @@ public class ChannelHandler extends SimpleChannelInboundHandler<Packet> {
 
 
     @Override
-    protected void messageReceived(ChannelHandlerContext channelHandlerContext, Packet packet) {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
 
     }
 }

@@ -6,6 +6,7 @@ package net.nevercloud.node.addons;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,16 +30,18 @@ public class AddonLoader {
         this(file, null);
     }
 
-    public <T> T loadAddon(AddonConfig config, Class<? extends T> addonClass) {
-        T t = null;
+    public Addon loadAddon(AddonConfig config) {
+        Addon t = null;
         try {
             Class<?> class_ = this.classLoader.loadClass(config.getMain());
             if (class_ != null) {
-                Preconditions.checkArgument(class_.isAssignableFrom(addonClass), "main class of addon " + config.getName() + " was not an instance of " + addonClass.getName());
-                t = (T) class_.getDeclaredConstructor(AddonLoader.class, AddonConfig.class).newInstance(this, config);
+                Preconditions.checkArgument(Addon.class.isAssignableFrom(class_), "main class of addon " + config.getName() + " was not an instance of " + Addon.class.getName());
+                t = (Addon) class_.getConstructor().newInstance();
+                t.setAddonConfig(config);
+                t.setAddonLoader(this);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            System.err.println("there was an error while loading the main class " + config.getMain() + " of addon " + config.getName());
+            System.err.println("&cThere was an error while loading the main class &e" + config.getMain() + " &cof addon &9" + config.getName());
             e.printStackTrace();
         }
         return t;
