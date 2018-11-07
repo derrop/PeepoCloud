@@ -5,8 +5,8 @@ package net.nevercloud.node.commands.defaults;
 
 import lombok.*;
 import net.nevercloud.node.NeverCloudNode;
-import net.nevercloud.node.commands.Command;
-import net.nevercloud.node.commands.CommandSender;
+import net.nevercloud.node.command.Command;
+import net.nevercloud.node.command.CommandSender;
 
 public class CommandReload extends Command {
     public CommandReload() {

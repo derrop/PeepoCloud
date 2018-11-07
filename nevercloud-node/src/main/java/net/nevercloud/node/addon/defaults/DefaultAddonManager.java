@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
 import net.md_5.bungee.http.HttpClient;
 import net.nevercloud.lib.json.SimpleJsonObject;
+import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.addon.node.NodeAddon;
 
@@ -19,10 +20,8 @@ import java.util.function.Consumer;
 
 public class DefaultAddonManager {
 
-    private static final String URL_PREFIX = "http://localhost:1350/";
-
     public void getDefaultAddons(Consumer<Collection<DefaultAddonConfig>> consumer) {
-        HttpClient.get(URL_PREFIX + "addons", null, (s, throwable) -> {
+        HttpClient.get(SystemUtils.CENTRAL_SERVER_URL + "addons", null, (s, throwable) -> {
             if (throwable != null) {
                 consumer.accept(null);
                 throwable.printStackTrace();
@@ -50,7 +49,7 @@ public class DefaultAddonManager {
         if (Files.exists(path))
             return InstallAddonResult.ADDON_ALREADY_INSTALLED;
 
-        if (!HttpClient.downloadFile(URL_PREFIX + "file?addonName=" + defaultAddonConfig.getName() + "&addonVersion=" + defaultAddonConfig.getVersion(), path))
+        if (!HttpClient.downloadFile(SystemUtils.CENTRAL_SERVER_URL + "file?addonName=" + defaultAddonConfig.getName() + "&addonVersion=" + defaultAddonConfig.getVersion(), path))
             return InstallAddonResult.DOWNLOAD_FAILED;
         if (!NeverCloudNode.getInstance().getNodeAddonManager().loadAndEnableAddon(path))
             return InstallAddonResult.ADDON_LOAD_FAILED;
@@ -102,7 +101,7 @@ public class DefaultAddonManager {
             if (Files.exists(path))
                 return UpdateAddonResult.ADDON_ALREADY_INSTALLED;
 
-            if (!HttpClient.downloadFile(URL_PREFIX + "file?addonName=" + defaultAddonConfig.getName() + "&addonVersion=" + defaultAddonConfig.getVersion(), path))
+            if (!HttpClient.downloadFile(SystemUtils.CENTRAL_SERVER_URL + "file?addonName=" + defaultAddonConfig.getName() + "&addonVersion=" + defaultAddonConfig.getVersion(), path))
                 return UpdateAddonResult.DOWNLOAD_FAILED;
 
             if (!NeverCloudNode.getInstance().getNodeAddonManager().loadAndEnableAddon(path))

@@ -11,10 +11,12 @@ import net.nevercloud.node.addon.AddonManager;
 import net.nevercloud.node.command.CommandManager;
 import net.nevercloud.node.command.defaults.CommandAddon;
 import net.nevercloud.node.command.defaults.CommandHelp;
+import net.nevercloud.node.command.defaults.CommandLanguage;
 import net.nevercloud.node.command.defaults.CommandStop;
 import net.nevercloud.node.database.DatabaseManager;
 import net.nevercloud.node.database.DatabaseLoader;
 import net.nevercloud.node.addon.defaults.DefaultAddonManager;
+import net.nevercloud.node.languagesystem.LanguagesManager;
 import net.nevercloud.node.logging.ColoredLogger;
 import net.nevercloud.node.logging.ConsoleColor;
 import net.nevercloud.node.addon.node.NodeAddon;
@@ -36,6 +38,8 @@ public class NeverCloudNode {
     private DatabaseManager databaseManager;
     private DatabaseLoader databaseLoader;
 
+    private LanguagesManager languagesManager;
+
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
 
@@ -52,6 +56,8 @@ public class NeverCloudNode {
         this.logger = new ColoredLogger(consoleReader);
 
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
+
+        this.languagesManager = new LanguagesManager();
 
         this.databaseLoader = new DatabaseLoader("databaseAddons");
         this.databaseManager = this.databaseLoader.loadDatabaseManager(this);
@@ -70,7 +76,8 @@ public class NeverCloudNode {
         commandManager.registerCommands(
                 new CommandHelp(),
                 new CommandStop(),
-                new CommandAddon()
+                new CommandAddon(),
+                new CommandLanguage()
         );
     }
 
@@ -119,6 +126,10 @@ public class NeverCloudNode {
 
     public void saveInternalConfigFile() {
         this.internalConfig.saveAsFile("internal/internalData.json");
+    }
+
+    public String getMessage(String key) {
+        return this.languagesManager.getMessage(key);
     }
 
     @Deprecated
