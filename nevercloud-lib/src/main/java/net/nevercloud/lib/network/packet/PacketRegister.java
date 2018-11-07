@@ -8,8 +8,8 @@ public class PacketRegister {
 
     private Map<Integer, Class<? extends Packet>> registeredPackets = new HashMap<>();
 
-    public void registerPacket(Packet packet) {
-        this.registeredPackets.put(packet.getId(), packet.getClass());
+    public void registerPacket(int id, Class<? extends Packet> packetClass) {
+        this.registeredPackets.put(id, packetClass);
     }
 
     public Class<? extends Packet> getPacket(int id) {
