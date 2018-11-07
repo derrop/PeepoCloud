@@ -4,6 +4,8 @@ package net.nevercloud.lib.network;
 import io.netty.channel.Channel;
 import net.nevercloud.lib.network.packet.Packet;
 
+import java.net.InetSocketAddress;
+
 public class NetworkParticipant {
     private Channel channel;
     private String address;
@@ -11,7 +13,7 @@ public class NetworkParticipant {
 
     public NetworkParticipant(Channel channel, long connectedAt) {
         this.channel = channel;
-        this.address = channel.remoteAddress().toString();
+        this.address = ((InetSocketAddress) channel.remoteAddress()).getAddress().getHostAddress();
         this.connectedAt = connectedAt;
     }
 

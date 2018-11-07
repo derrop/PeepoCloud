@@ -1,6 +1,5 @@
 package net.nevercloud.lib.network;
 
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
@@ -14,14 +13,17 @@ import net.nevercloud.lib.network.packet.Packet;
 import net.nevercloud.lib.network.packet.PacketRegister;
 import net.nevercloud.lib.network.packet.coding.PacketDecoder;
 import net.nevercloud.lib.network.packet.coding.PacketEncoder;
+import net.nevercloud.lib.network.packet.handler.ClientChannelHandler;
+import net.nevercloud.lib.network.packet.handler.PacketHandler;
 
 public class NetworkClient implements Runnable {
     private static final boolean EPOLL = Epoll.isAvailable();
 
-    private Channel channel;
     private String host;
     private int port;
+    private Channel channel;
     private PacketRegister packetRegister;
+    private PacketHandler packetHandler;
 
     public NetworkClient(String host, int port, PacketRegister packetRegister) {
         this.host = host;
@@ -46,7 +48,8 @@ public class NetworkClient implements Runnable {
                                     0, 4, 0, 4),
                                     new LengthFieldPrepender(4))
                                     .addLast(new PacketEncoder())
-                                    .addLast(new PacketDecoder(packetRegister));
+                                    .addLast(new PacketDecoder(packetRegister))
+                                    .addLast(new ClientChannelHandler(NetworkClient.this));
                         }
                     });
             this.channel = bootstrap.connect(this.host, this.port).syncUninterruptibly().channel();
@@ -65,11 +68,21 @@ public class NetworkClient implements Runnable {
         this.channel.writeAndFlush(packet);
     }
 
+    public void setPacketHandler(PacketHandler packetHandler) {
+        this.packetHandler = packetHandler;
+    }
+
     public Channel getChannel() {
         return channel;
+    }
+
+    public PacketHandler getPacketHandler() {
+        return packetHandler;
     }
 
     public PacketRegister getPacketRegister() {
         return packetRegister;
     }
+
+
 }
