@@ -13,5 +13,4 @@ public class DefaultAddonConfig {
     private String[] authors;
     private String version;
     private String[] allVersions;
-    private String downloadLink;
 }

@@ -43,6 +43,11 @@ public class ArangoDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public boolean isConnected() {
+        return true;//TODO
+    }
+
+    @Override
     public void connect(DatabaseConfig config) {
         this.arangoDB = new ArangoDB.Builder()
                 .host(config.getHost(), config.getPort())

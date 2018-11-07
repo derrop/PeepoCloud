@@ -11,6 +11,7 @@ import net.nevercloud.node.addons.AddonManager;
 import net.nevercloud.node.commands.CommandManager;
 import net.nevercloud.node.commands.defaults.CommandAddon;
 import net.nevercloud.node.commands.defaults.CommandHelp;
+import net.nevercloud.node.commands.defaults.CommandReload;
 import net.nevercloud.node.commands.defaults.CommandStop;
 import net.nevercloud.node.databases.DatabaseManager;
 import net.nevercloud.node.databases.DatabaseLoader;
@@ -70,7 +71,8 @@ public class NeverCloudNode {
         commandManager.registerCommands(
                 new CommandHelp(),
                 new CommandStop(),
-                new CommandAddon()
+                new CommandAddon(),
+                new CommandReload()
         );
     }
 
