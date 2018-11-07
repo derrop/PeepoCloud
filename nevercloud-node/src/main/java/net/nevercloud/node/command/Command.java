@@ -37,4 +37,8 @@ public abstract class Command {
 
     public abstract void execute(CommandSender sender, String commandLine, String[] args);
 
+    public String getUsage() {
+        return "no usage defined";
+    }
+
 }

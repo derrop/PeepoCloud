@@ -19,8 +19,10 @@ import java.util.function.Consumer;
 
 public class DefaultAddonManager {
 
+    private static final String URL_PREFIX = "http://localhost:1350/";
+
     public void getDefaultAddons(Consumer<Collection<DefaultAddonConfig>> consumer) {
-        HttpClient.get("http://localhost/nevercloud-addons.json", null, (s, throwable) -> {
+        HttpClient.get(URL_PREFIX + "addons", null, (s, throwable) -> {
             if (throwable != null) {
                 consumer.accept(null);
                 throwable.printStackTrace();
@@ -44,13 +46,11 @@ public class DefaultAddonManager {
     }
 
     public InstallAddonResult installAddon(DefaultAddonConfig defaultAddonConfig) {
-        if (defaultAddonConfig.getDownloadLink() == null)
-            return InstallAddonResult.NO_DOWNLOAD_LINK;
         Path path = Paths.get("nodeAddons/" + defaultAddonConfig.getName() + "-" + defaultAddonConfig.getVersion() + ".jar");
         if (Files.exists(path))
             return InstallAddonResult.ADDON_ALREADY_INSTALLED;
 
-        if (!HttpClient.downloadFile(defaultAddonConfig.getDownloadLink(), path))
+        if (!HttpClient.downloadFile(URL_PREFIX + "file?addonName=" + defaultAddonConfig.getName() + "&addonVersion=" + defaultAddonConfig.getVersion(), path))
             return InstallAddonResult.DOWNLOAD_FAILED;
         if (!NeverCloudNode.getInstance().getNodeAddonManager().loadAndEnableAddon(path))
             return InstallAddonResult.ADDON_LOAD_FAILED;
@@ -102,7 +102,7 @@ public class DefaultAddonManager {
             if (Files.exists(path))
                 return UpdateAddonResult.ADDON_ALREADY_INSTALLED;
 
-            if (!HttpClient.downloadFile(defaultAddonConfig.getDownloadLink(), path))
+            if (!HttpClient.downloadFile(URL_PREFIX + "file?addonName=" + defaultAddonConfig.getName() + "&addonVersion=" + defaultAddonConfig.getVersion(), path))
                 return UpdateAddonResult.DOWNLOAD_FAILED;
 
             if (!NeverCloudNode.getInstance().getNodeAddonManager().loadAndEnableAddon(path))
@@ -117,7 +117,7 @@ public class DefaultAddonManager {
 
         ADDON_NOT_FOUND("&cThe specified addon is not installed"),
         ADDON_UP_TO_DATE("&cThe specified addon is already on the newest version"),
-        DOWNLOAD_FAILED("&cThe download of the addon %s-%s from %s failed, please report this message to the support that we can fix this issue"),
+        DOWNLOAD_FAILED("&cThe download of the addon %s-%s failed, please report this message to the support that we can fix this issue"),
         ADDON_ALREADY_INSTALLED("&cThe specified addon is already installed"),
         ADDON_LOAD_FAILED("&cAn error occurred while loading and enabling the addon"),
         SUCCESS("&aThe addon was successfully updated");
@@ -126,7 +126,7 @@ public class DefaultAddonManager {
 
         public String formatMessage(DefaultAddonConfig addonConfig) {
             if (this == DOWNLOAD_FAILED) {
-                return String.format(message, addonConfig.getName(), addonConfig.getVersion(), addonConfig.getDownloadLink());
+                return String.format(message, addonConfig.getName(), addonConfig.getVersion());
             }
             return message;
         }
@@ -136,9 +136,8 @@ public class DefaultAddonManager {
     @AllArgsConstructor
     public static enum InstallAddonResult {
 
-        NO_DOWNLOAD_LINK("&aThe specified addon has no download link"),
         ADDON_ALREADY_INSTALLED("&cThe specified addon is already installed"),
-        DOWNLOAD_FAILED("&cThe download of the addon %s-%s from %s failed, please report this message to the support that we can fix this issue"),
+        DOWNLOAD_FAILED("&cThe download of the addon %s-%s failed, please report this message to the support that we can fix this issue"),
         ADDON_LOAD_FAILED("&cAn error occurred while loading and enabling the addon"),
         SUCCESS("&aThe addon was successfully installed");
 
@@ -146,7 +145,7 @@ public class DefaultAddonManager {
 
         public String formatMessage(DefaultAddonConfig addonConfig) {
             if (this == DOWNLOAD_FAILED) {
-                return String.format(message, addonConfig.getName(), addonConfig.getVersion(), addonConfig.getDownloadLink());
+                return String.format(message, addonConfig.getName(), addonConfig.getVersion());
             }
             return message;
         }

@@ -379,13 +379,13 @@ public final class Configuration {
     public String getString(String path)
     {
         Object def = getDefault(path);
-        return getString(path, (def instanceof String) ? (String) def : "");
+        return getString(path, String.valueOf(def));
     }
 
     public String getString(String path, String def)
     {
         Object val = get(path, def);
-        return (val instanceof String) ? (String) val : def;
+        return (val != null) ? String.valueOf(val) : def;
     }
 
     public List<String> getStringList(String path)

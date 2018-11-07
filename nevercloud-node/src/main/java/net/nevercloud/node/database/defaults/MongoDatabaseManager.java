@@ -63,6 +63,11 @@ public class MongoDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public boolean isConnected() {
+        return true; //TODO
+    }
+
+    @Override
     public void connect(DatabaseConfig config) {
         this.mongoClient = MongoClients.create(
                 new ConnectionString(

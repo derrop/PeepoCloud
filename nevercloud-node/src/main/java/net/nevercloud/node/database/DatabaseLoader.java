@@ -42,8 +42,22 @@ public class DatabaseLoader {
         }
 
         NeverCloudNode.getInstance().setDatabaseManager(databaseManager);
-        databaseManager.connect(loadConfig(databaseManager));
-        System.out.println("&aSuccessfully loaded database &9" + databaseManager.getClass().getSimpleName() + " &eby &6" + addon.getAddonConfig().getAuthor());
+        DatabaseConfig config = loadConfig(databaseManager);
+        System.out.println("&eTrying to connect to database &7@" + config.getHost() + ":" + config.getPort() + "&e...");
+        try {
+            databaseManager.connect(config);
+            System.out.println("&aSuccessfully loaded database &9" + databaseManager.getClass().getSimpleName() + " &eby &6" + addon.getAddonConfig().getAuthor());
+            System.out.println("&aSuccessfully connected to database &7@" + config.getHost() + ":" + config.getPort());
+        } catch (Exception e) {
+            System.err.println("&cCould not connect to database, system will exit in 5 seconds...");
+            e.printStackTrace();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            System.exit(0);
+        }
     }
 
     public DatabaseManager loadDatabaseManager(NeverCloudNode node) {
@@ -82,8 +96,20 @@ public class DatabaseLoader {
 
         DatabaseConfig config = loadConfig(databaseManager);
 
-        System.out.println("&eTrying to connect to database &7@" + config.getHost() + ":" + config.getPort());
-        databaseManager.connect(config);
+        System.out.println("&eTrying to connect to database &7@" + config.getHost() + ":" + config.getPort() + "&e...");
+        try {
+            databaseManager.connect(config);
+            System.out.println("&aSuccessfully connected to database &7@" + config.getHost() + ":" + config.getPort());
+        } catch (Exception e) {
+            System.err.println("&cCould not connect to database, system will exit in 5 seconds...");
+            e.printStackTrace();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            System.exit(0);
+        }
 
         return databaseManager;
     }

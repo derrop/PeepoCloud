@@ -18,7 +18,9 @@ public interface DatabaseManager {
 
     int getDefaultPort();
 
-    void connect(DatabaseConfig config);
+    boolean isConnected();
+
+    void connect(DatabaseConfig config) throws Exception;
 
     void shutdown();
 

@@ -28,7 +28,11 @@ public class MySQLDatabaseManager implements DatabaseManager {
             return connection;
         try {
             if (connection == null || connection.isClosed()) {
-                this.connect(this.config);
+                try {
+                    this.connect(this.config);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 Thread.sleep(400);
             }
         } catch (SQLException | InterruptedException e) {
@@ -77,31 +81,32 @@ public class MySQLDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public void connect(DatabaseConfig config) {
+    public boolean isConnected() {
+        try {
+            return connection != null && !connection.isClosed();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public void connect(DatabaseConfig config) throws Exception {
         if (connectionClosed)
             return;
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        Class.forName("com.mysql.cj.jdbc.Driver");
 
         this.config = config;
-        try {
-            this.connection = DriverManager.getConnection(
-                    "jdbc:mysql://" +
-                            config.getHost() + ":" +
-                            config.getPort() + "/" +
-                            config.getDatabase() +
-                            "?autoReconnect=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
-                    config.getUsername(),
-                    config.getPassword());
-            System.out.println("&aSuccessfully connected to mysql database &7@" + config.getHost() + ":" + config.getPort());
-        } catch (SQLException e) {
-            System.err.println("Could not connect to mysql database");
-            e.printStackTrace();
-        }
+        this.connection = DriverManager.getConnection(
+                "jdbc:mysql://" +
+                        config.getHost() + ":" +
+                        config.getPort() + "/" +
+                        config.getDatabase() +
+                        "?autoReconnect=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
+                config.getUsername(),
+                config.getPassword());
+        System.out.println("&aSuccessfully connected to mysql database &7@" + config.getHost() + ":" + config.getPort());
     }
 
     @Override

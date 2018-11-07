@@ -22,11 +22,6 @@ import java.util.jar.JarFile;
 public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
 
     private Map<String, Addon> loadedAddons = new HashMap<>();
-    private Class<Addon> classOfAddon;
-
-    public AddonManager() {
-        this.classOfAddon = (Class<Addon>) TypeResolver.resolveRawArgument(AddonManager.class, getClass());
-    }
 
     public void loadAddons(String directory) throws IOException {
         this.loadAddons(Paths.get(directory));
@@ -114,33 +109,21 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
     }
 
     public void enableAddons() {
-        this.loadedAddons.values().forEach(addon -> {
-            addon.enabled = true;
-            addon.onEnable();
-        });
+        this.loadedAddons.values().forEach(this::enableAddon);
     }
 
     public void disableAndUnloadAddons() {
-        this.loadedAddons.values().forEach(addon -> {
-            addon.enabled = false;
-            addon.onDisable();
-            try {
-                addon.getAddonLoader().getClassLoader().close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        this.loadedAddons.clear();
+        new ArrayList<>(this.loadedAddons.values()).forEach(this::unloadAddon);
     }
 
     public void disableAddon(Addon addon) {
         if (!addon.enabled)
             return;
+        long start = System.nanoTime();
+        System.out.println("&eDisabling addon &9" + addon.getAddonConfig().getName() + " &eby &6" + addon.getAddonConfig().getAuthor() + " &eversion &b" + addon.getAddonConfig().getVersion() + "&e...");
         addon.enabled = false;
         addon.onDisable();
-        System.out.println("&cDisabled addon &9" + addon.getAddonConfig().getName() + " &cby &6" + addon.getAddonConfig().getAuthor() + " &cversion &b" + addon.getAddonConfig().getVersion());
-    }
+        System.out.println("&aDisabled addon &9" + addon.getAddonConfig().getName() + " &aby &6" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion() + "&a, took &c" + (System.nanoTime() - start) + "ns");    }
 
     public void unloadAddon(Addon addon) {
         if (!addon.enabled)
@@ -157,9 +140,11 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
     public void enableAddon(Addon addon) {
         if (addon.enabled)
             return;
+        long start = System.nanoTime();
+        System.out.println("&eEnabling addon &9" + addon.getAddonConfig().getName() + " &aby &9" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion() + "&e...");
         addon.enabled = true;
         addon.onEnable();
-        System.out.println("&aEnabled addon &9" + addon.getAddonConfig().getName() + " &aby &6" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion());
+        System.out.println("&aEnabled addon &9" + addon.getAddonConfig().getName() + " &aby &6" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion() + "&a, took &c" + (System.nanoTime() - start) + "ns");
     }
 
     public Addon getAddonByName(String name) {
