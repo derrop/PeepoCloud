@@ -34,7 +34,7 @@ public class LanguagesManager {
         if (selectedLang != null) {
             this.setSelectedLanguage(selectedLang, language -> {
                 if (language == null) {
-                    System.out.println("&cSelected language &e" + selectedLang + " &ccouldn't be loaded");
+                    System.out.println("&cSelected language &e" + selectedLang + " &ccouldn't be loaded, using default language &e" + this.defaultLanguage.getName() + " (" + this.defaultLanguage.getShortName() + ")");
                 } else {
                     System.out.println("&aSuccessfully loaded language &e" + language.getName() + " (" + language.getShortName() + ") &awith &e" + language.getMessages().size() + " messages");
                 }

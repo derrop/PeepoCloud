@@ -25,7 +25,7 @@ public class CommandLanguage extends Command {
             if (language != null) {
                 sender.sendMessage("&aSuccessfully changed language to &e" + language.getName() + " (" + language.getShortName() + ")");
             } else {
-                sender.sendMessage("&cThe specified language was not found on the server");
+                sender.sendMessage("&cThe specified language was not found on the server, using default language");
             }
         });
     }

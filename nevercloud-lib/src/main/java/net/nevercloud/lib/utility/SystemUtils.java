@@ -18,6 +18,19 @@ public class SystemUtils {
 
     private static final char[] values = "abcdefghijklmnopqrstuvwxyzäöüABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890".toCharArray();
 
+    public static String getCurrentVersion() {
+        return "1.0";
+    }
+
+    public static String getPathOfInternalJarFile() {
+        String name = SystemUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        if (name.contains("/")) {
+            String[] split = name.split("/");
+            name = split[split.length - 1];
+        }
+        return name;
+    }
+
     public static String randomString(int length) {
         char[] chars = new char[length];
         for (int i = 0; i < length; i++) {

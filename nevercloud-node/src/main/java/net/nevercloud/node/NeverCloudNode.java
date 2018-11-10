@@ -9,10 +9,7 @@ import lombok.*;
 import net.nevercloud.lib.json.SimpleJsonObject;
 import net.nevercloud.node.addon.AddonManager;
 import net.nevercloud.node.command.CommandManager;
-import net.nevercloud.node.command.defaults.CommandAddon;
-import net.nevercloud.node.command.defaults.CommandHelp;
-import net.nevercloud.node.command.defaults.CommandLanguage;
-import net.nevercloud.node.command.defaults.CommandStop;
+import net.nevercloud.node.command.defaults.*;
 import net.nevercloud.node.database.DatabaseManager;
 import net.nevercloud.node.database.DatabaseLoader;
 import net.nevercloud.node.addon.defaults.DefaultAddonManager;
@@ -20,6 +17,8 @@ import net.nevercloud.node.languagesystem.LanguagesManager;
 import net.nevercloud.node.logging.ColoredLogger;
 import net.nevercloud.node.logging.ConsoleColor;
 import net.nevercloud.node.addon.node.NodeAddon;
+import net.nevercloud.node.updater.AutoUpdaterManager;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,6 +41,7 @@ public class NeverCloudNode {
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
+    private AutoUpdaterManager autoUpdaterManager;
 
     private AddonManager<NodeAddon> nodeAddonManager;
     private DefaultAddonManager defaultAddonManager = new DefaultAddonManager();
@@ -56,6 +56,8 @@ public class NeverCloudNode {
         this.logger = new ColoredLogger(consoleReader);
 
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
+
+        this.autoUpdaterManager = new AutoUpdaterManager();
 
         this.languagesManager = new LanguagesManager();
 
@@ -77,7 +79,9 @@ public class NeverCloudNode {
                 new CommandHelp(),
                 new CommandStop(),
                 new CommandAddon(),
-                new CommandLanguage()
+                new CommandLanguage(),
+                new CommandUpdate(),
+                new CommandVersion()
         );
     }
 
