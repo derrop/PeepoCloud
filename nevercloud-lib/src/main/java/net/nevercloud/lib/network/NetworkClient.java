@@ -10,11 +10,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import net.nevercloud.lib.network.packet.Packet;
-import net.nevercloud.lib.network.packet.PacketRegister;
+import net.nevercloud.lib.network.packet.PacketManager;
 import net.nevercloud.lib.network.packet.coding.PacketDecoder;
 import net.nevercloud.lib.network.packet.coding.PacketEncoder;
 import net.nevercloud.lib.network.packet.handler.ClientChannelHandler;
-import net.nevercloud.lib.network.packet.handler.PacketHandler;
 
 public class NetworkClient implements Runnable {
     private static final boolean EPOLL = Epoll.isAvailable();
@@ -22,13 +21,12 @@ public class NetworkClient implements Runnable {
     private String host;
     private int port;
     private Channel channel;
-    private PacketRegister packetRegister;
-    private PacketHandler packetHandler;
+    private PacketManager packetManager;
 
-    public NetworkClient(String host, int port, PacketRegister packetRegister) {
+    public NetworkClient(String host, int port, PacketManager packetManager) {
         this.host = host;
         this.port = port;
-        this.packetRegister = packetRegister;
+        this.packetManager = packetManager;
     }
 
     @Override
@@ -48,12 +46,13 @@ public class NetworkClient implements Runnable {
                                     0, 4, 0, 4),
                                     new LengthFieldPrepender(4))
                                     .addLast(new PacketEncoder())
-                                    .addLast(new PacketDecoder(packetRegister))
-                                    .addLast(new ClientChannelHandler(NetworkClient.this));
+                                    .addLast(new PacketDecoder(NetworkClient.this.packetManager))
+                                    .addLast(new ClientChannelHandler(NetworkClient.this.packetManager));
                         }
                     });
             this.channel = bootstrap.connect(this.host, this.port).syncUninterruptibly().channel();
         } catch (Exception exception) {
+            System.err.println("Error while trying to connect to " + this.host + ":" + this.port);
             exception.printStackTrace();
         } finally {
             eventLoopGroup.shutdownGracefully();
@@ -68,20 +67,12 @@ public class NetworkClient implements Runnable {
         this.channel.writeAndFlush(packet);
     }
 
-    public void setPacketHandler(PacketHandler packetHandler) {
-        this.packetHandler = packetHandler;
-    }
-
     public Channel getChannel() {
         return channel;
     }
 
-    public PacketHandler getPacketHandler() {
-        return packetHandler;
-    }
-
-    public PacketRegister getPacketRegister() {
-        return packetRegister;
+    public PacketManager getPacketManager() {
+        return packetManager;
     }
 
 

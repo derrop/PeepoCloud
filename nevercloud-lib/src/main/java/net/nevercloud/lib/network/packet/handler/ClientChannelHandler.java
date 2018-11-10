@@ -2,36 +2,48 @@ package net.nevercloud.lib.network.packet.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import net.nevercloud.lib.network.NetworkClient;
 import net.nevercloud.lib.network.NetworkParticipant;
 import net.nevercloud.lib.network.packet.Packet;
+import net.nevercloud.lib.network.packet.PacketManager;
+
+import java.io.IOException;
+import java.util.function.Consumer;
 
 public class ClientChannelHandler extends SimpleChannelInboundHandler<Packet> {
-    private NetworkClient networkClient;
     private NetworkParticipant server;
+    private PacketManager packetManager;
 
-    public ClientChannelHandler(NetworkClient networkClient) {
-        this.networkClient = networkClient;
+    public ClientChannelHandler(PacketManager packetManager) {
+        this.packetManager = packetManager;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext channelHandlerContext) {
         this.server = new NetworkParticipant(channelHandlerContext.channel());
-        this.networkClient.getPacketHandler().onConnect(this.server);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        this.networkClient.getPacketHandler().onDisconnect(this.server);
+        this.server = null;
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        this.networkClient.getPacketHandler().onException(this.server, cause);
+        if(!(cause instanceof IOException)) {
+            System.err.println("Error with " + ctx.channel().remoteAddress());
+            cause.printStackTrace();
+        }
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
-        this.networkClient.getPacketHandler().handlePacket(this.server, packet, (queryResponse) -> this.networkClient.sendPacket(queryResponse));
+        Consumer<Packet> query = this.packetManager.getQuery(packet.getQueryUUID());
+        if(query != null)
+            query.accept(packet);
+
+        this.packetManager.getPacketInfo(packet.getId()).getPacketHandler().handlePacket(this.server, packet, queryResponse -> {
+            if(packet.getQueryUUID() != null)
+                this.server.sendPacket(this.packetManager.convertToQueryPacket(queryResponse, packet.getQueryUUID()));
+        });
     }
 }

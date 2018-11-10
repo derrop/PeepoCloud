@@ -6,12 +6,6 @@ import java.util.function.Consumer;
 
 public interface PacketHandler {
 
-    void handlePacket(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> queryResult);
-
-    void onException(NetworkParticipant networkParticipant, Throwable throwable);
-
-    void onConnect(NetworkParticipant networkParticipant);
-
-    void onDisconnect(NetworkParticipant networkParticipant);
+    void handlePacket(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> queryResponse);
 
 }

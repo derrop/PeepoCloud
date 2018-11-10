@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -16,8 +15,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.nevercloud.lib.Callback;
-import sun.misc.IOUtils;
+import net.nevercloud.lib.utility.Callback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,7 +24,6 @@ import java.io.OutputStream;
 import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.TimeUnit;
 

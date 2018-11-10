@@ -5,8 +5,8 @@ package net.nevercloud.node.command;
 
 public interface CommandSender {
 
-    default void sendMessage(String... messsages) {
-        for (String message : messsages) {
+    default void sendMessage(String... messages) {
+        for (String message : messages) {
             this.sendMessage(message);
         }
     }

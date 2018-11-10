@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import lombok.RequiredArgsConstructor;
-import net.nevercloud.lib.Callback;
+import net.nevercloud.lib.utility.Callback;
 
 import java.nio.charset.Charset;
 

@@ -1,10 +1,12 @@
 package net.nevercloud.lib.network.packet;
 
-
 import io.netty.buffer.ByteBuf;
+
+import java.util.UUID;
 
 public abstract class Packet {
     private int id;
+    private UUID queryUUID;
 
     public Packet(int id) {
         this.id = id;
@@ -13,21 +15,15 @@ public abstract class Packet {
     public abstract void write(ByteBuf byteBuf);
     public abstract void read(ByteBuf byteBuf);
 
-    protected void writeString(ByteBuf byteBuf, String string) {
-        byte[] bytes = string.getBytes();
-
-        byteBuf.writeInt(bytes.length);
-        byteBuf.writeBytes(bytes);
-    }
-
-    protected String readString(ByteBuf byteBuf) {
-        byte[] bytes = new byte[byteBuf.readInt()];
-        byteBuf.readBytes(bytes);
-
-        return new String(bytes);
-    }
-
     public int getId() {
         return id;
+    }
+
+    public UUID getQueryUUID() {
+        return queryUUID;
+    }
+
+    void setQueryUUID(UUID queryUUID) {
+        this.queryUUID = queryUUID;
     }
 }

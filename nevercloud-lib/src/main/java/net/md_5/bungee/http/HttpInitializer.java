@@ -7,7 +7,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.RequiredArgsConstructor;
-import net.nevercloud.lib.Callback;
+import net.nevercloud.lib.utility.Callback;
 
 import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
