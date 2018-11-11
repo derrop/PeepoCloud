@@ -17,19 +17,19 @@ import net.nevercloud.lib.network.packet.coding.PacketEncoder;
 import net.nevercloud.lib.network.packet.handler.ChannelHandler;
 import net.nevercloud.lib.network.packet.handler.MainChannelHandler;
 
+import java.net.InetSocketAddress;
+
 public class NetworkClient extends NetworkParticipant implements Runnable {
     private static final boolean EPOLL = Epoll.isAvailable();
 
-    private String host;
-    private int port;
+    private InetSocketAddress address;
     private PacketManager packetManager;
     private ChannelHandler firstHandler;
     private Auth auth;
 
-    public NetworkClient(String host, int port, PacketManager packetManager, ChannelHandler firstHandler, Auth auth) {
+    public NetworkClient(InetSocketAddress address, PacketManager packetManager, ChannelHandler firstHandler, Auth auth) {
         super(null, -1);
-        this.host = host;
-        this.port = port;
+        this.address = address;
         this.packetManager = packetManager;
         this.firstHandler = firstHandler;
         this.auth = auth;
@@ -37,7 +37,7 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("&eTrying to connect to " + this.host + ":" + this.port);
+        System.out.println("&eTrying to connect to " + address);
         EventLoopGroup eventLoopGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
         try {
@@ -57,12 +57,12 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
                                     .addLast(new MainChannelHandler(NetworkClient.this.packetManager, NetworkClient.this.firstHandler));
                         }
                     });
-            super.channel = bootstrap.connect(this.host, this.port).syncUninterruptibly().channel().writeAndFlush(new PacketOutAuth(this.auth)).syncUninterruptibly().channel();
+            super.channel = bootstrap.connect(address).syncUninterruptibly().channel().writeAndFlush(new PacketOutAuth(this.auth)).syncUninterruptibly().channel();
             super.connectedAt = System.currentTimeMillis();
-            System.out.println("&aSuccessfully connected to " + this.host + ":" + this.port);
+            System.out.println("&aSuccessfully connected to " + address);
             super.channel.closeFuture().syncUninterruptibly();
         } catch (Exception exception) {
-            System.err.println("&eError while trying to connect to " + this.host + ":" + this.port+": &e"+ exception.getMessage());
+            System.err.println("&eError while trying to connect to " + address + ": &e"+ exception.getMessage());
         } finally {
             eventLoopGroup.shutdownGracefully();
         }

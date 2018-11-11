@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.nevercloud.lib.network.packet.Packet;
-import net.nevercloud.lib.utility.PacketUtils;
+import net.nevercloud.lib.utility.network.PacketUtils;
 
 public class PacketEncoder extends MessageToByteEncoder<Packet> {
 

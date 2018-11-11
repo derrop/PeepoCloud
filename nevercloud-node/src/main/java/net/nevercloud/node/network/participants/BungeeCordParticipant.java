@@ -10,14 +10,15 @@ import net.nevercloud.lib.network.auth.Auth;
 
 @Getter
 public class BungeeCordParticipant extends NetworkParticipant {
+    private Auth auth;
+    private NodeParticipant parent;
+
     public BungeeCordParticipant(Channel channel, Auth auth, NodeParticipant parent) {
         super(channel);
         this.auth = auth;
         this.parent = parent;
     }
 
-    private Auth auth;
-    private NodeParticipant parent;
 
 
 }

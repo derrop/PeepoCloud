@@ -3,12 +3,8 @@ package net.nevercloud.node.network;
  * Created by Mc_Ruben on 11.11.2018
  */
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import net.nevercloud.lib.network.NetworkParticipant;
 import net.nevercloud.lib.network.packet.Packet;
-import net.nevercloud.lib.network.packet.PacketInfo;
-import net.nevercloud.lib.network.packet.handler.ChannelHandler;
 import net.nevercloud.lib.network.packet.handler.ChannelHandlerAdapter;
 
 public class ServerAuthChannelHandler extends ChannelHandlerAdapter {

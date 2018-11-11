@@ -14,6 +14,7 @@ import net.nevercloud.node.network.NetworkServer;
 
 import java.util.function.Consumer;
 public class PacketInAuth extends JsonPacket {
+
     public PacketInAuth(int id) {
         super(id);
     }

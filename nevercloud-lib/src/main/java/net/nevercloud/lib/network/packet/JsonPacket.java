@@ -3,7 +3,7 @@ package net.nevercloud.lib.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import net.nevercloud.lib.json.SimpleJsonObject;
-import net.nevercloud.lib.utility.PacketUtils;
+import net.nevercloud.lib.utility.network.PacketUtils;
 
 public class JsonPacket extends Packet {
     private SimpleJsonObject simpleJsonObject;

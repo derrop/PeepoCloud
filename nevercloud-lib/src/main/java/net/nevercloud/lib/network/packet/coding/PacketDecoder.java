@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.nevercloud.lib.network.packet.Packet;
 import net.nevercloud.lib.network.packet.PacketManager;
-import net.nevercloud.lib.utility.PacketUtils;
+import net.nevercloud.lib.utility.network.PacketUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

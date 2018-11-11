@@ -1,4 +1,4 @@
-package net.nevercloud.lib.utility;
+package net.nevercloud.lib.utility.network;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */

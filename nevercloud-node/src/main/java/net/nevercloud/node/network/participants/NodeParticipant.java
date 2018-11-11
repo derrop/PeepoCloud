@@ -16,6 +16,7 @@ import java.util.Map;
 
 @Getter
 public class NodeParticipant extends NetworkParticipant {
+
     public NodeParticipant(Channel channel, Auth auth) {
         super(channel);
         this.auth = auth;

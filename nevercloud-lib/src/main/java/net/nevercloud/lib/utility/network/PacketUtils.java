@@ -1,4 +1,4 @@
-package net.nevercloud.lib.utility;
+package net.nevercloud.lib.utility.network;
 
 
 import io.netty.buffer.ByteBuf;

@@ -15,7 +15,7 @@ import net.nevercloud.lib.network.auth.Auth;
 import net.nevercloud.lib.network.auth.NetworkComponentType;
 import net.nevercloud.lib.network.packet.PacketManager;
 import net.nevercloud.lib.network.packet.handler.ChannelHandlerAdapter;
-import net.nevercloud.lib.utility.NetworkAddress;
+import net.nevercloud.lib.utility.network.NetworkAddress;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.addon.AddonManager;
 import net.nevercloud.node.addon.defaults.DefaultAddonManager;
@@ -187,8 +187,9 @@ public class NeverCloudNode {
         Collection<NetworkAddress> nodes = (Collection<NetworkAddress>) configuration.get("nodes");
         NetworkAddress host = (NetworkAddress) configuration.get("host");
         if (this.networkServer == null) {
-            this.networkServer = new NetworkServer(this.networkServerPacketManager);
-            this.networkServer.start(host.getHost().equals("*") ? new InetSocketAddress(host.getPort()) : new InetSocketAddress(host.getHost(), host.getPort()));
+            this.networkServer = new NetworkServer(host.getHost().equals("*") ? new InetSocketAddress(host.getPort())
+                    : new InetSocketAddress(host.getHost(), host.getPort()), this.networkServerPacketManager);
+            this.networkServer.run();
         }
 
         if (this.connectableNodes == null || !this.connectableNodes.equals(nodes)) {
@@ -228,7 +229,7 @@ public class NeverCloudNode {
     }
 
     private void connectToNode(NetworkAddress node) {
-        NetworkClient client = new NetworkClient(node.getHost(), node.getPort(), this.networkClientPacketManager, new ChannelHandlerAdapter(),
+        NetworkClient client = new NetworkClient(new InetSocketAddress(node.getHost(), node.getPort()), this.networkClientPacketManager, new ChannelHandlerAdapter(),
                 new Auth(this.networkAuthKey, this.networkName, NetworkComponentType.NODE, null));
         this.connectedNodes.put(node.getHost(), client);
         new Thread(client, "Node client @" + node.toString()).start();
