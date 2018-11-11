@@ -97,8 +97,6 @@ public class NeverCloudNode {
 
         this.eventManager = new EventManager();
 
-        this.eventManager.registerListener(this.statisticsManager);
-
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
 
         this.autoUpdaterManager = new AutoUpdaterManager();
@@ -109,6 +107,8 @@ public class NeverCloudNode {
         this.databaseManager = this.databaseLoader.loadDatabaseManager(this);
 
         this.commandManager = new CommandManager(this.logger);
+
+        this.eventManager.registerListener(this.statisticsManager);
 
         this.initCommands(this.commandManager);
 
