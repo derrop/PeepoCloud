@@ -68,8 +68,8 @@ public class PacketManager {
         return reference.get();
     }
 
-    public Consumer<Packet> getQuery(UUID uuid) {
-        return this.pendingQueries.get(uuid);
+    public Consumer<Packet> getQueryAndRemove(UUID uuid) {
+        return this.pendingQueries.remove(uuid);
     }
 
 

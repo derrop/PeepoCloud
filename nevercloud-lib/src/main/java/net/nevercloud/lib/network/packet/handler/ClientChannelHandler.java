@@ -37,7 +37,7 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
-        Consumer<Packet> query = this.packetManager.getQuery(packet.getQueryUUID());
+        Consumer<Packet> query = this.packetManager.getQueryAndRemove(packet.getQueryUUID());
         if(query != null)
             query.accept(packet);
 
