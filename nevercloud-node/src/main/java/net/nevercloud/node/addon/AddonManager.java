@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -76,8 +77,11 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
                         configuration.getString("version"),
                         configuration.getString("author"),
                         configuration.getString("main"),
-                        path.getFileName().toString()
+                        path.getFileName().toString(),
+                        configuration.contains("reloadType") ? AddonConfig.ReloadType.valueOf(configuration.getString("reloadType")) : AddonConfig.ReloadType.ALWAYS
                 );
+                if (this.loadedAddons.containsKey(config.getName()))
+                    return this.loadedAddons.get(config.getName());
 
                 System.out.println("&eLoading addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &eversion &b" + config.getVersion() + "&e...");
                 long start = System.nanoTime();
@@ -113,7 +117,15 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
     }
 
     public void disableAndUnloadAddons() {
-        new ArrayList<>(this.loadedAddons.values()).forEach(this::unloadAddon);
+        this.disableAndUnloadAddons0(addon -> AddonConfig.ReloadType.ALWAYS.equals(addon.getAddonConfig().getReloadType()));
+    }
+
+    private void disableAndUnloadAddons0(Function<Addon, Boolean> mayDisableAndUnload) {
+        new ArrayList<>(this.loadedAddons.values()).forEach(addon -> {
+            if (mayDisableAndUnload.apply(addon)) {
+                this.unloadAddon(addon);
+            }
+        });
     }
 
     public void disableAddon(Addon addon) {
@@ -123,7 +135,8 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
         System.out.println("&eDisabling addon &9" + addon.getAddonConfig().getName() + " &eby &6" + addon.getAddonConfig().getAuthor() + " &eversion &b" + addon.getAddonConfig().getVersion() + "&e...");
         addon.enabled = false;
         addon.onDisable();
-        System.out.println("&aDisabled addon &9" + addon.getAddonConfig().getName() + " &aby &6" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion() + "&a, took &c" + (System.nanoTime() - start) + "ns");    }
+        System.out.println("&aDisabled addon &9" + addon.getAddonConfig().getName() + " &aby &6" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion() + "&a, took &c" + (System.nanoTime() - start) + "ns");
+    }
 
     public void unloadAddon(Addon addon) {
         if (!addon.enabled)
@@ -158,6 +171,10 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
             }
         }
         return null;
+    }
+
+    public void shutdown() {
+        this.disableAndUnloadAddons0(addon -> true);
     }
 
     public Map<String, Addon> getLoadedAddons() {

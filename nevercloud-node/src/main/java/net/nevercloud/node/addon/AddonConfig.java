@@ -15,4 +15,9 @@ public class AddonConfig {
     private String author;
     private String main;
     private String fileName;
+    private ReloadType reloadType;
+
+    public static enum ReloadType {
+        NEVER, ALWAYS
+    }
 }

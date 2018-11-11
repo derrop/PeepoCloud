@@ -92,6 +92,9 @@ public class NeverCloudNode {
         ConsoleReader consoleReader = new ConsoleReader(System.in, System.out);
         this.logger = new ColoredLogger(consoleReader);
 
+        this.nodeAddonManager = new AddonManager<>();
+        this.nodeAddonManager.loadAddons("nodeAddons");
+
         this.loadAuthKey();
         this.loadNetworkConfig();
 
@@ -108,13 +111,10 @@ public class NeverCloudNode {
 
         this.commandManager = new CommandManager(this.logger);
 
-        this.eventManager.registerListener(this.statisticsManager);
-
         this.initCommands(this.commandManager);
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown0));
 
-        this.nodeAddonManager = new AddonManager<>();
         this.reloadModules();
     }
 
