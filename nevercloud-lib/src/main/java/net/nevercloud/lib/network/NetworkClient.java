@@ -9,6 +9,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import net.nevercloud.lib.network.auth.Auth;
+import net.nevercloud.lib.network.auth.PacketOutAuth;
 import net.nevercloud.lib.network.packet.PacketManager;
 import net.nevercloud.lib.network.packet.coding.PacketDecoder;
 import net.nevercloud.lib.network.packet.coding.PacketEncoder;
@@ -22,17 +24,20 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
     private int port;
     private PacketManager packetManager;
     private ChannelHandler firstHandler;
+    private Auth auth;
 
-    public NetworkClient(String host, int port, PacketManager packetManager, ChannelHandler firstHandler) {
+    public NetworkClient(String host, int port, PacketManager packetManager, ChannelHandler firstHandler, Auth auth) {
         super(null, -1);
         this.host = host;
         this.port = port;
         this.packetManager = packetManager;
         this.firstHandler = firstHandler;
+        this.auth = auth;
     }
 
     @Override
     public void run() {
+        System.out.println("&eTrying to connect to " + this.host + ":" + this.port);
         EventLoopGroup eventLoopGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
         try {
@@ -52,11 +57,12 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
                                     .addLast(new MainChannelHandler(NetworkClient.this.packetManager, NetworkClient.this.firstHandler));
                         }
                     });
-            super.channel = bootstrap.connect(this.host, this.port).syncUninterruptibly().channel();
+            super.channel = bootstrap.connect(this.host, this.port).syncUninterruptibly().channel().writeAndFlush(new PacketOutAuth(this.auth)).syncUninterruptibly().channel();
             super.connectedAt = System.currentTimeMillis();
+            System.out.println("&aSuccessfully connected to " + this.host + ":" + this.port);
+            super.channel.closeFuture().syncUninterruptibly();
         } catch (Exception exception) {
-            System.err.println("Error while trying to connect to " + this.host + ":" + this.port);
-            exception.printStackTrace();
+            System.err.println("&eError while trying to connect to " + this.host + ":" + this.port+": &e"+ exception.getMessage());
         } finally {
             eventLoopGroup.shutdownGracefully();
         }

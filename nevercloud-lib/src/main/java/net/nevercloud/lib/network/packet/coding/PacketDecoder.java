@@ -25,7 +25,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
             Class<? extends Packet> packetClass = this.packetManager.getPacketInfo(id).getPacketClass();
             try {
-                Packet packet = packetClass.getDeclaredConstructor(Integer.class).newInstance(id);
+                Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
 
                 if(isQuery)
                     this.packetManager.convertToQueryPacket(packet, PacketUtils.readUUID(byteBuf));

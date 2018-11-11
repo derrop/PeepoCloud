@@ -2,6 +2,7 @@ package net.nevercloud.lib.network.packet.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.Setter;
 import net.nevercloud.lib.network.NetworkParticipant;
 import net.nevercloud.lib.network.packet.Packet;
 import net.nevercloud.lib.network.packet.PacketInfo;
@@ -12,6 +13,7 @@ import java.util.function.Consumer;
 public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
     private NetworkParticipant participant;
     private PacketManager packetManager;
+    @Setter
     private ChannelHandler channelHandler;
 
     public MainChannelHandler(PacketManager packetManager, ChannelHandler firstHandler) {

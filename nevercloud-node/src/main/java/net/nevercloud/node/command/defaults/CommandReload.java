@@ -1,4 +1,4 @@
-package net.nevercloud.node.commands.defaults;
+package net.nevercloud.node.command.defaults;
 /*
  * Created by Mc_Ruben on 06.11.2018
  */
