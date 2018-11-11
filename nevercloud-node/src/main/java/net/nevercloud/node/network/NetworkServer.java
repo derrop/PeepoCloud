@@ -103,7 +103,6 @@ public class NetworkServer {
     public void handleAuth(NetworkParticipant networkParticipant, Auth auth) {
         boolean successful = false;
 
-        System.out.println("key: " + auth.getAuthKey().equals(NeverCloudNode.getInstance().getNetworkAuthKey()));
         if (auth.getAuthKey().equals(NeverCloudNode.getInstance().getNetworkAuthKey())) {
             switch (auth.getType()) {
                 case NODE:{
@@ -161,7 +160,6 @@ public class NetworkServer {
             }
         }
 
-        System.out.println(successful);
         if (successful) {
             ((MainChannelHandler) networkParticipant.getChannel().pipeline().get("authHandler")).setChannelHandler(this.defaultHandler);
         } else {
