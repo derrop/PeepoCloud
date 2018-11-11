@@ -26,6 +26,9 @@ import net.nevercloud.lib.network.packet.handler.ChannelHandler;
 import net.nevercloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.nevercloud.lib.network.packet.handler.MainChannelHandler;
 import net.nevercloud.node.NeverCloudNode;
+import net.nevercloud.node.api.events.network.bungeecord.BungeeConnectEvent;
+import net.nevercloud.node.api.events.network.minecraftserver.ServerConnectEvent;
+import net.nevercloud.node.api.events.network.node.NodeConnectEvent;
 import net.nevercloud.node.network.packet.serverside.auth.PacketInAuth;
 import net.nevercloud.node.network.participants.*;
 
@@ -115,6 +118,8 @@ public class NetworkServer implements Runnable {
 
                     NeverCloudNode.getInstance().tryConnectToNode(networkParticipant.getAddress());
                     successful = true;
+
+                    NeverCloudNode.getInstance().getEventManager().callEvent(new NodeConnectEvent((NodeParticipant) networkParticipant));
                 }
                 break;
 
@@ -134,6 +139,7 @@ public class NetworkServer implements Runnable {
                     parent.getStartingServers().remove(auth.getComponentName());
                     parent.getServers().put(auth.getComponentName(), (MinecraftServerParticipant) networkParticipant);
                     successful = true;
+                    NeverCloudNode.getInstance().getEventManager().callEvent(new ServerConnectEvent((MinecraftServerParticipant) networkParticipant));
 
                 }
                 break;
@@ -154,6 +160,7 @@ public class NetworkServer implements Runnable {
                     parent.getStartingProxies().remove(auth.getComponentName());
                     parent.getProxies().put(auth.getComponentName(), (BungeeCordParticipant) networkParticipant);
                     successful = true;
+                    NeverCloudNode.getInstance().getEventManager().callEvent(new BungeeConnectEvent((BungeeCordParticipant) networkParticipant));
 
                 }
                 break;

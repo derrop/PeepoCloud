@@ -24,10 +24,12 @@ import net.nevercloud.node.command.CommandManager;
 import net.nevercloud.node.command.defaults.*;
 import net.nevercloud.node.database.DatabaseLoader;
 import net.nevercloud.node.database.DatabaseManager;
+import net.nevercloud.node.events.EventManager;
 import net.nevercloud.node.languagesystem.LanguagesManager;
 import net.nevercloud.node.logging.ColoredLogger;
 import net.nevercloud.node.logging.ConsoleColor;
 import net.nevercloud.node.network.NetworkServer;
+import net.nevercloud.node.statistics.StatisticsManager;
 import net.nevercloud.node.updater.AutoUpdaterManager;
 
 import java.io.*;
@@ -77,6 +79,10 @@ public class NeverCloudNode {
 
     private String networkName;
 
+    private EventManager eventManager;
+
+    private StatisticsManager statisticsManager = new StatisticsManager();
+
     private boolean running = true;
 
     NeverCloudNode() throws IOException {
@@ -88,6 +94,10 @@ public class NeverCloudNode {
 
         this.loadAuthKey();
         this.loadNetworkConfig();
+
+        this.eventManager = new EventManager();
+
+        this.eventManager.registerListener(this.statisticsManager);
 
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
 
@@ -243,19 +253,20 @@ public class NeverCloudNode {
     public void reload() {
         this.reloadModules();
         this.reloadConfigs();
-
-        this.loadAuthKey();
-        this.loadNetworkConfig();
     }
 
     public void reloadConfigs() {
-
+        this.loadAuthKey();
+        this.loadNetworkConfig();
     }
 
     public void reloadModules() {
         this.nodeAddonManager.disableAndUnloadAddons();
         this.commandManager.getCommands().clear();
+        this.eventManager.unregisterAll();
         this.initCommands(this.commandManager);
+        this.eventManager.registerListener(this.statisticsManager);
+        this.statisticsManager.clearListeners();
         try {
             this.nodeAddonManager.loadAddons("nodeAddons");
         } catch (IOException e) {
