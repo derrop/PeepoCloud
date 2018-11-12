@@ -179,7 +179,7 @@ public class NeverCloudNode {
             configurable.saveAsFile(path);
         }
 
-        this.networkName = configurable.getString("componentName");
+        this.networkName = configurable.getString("nodeName");
 
         Collection<NetworkAddress> nodes = (Collection<NetworkAddress>) configurable.get("nodes");
         NetworkAddress host = (NetworkAddress) configurable.get("host");
