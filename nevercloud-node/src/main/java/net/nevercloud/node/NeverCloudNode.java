@@ -9,7 +9,8 @@ import lombok.Getter;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
-import net.nevercloud.lib.json.SimpleJsonObject;
+import net.nevercloud.lib.conf.json.SimpleJsonObject;
+import net.nevercloud.lib.conf.yaml.YamlConfigurable;
 import net.nevercloud.lib.network.NetworkClient;
 import net.nevercloud.lib.network.auth.Auth;
 import net.nevercloud.lib.network.auth.NetworkComponentType;
@@ -167,35 +168,21 @@ public class NeverCloudNode {
 
     private void loadNetworkConfig() {
         Path path = Paths.get("networking.yml");
-        Configuration configuration = null;
+        YamlConfigurable configurable = null;
         if (Files.exists(path)) {
-            try (InputStream inputStream = Files.newInputStream(path)) {
-                configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(inputStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            configurable = YamlConfigurable.load(path);
         } else {
-            configuration = new Configuration();
-            configuration.set("nodes", Arrays.asList(new NetworkAddress(getLocalAddress(), 0)));
-            configuration.set("host", new NetworkAddress(getLocalAddress(), 2580));
-            configuration.set("componentName", "Node-1");
-            try (OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW);
-                 Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
-                ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, writer);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            configurable = new YamlConfigurable()
+                    .append("nodes", Arrays.asList(new NetworkAddress(getLocalAddress(), 0)))
+                    .append("host", new NetworkAddress(getLocalAddress(), 2580))
+                    .append("nodeName", "Node-1");
+            configurable.saveAsFile(path);
         }
 
-        if (configuration == null) {
-            System.err.println("&cThere was an error while loading the &enetworking.yml &cconfig");
-            return;
-        }
+        this.networkName = configurable.getString("componentName");
 
-        this.networkName = configuration.getString("componentName");
-
-        Collection<NetworkAddress> nodes = (Collection<NetworkAddress>) configuration.get("nodes");
-        NetworkAddress host = (NetworkAddress) configuration.get("host");
+        Collection<NetworkAddress> nodes = (Collection<NetworkAddress>) configurable.get("nodes");
+        NetworkAddress host = (NetworkAddress) configurable.get("host");
         if (this.networkServer == null) {
             this.networkServer = new NetworkServer(host.getHost().equals("*") ? new InetSocketAddress(host.getPort())
                     : new InetSocketAddress(host.getHost(), host.getPort()), this.networkServerPacketManager);

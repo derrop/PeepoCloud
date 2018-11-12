@@ -1,10 +1,11 @@
-package net.nevercloud.lib.json;
+package net.nevercloud.lib.conf.json;
 /*
  * Created by Mc_Ruben on 05.11.2018
  */
 
 import com.google.common.base.Preconditions;
 import com.google.gson.*;
+import net.nevercloud.lib.conf.IConfigurable;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,7 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-public class SimpleJsonObject {
+public class SimpleJsonObject implements IConfigurable<SimpleJsonObject> {
 
     public static final JsonParser PARSER = new JsonParser();
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -168,10 +169,6 @@ public class SimpleJsonObject {
             e.printStackTrace();
         }
         return new SimpleJsonObject();
-    }
-
-    public void saveAsFile(String path) {
-        this.saveAsFile(Paths.get(path));
     }
 
     public String toJson() {

@@ -6,7 +6,7 @@ package net.nevercloud.node.addon.defaults;
 import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
 import net.md_5.bungee.http.HttpClient;
-import net.nevercloud.lib.json.SimpleJsonObject;
+import net.nevercloud.lib.conf.json.SimpleJsonObject;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.addon.node.NodeAddon;

@@ -4,7 +4,7 @@ package net.nevercloud.node.statistics;
  */
 
 import lombok.Getter;
-import net.nevercloud.lib.json.SimpleJsonObject;
+import net.nevercloud.lib.conf.json.SimpleJsonObject;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.api.events.network.bungeecord.BungeeStartEvent;
 import net.nevercloud.node.api.events.network.minecraftserver.ServerStartEvent;

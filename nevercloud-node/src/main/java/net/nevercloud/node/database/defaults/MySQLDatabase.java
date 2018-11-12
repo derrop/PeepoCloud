@@ -4,7 +4,7 @@ package net.nevercloud.node.database.defaults;
  */
 
 import lombok.*;
-import net.nevercloud.lib.json.SimpleJsonObject;
+import net.nevercloud.lib.conf.json.SimpleJsonObject;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.database.Database;
 

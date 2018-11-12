@@ -3,7 +3,7 @@ package net.nevercloud.lib.network.auth;
  * Created by Mc_Ruben on 11.11.2018
  */
 
-import net.nevercloud.lib.json.SimpleJsonObject;
+import net.nevercloud.lib.conf.json.SimpleJsonObject;
 import net.nevercloud.lib.network.packet.JsonPacket;
 
 public class PacketOutAuth extends JsonPacket {
