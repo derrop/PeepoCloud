@@ -4,8 +4,8 @@ package net.nevercloud.node.api.events.player;
  */
 
 import lombok.*;
-import net.nevercloud.node.events.Cancellable;
-import net.nevercloud.node.events.Event;
+import net.nevercloud.node.api.events.internal.Cancellable;
+import net.nevercloud.node.api.events.internal.Event;
 
 @Getter
 @AllArgsConstructor

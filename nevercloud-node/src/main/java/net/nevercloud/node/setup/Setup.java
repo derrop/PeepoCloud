@@ -3,7 +3,7 @@ package net.nevercloud.node.setup;
  * Created by Mc_Ruben on 12.11.2018
  */
 
-import net.nevercloud.lib.conf.IConfigurable;
+import net.nevercloud.lib.config.Configurable;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.logging.ColoredLogger;
@@ -13,14 +13,14 @@ import java.util.function.Consumer;
 public class Setup {
 
     private ColoredLogger logger;
-    private IConfigurable configurable;
+    private Configurable configurable;
 
-    private Setup(IConfigurable configurable, ColoredLogger logger) {
+    private Setup(Configurable configurable, ColoredLogger logger) {
         this.logger = logger;
         this.configurable = configurable;
     }
 
-    public static void startSetup(IConfigurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
+    public static void startSetup(Configurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
         NeverCloudNode.getInstance().getExecutorService().execute(() -> {
             consumer.accept(new Setup(configurable, logger));
         });
@@ -59,7 +59,7 @@ public class Setup {
         return this;
     }
 
-    public IConfigurable getData() {
+    public Configurable getData() {
         return this.configurable;
     }
 

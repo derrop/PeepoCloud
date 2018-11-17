@@ -4,7 +4,7 @@ package net.nevercloud.node.api.events.network.bungeecord;
  */
 
 import lombok.*;
-import net.nevercloud.node.events.Event;
+import net.nevercloud.node.api.events.internal.Event;
 import net.nevercloud.node.network.participants.BungeeCordParticipant;
 
 @Getter

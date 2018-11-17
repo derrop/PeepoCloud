@@ -5,8 +5,8 @@ package net.nevercloud.node.api.events.network.minecraftserver;
 
 import lombok.*;
 import net.nevercloud.lib.server.MinecraftServerInfo;
-import net.nevercloud.node.events.Cancellable;
-import net.nevercloud.node.events.Event;
+import net.nevercloud.node.api.events.internal.Cancellable;
+import net.nevercloud.node.api.events.internal.Event;
 
 @Getter
 @RequiredArgsConstructor

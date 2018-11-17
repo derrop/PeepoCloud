@@ -1,10 +1,9 @@
-package net.nevercloud.node.events;
+package net.nevercloud.node.api.events.internal;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */
 
 import com.google.common.base.Preconditions;
-import net.nevercloud.node.addon.Addon;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

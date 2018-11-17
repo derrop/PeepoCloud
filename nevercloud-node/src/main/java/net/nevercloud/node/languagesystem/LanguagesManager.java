@@ -7,7 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.*;
 import net.md_5.bungee.http.HttpClient;
-import net.nevercloud.lib.conf.json.SimpleJsonObject;
+import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 

@@ -1,4 +1,4 @@
-package net.nevercloud.lib.conf;
+package net.nevercloud.lib.config;
 /*
  * Created by Mc_Ruben on 12.11.2018
  */
@@ -9,7 +9,7 @@ import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public interface IConfigurable<V extends IConfigurable> {
+public interface Configurable<V extends Configurable> {
     V append(String key, Object value);
 
     V append(String key, String value);
