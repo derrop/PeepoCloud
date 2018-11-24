@@ -9,24 +9,6 @@ import net.nevercloud.lib.network.packet.handler.ChannelHandlerAdapter;
 
 public class ServerAuthChannelHandler extends ChannelHandlerAdapter {
 
-    private NetworkServer networkServer;
-    private NetworkParticipant networkParticipant;
-
-    @Override
-    public void connected(NetworkParticipant networkParticipant) {
-
-    }
-
-    @Override
-    public void disconnected(NetworkParticipant networkParticipant) {
-
-    }
-
-    @Override
-    public void exception(NetworkParticipant networkParticipant, Throwable cause) {
-
-    }
-
     @Override
     public boolean packet(NetworkParticipant networkParticipant, Packet packet) {
         return packet.getId() != -1;

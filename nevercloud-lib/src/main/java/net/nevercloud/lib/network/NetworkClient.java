@@ -28,7 +28,7 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
     private Auth auth;
 
     public NetworkClient(InetSocketAddress address, PacketManager packetManager, ChannelHandler firstHandler, Auth auth) {
-        super(null, -1);
+        super(auth.getComponentName(), null, -1);
         this.address = address;
         this.packetManager = packetManager;
         this.firstHandler = firstHandler;

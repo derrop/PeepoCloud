@@ -8,8 +8,11 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import net.nevercloud.lib.network.NetworkParticipant;
 import net.nevercloud.lib.network.auth.Auth;
+import net.nevercloud.lib.network.packet.Packet;
 import net.nevercloud.lib.server.BungeeCordProxyInfo;
 import net.nevercloud.lib.server.MinecraftServerInfo;
+import net.nevercloud.node.network.packet.serverside.server.PacketSOutStartBungee;
+import net.nevercloud.node.network.packet.serverside.server.PacketSOutStartServer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +21,7 @@ import java.util.Map;
 public class NodeParticipant extends NetworkParticipant {
 
     public NodeParticipant(Channel channel, Auth auth) {
-        super(channel);
+        super(auth.getComponentName(), channel);
         this.auth = auth;
     }
 
@@ -36,11 +39,13 @@ public class NodeParticipant extends NetworkParticipant {
     public void startMinecraftServer(MinecraftServerInfo serverInfo) {
         Preconditions.checkArgument(serverInfo.getParentComponentName().equals(this.auth.getComponentName()), "serverInfo parent componentName is not equal with the name of the node to start on");
         this.waitingServers.put(serverInfo.getComponentName(), serverInfo);
+        this.sendPacket(new PacketSOutStartServer(serverInfo));
     }
 
     public void startBungeeCordProxy(BungeeCordProxyInfo proxyInfo) {
         Preconditions.checkArgument(proxyInfo.getParentComponentName().equals(this.auth.getComponentName()), "proxyInfo parent componentName is not equal with the name of the node to start on");
         this.waitingProxies.put(proxyInfo.getComponentName(), proxyInfo);
+        this.sendPacket(new PacketSOutStartBungee(proxyInfo));
     }
 
     public void closeConnection() {
@@ -53,5 +58,13 @@ public class NodeParticipant extends NetworkParticipant {
         this.startingServers.clear();
         this.startingProxies.clear();
         this.getChannel().close();
+    }
+
+    public void sendBungees(Packet packet) {
+        this.proxies.values().forEach(bungeeCordParticipant -> bungeeCordParticipant.sendPacket(packet));
+    }
+
+    public void sendMinecraftServers(Packet packet) {
+        this.servers.values().forEach(minecraftServerParticipant -> minecraftServerParticipant.sendPacket(packet));
     }
 }

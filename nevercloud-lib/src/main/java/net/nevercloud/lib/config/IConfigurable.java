@@ -9,7 +9,7 @@ import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public interface Configurable<V extends Configurable> {
+public interface IConfigurable<V extends IConfigurable> {
     V append(String key, Object value);
 
     V append(String key, String value);

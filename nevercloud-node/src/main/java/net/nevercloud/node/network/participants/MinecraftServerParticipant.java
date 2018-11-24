@@ -7,16 +7,19 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import net.nevercloud.lib.network.NetworkParticipant;
 import net.nevercloud.lib.network.auth.Auth;
+import net.nevercloud.lib.server.MinecraftServerInfo;
 
 @Getter
 public class MinecraftServerParticipant extends NetworkParticipant {
     private Auth auth;
     private NodeParticipant parent;
+    private MinecraftServerInfo serverInfo;
 
     public MinecraftServerParticipant(Channel channel, Auth auth, NodeParticipant parent) {
-        super(channel);
+        super(auth.getComponentName(), channel);
         this.auth = auth;
         this.parent = parent;
+        this.serverInfo = auth.getExtraData().getObject("serverInfo", MinecraftServerInfo.class);
     }
 
 

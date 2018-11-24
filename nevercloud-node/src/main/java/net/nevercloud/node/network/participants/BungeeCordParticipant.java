@@ -7,16 +7,19 @@ import io.netty.channel.Channel;
 import lombok.Getter;
 import net.nevercloud.lib.network.NetworkParticipant;
 import net.nevercloud.lib.network.auth.Auth;
+import net.nevercloud.lib.server.BungeeCordProxyInfo;
 
 @Getter
 public class BungeeCordParticipant extends NetworkParticipant {
     private Auth auth;
     private NodeParticipant parent;
+    private BungeeCordProxyInfo proxyInfo;
 
     public BungeeCordParticipant(Channel channel, Auth auth, NodeParticipant parent) {
-        super(channel);
+        super(auth.getComponentName(), channel);
         this.auth = auth;
         this.parent = parent;
+        this.proxyInfo = auth.getExtraData().getObject("proxyInfo", BungeeCordProxyInfo.class);
     }
 
 

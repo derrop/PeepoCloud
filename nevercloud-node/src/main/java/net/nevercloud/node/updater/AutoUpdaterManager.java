@@ -8,6 +8,8 @@ import io.netty.util.internal.ThreadLocalRandom;
 import net.md_5.bungee.http.HttpClient;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.utility.SystemUtils;
+import net.nevercloud.node.NeverCloudNode;
+import net.nevercloud.node.utility.FileDownloading;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,9 +42,15 @@ public class AutoUpdaterManager {
     public void update(Consumer<Boolean> consumer) {
         if (PlatformDependent.isWindows()) {
             Path path = Paths.get(SystemUtils.getPathOfInternalJarFile().replaceFirst(".jar", "") + "-update-" + ThreadLocalRandom.current().nextLong(Long.MAX_VALUE) + ".jar");
-            consumer.accept(HttpClient.downloadFile(SystemUtils.CENTRAL_SERVER_URL + "updatenode", path));
+            consumer.accept(FileDownloading.downloadFileWithProgressBar(NeverCloudNode.getInstance().getLogger(), SystemUtils.CENTRAL_SERVER_URL + "updatenode", path,
+                    () -> {
+                    }, () -> {
+                    }));
         } else {
-            consumer.accept(HttpClient.downloadFile(SystemUtils.CENTRAL_SERVER_URL + "updatenode", Paths.get(SystemUtils.getPathOfInternalJarFile())));
+            consumer.accept(FileDownloading.downloadFileWithProgressBar(NeverCloudNode.getInstance().getLogger(), SystemUtils.CENTRAL_SERVER_URL + "updatenode", Paths.get(SystemUtils.getPathOfInternalJarFile()),
+                    () -> {
+                    }, () -> {
+                    }));
         }
 
     }

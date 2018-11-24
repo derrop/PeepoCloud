@@ -4,6 +4,7 @@ package net.nevercloud.lib.server;
  */
 
 import lombok.*;
+import net.nevercloud.lib.utility.SystemUtils;
 
 import java.util.Map;
 import java.util.UUID;
@@ -15,9 +16,16 @@ import java.util.UUID;
 public class BungeeCordProxyInfo {
 
     private String componentName;
+    private String groupName;
     private int componentId;
     private String parentComponentName;
 
     private Map<UUID, String> players;
+
+    private Template template;
+
+    public BungeeGroup getGroup() {
+        return SystemUtils.getApi().getBungeeGroup(this.groupName);
+    }
 
 }

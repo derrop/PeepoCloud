@@ -5,6 +5,7 @@ package net.nevercloud.lib.network.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.nevercloud.lib.config.json.SimpleJsonObject;
 
 @Getter
 @AllArgsConstructor
@@ -13,4 +14,5 @@ public class Auth {
     private String componentName;
     private NetworkComponentType type;
     private String parentComponentName;
+    private SimpleJsonObject extraData;
 }

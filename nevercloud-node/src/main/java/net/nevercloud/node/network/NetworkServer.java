@@ -90,6 +90,10 @@ public class NetworkServer implements Runnable {
         return this.coreNode == null;
     }
 
+    public Map<String, NodeParticipant> getConnectedNodes() {
+        return connectedNodes;
+    }
+
     public NodeParticipant getConnectedNode(String id) {
         return this.connectedNodes.get(id);
     }
@@ -117,6 +121,7 @@ public class NetworkServer implements Runnable {
                     this.connectedNodes.put(auth.getComponentName(), (NodeParticipant) networkParticipant);
 
                     NeverCloudNode.getInstance().tryConnectToNode(networkParticipant.getAddress());
+                    this.coreNode = (NodeParticipant) networkParticipant;
                     successful = true;
 
                     NeverCloudNode.getInstance().getEventManager().callEvent(new NodeConnectEvent((NodeParticipant) networkParticipant));

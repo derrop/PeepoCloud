@@ -3,7 +3,7 @@ package net.nevercloud.node.setup;
  * Created by Mc_Ruben on 12.11.2018
  */
 
-import net.nevercloud.lib.config.Configurable;
+import net.nevercloud.lib.config.IConfigurable;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.logging.ColoredLogger;
@@ -13,53 +13,87 @@ import java.util.function.Consumer;
 public class Setup {
 
     private ColoredLogger logger;
-    private Configurable configurable;
+    private IConfigurable configurable;
+    private boolean cancellable = false;
+    private boolean cancelled = false;
 
-    private Setup(Configurable configurable, ColoredLogger logger) {
+    public Setup(IConfigurable configurable, ColoredLogger logger) {
         this.logger = logger;
         this.configurable = configurable;
     }
 
-    public static void startSetup(Configurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
+    public static void startSetupAsync(IConfigurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
         NeverCloudNode.getInstance().getExecutorService().execute(() -> {
             consumer.accept(new Setup(configurable, logger));
         });
     }
 
-    public Setup request(String name, String invalidInputMessage, SetupAcceptable setupAcceptable) {
-        Object val;
+    public static void startSetupSync(IConfigurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
+        consumer.accept(new Setup(configurable, logger));
+    }
+
+    public Setup setCancellable(boolean cancellable) {
+        this.cancellable = cancellable;
+        return this;
+    }
+
+    public Setup request(String name, String requestMessage, String invalidInputMessage, SetupAcceptable setupAcceptable) {
+        if (this.cancelled)
+            return this;
+        System.out.println(requestMessage);
+        String response;
+        Object val = null;
         if (setupAcceptable instanceof BooleanSetupAcceptable) {
-            val = Boolean.parseBoolean(
-                    this.logger.readLineUntil(
-                            s ->
-                                    (s.equalsIgnoreCase("true") ||
-                                            s.equalsIgnoreCase("false")) &&
-                                            ((BooleanSetupAcceptable) setupAcceptable).onPrint(Boolean.parseBoolean(s)),
-                            invalidInputMessage
-                    )
+            response = this.logger.readLineUntil(
+                    s ->
+                            (s.equalsIgnoreCase("true") ||
+                                    s.equalsIgnoreCase("false")) &&
+                                    ((BooleanSetupAcceptable) setupAcceptable).onPrint(Boolean.parseBoolean(s)),
+                    invalidInputMessage,
+                    cancellable ? "cancel" : null
             );
+            if (response != null) {
+                val = Boolean.parseBoolean(
+                        response
+                );
+            }
         } else if (setupAcceptable instanceof IntegerSetupAcceptable) {
-            val = Integer.parseInt(
-                    this.logger.readLineUntil(
-                            s ->
-                                    SystemUtils.isInteger(s) &&
-                                            ((IntegerSetupAcceptable) setupAcceptable).onPrint(Integer.parseInt(s))
-                            , invalidInputMessage
-                    )
+            response = this.logger.readLineUntil(
+                    s ->
+                            SystemUtils.isInteger(s) &&
+                                    ((IntegerSetupAcceptable) setupAcceptable).onPrint(Integer.parseInt(s)),
+                    invalidInputMessage,
+                    cancellable ? "cancel" : null
             );
+            if (response != null) {
+                val = Integer.parseInt(
+                        response
+                );
+            }
         } else if (setupAcceptable instanceof StringSetupAcceptable) {
-            val = this.logger.readLineUntil(
+            response = this.logger.readLineUntil(
                     ((StringSetupAcceptable) setupAcceptable)::onPrint,
-                    invalidInputMessage
+                    invalidInputMessage,
+                    cancellable ? "cancel" : null
             );
+            if (response != null) {
+                val = response;
+            }
         } else {
             throw new IllegalArgumentException("setupAcceptable must be an instance of BooleanSetupAcceptable, IntegerSetupAcceptable or StringSetupAcceptable");
         }
+        if (response == null && this.cancellable) {
+            System.out.println("&cThe setup was cancelled");
+            this.cancelled = true;
+            return this;
+        }
+        if (val == null)
+            return this;
         this.configurable.append(name, val);
         return this;
     }
 
-    public Configurable getData() {
+    public IConfigurable getData() {
         return this.configurable;
     }
 

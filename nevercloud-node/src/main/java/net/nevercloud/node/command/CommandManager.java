@@ -15,20 +15,26 @@ public class CommandManager {
     private final CommandSender console = new ConsoleCommandSender();
 
     private Map<String, Command> commands = new HashMap<>();
+    private Thread commandReaderThread;
 
     public CommandManager(ColoredLogger logger) {
         logger.getConsoleReader().addCompleter(new CommandCompleter(this));
-        new Thread("ConsoleCommand Reader") {
+        this.commandReaderThread = new Thread("ConsoleCommand Reader") {
             @Override
             public void run() {
                 String line;
                 while (!isInterrupted() && NeverCloudNode.getInstance().isRunning() && (line = logger.readLine()) != null) {
-                    if (!dispatchCommand(console, line)) {
+                    if (!"".equals(line) && !dispatchCommand(console, line)) {
                         System.out.println("Command not found, type &ehelp &rfor a list of all commands");
                     }
                 }
             }
-        }.start();
+        };
+        this.commandReaderThread.start();
+    }
+
+    public void shutdown() {
+        this.commandReaderThread.interrupt();
     }
 
     /**

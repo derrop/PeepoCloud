@@ -3,8 +3,11 @@ package net.nevercloud.node.logging;
  * Created by Mc_Ruben on 04.11.2018
  */
 
+import com.google.common.base.Preconditions;
 import jline.console.ConsoleReader;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.nevercloud.node.logging.animated.AbstractConsoleAnimation;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -15,6 +18,8 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.*;
 
@@ -23,6 +28,9 @@ public class ColoredLogger extends Logger {
     private ConsoleReader consoleReader;
 
     private final String prompt = ConsoleColor.RED + System.getProperty("user.name") + ConsoleColor.RESET + "@" + ConsoleColor.WHITE + "NeverCloudNode > " + ConsoleColor.YELLOW;
+    @Getter
+    private AbstractConsoleAnimation runningAnimation;
+    private Consumer<String> lineAcceptor;
 
     public ColoredLogger(ConsoleReader consoleReader) throws IOException {
         super("NeverCloud Logger", null);
@@ -48,6 +56,22 @@ public class ColoredLogger extends Logger {
     }
 
     public String readLine() {
+        String line = this.readLine0();
+        if (this.lineAcceptor != null) {
+            this.lineAcceptor.accept(line);
+            return "";
+        }
+        return line;
+    }
+
+    private String readLine0() {
+        while (this.runningAnimation != null) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         String line = null;
         try {
             line = this.consoleReader.readLine(this.prompt);
@@ -58,12 +82,33 @@ public class ColoredLogger extends Logger {
         return line;
     }
 
-    public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage) {
+    private String readLine1() {
+        AtomicReference<String> line = new AtomicReference<>();
+        this.lineAcceptor = line::set;
+        while (line.get() == null) {
+            try {
+                Thread.sleep(0, 500000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        this.lineAcceptor = null;
+        return line.get();
+    }
+
+    public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage, String nullOn) {
         String line;
-        while (!function.apply(line = this.readLine())) {
+        while (!function.apply(line = this.readLine1()) || (line.equalsIgnoreCase(nullOn))) {
+            if (line.equalsIgnoreCase(nullOn)) {
+                return null;
+            }
             System.out.println(invalidInputMessage);
         }
         return line;
+    }
+
+    public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage) {
+        return this.readLineUntil(function, invalidInputMessage, null);
     }
 
     public ConsoleReader getConsoleReader() {
@@ -76,6 +121,45 @@ public class ColoredLogger extends Logger {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void print(String line) {
+        line = ConsoleColor.toColouredString(line);
+
+        try {
+            consoleReader.print(Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + ConsoleReader.RESET_LINE + line + Ansi.ansi().reset().toString());
+            consoleReader.drawLine();
+            consoleReader.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void printRaw(String line) {
+        line = ConsoleColor.toColouredString(line);
+
+        try {
+            consoleReader.print(line + Ansi.ansi().reset().toString());
+            consoleReader.drawLine();
+            consoleReader.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isAnimationRunning() {
+        return runningAnimation != null;
+    }
+
+    public void startAnimation(AbstractConsoleAnimation animation) {
+        Preconditions.checkArgument(this.runningAnimation == null, "there is already another animation running in this logger");
+        this.runningAnimation = animation;
+        Thread thread = new Thread(() -> {
+            animation.start(this);
+            this.runningAnimation = null;
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private class LogFileFormatter extends Formatter {
@@ -135,18 +219,6 @@ public class ColoredLogger extends Logger {
         public void publish(LogRecord record) {
             if (isLoggable(record)) {
                 print(getFormatter().format(record));
-            }
-        }
-
-        public void print(String line) {
-            line = ConsoleColor.toColouredString(line);
-
-            try {
-                consoleReader.print(Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + ConsoleReader.RESET_LINE + line + Ansi.ansi().reset().toString());
-                consoleReader.drawLine();
-                consoleReader.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 

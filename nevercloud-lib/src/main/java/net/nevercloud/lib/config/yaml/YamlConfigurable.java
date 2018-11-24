@@ -6,7 +6,7 @@ package net.nevercloud.lib.config.yaml;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
-import net.nevercloud.lib.config.Configurable;
+import net.nevercloud.lib.config.IConfigurable;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -18,13 +18,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-public class YamlConfigurable implements Configurable<YamlConfigurable> {
+public class YamlConfigurable implements IConfigurable<YamlConfigurable> {
 
     private static ConfigurationProvider configurationProvider = ConfigurationProvider.getProvider(YamlConfiguration.class);
 
     private Configuration configuration;
     
-    public YamlConfigurable() { }
+    public YamlConfigurable() {
+        this.configuration = new Configuration();
+    }
 
     public YamlConfigurable(Reader reader) {
         this.configuration = configurationProvider.load(reader);
