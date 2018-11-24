@@ -30,6 +30,11 @@ public class BungeeProcess implements ICloudProcess {
     }
 
     @Override
+    public int getMemory() {
+        return this.proxyInfo.getMemory();
+    }
+
+    @Override
     public void startup() {
 
     }

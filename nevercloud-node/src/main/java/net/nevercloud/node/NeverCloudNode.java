@@ -7,7 +7,7 @@ import com.google.common.base.Preconditions;
 import io.netty.util.internal.PlatformDependent;
 import jline.console.ConsoleReader;
 import lombok.Getter;
-import net.nevercloud.lib.INeverCloudAPI;
+import net.nevercloud.lib.NeverCloudAPI;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.config.yaml.YamlConfigurable;
 import net.nevercloud.lib.network.auth.Auth;
@@ -62,7 +62,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Getter
-public class NeverCloudNode implements INeverCloudAPI {
+public class NeverCloudNode implements NeverCloudAPI {
 
     @Getter
     private static NeverCloudNode instance;

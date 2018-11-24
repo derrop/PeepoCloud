@@ -32,6 +32,11 @@ public class ServerProcess implements ICloudProcess {
     }
 
     @Override
+    public int getMemory() {
+        return this.serverInfo.getMemory();
+    }
+
+    @Override
     public void startup() {
         this.loadTemplate();
         this.loadSpigot();

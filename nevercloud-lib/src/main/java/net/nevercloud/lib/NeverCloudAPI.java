@@ -9,7 +9,7 @@ import net.nevercloud.lib.server.BungeeGroup;
 import net.nevercloud.lib.server.MinecraftGroup;
 import net.nevercloud.lib.server.MinecraftServerInfo;
 
-public interface INeverCloudAPI {
+public interface NeverCloudAPI {
 
     BungeeGroup getBungeeGroup(String name);
 

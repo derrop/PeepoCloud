@@ -20,6 +20,7 @@ public class MinecraftServerInfo {
     private String groupName;
     private int componentId;
     private String parentComponentName;
+    private int memory;
 
     private Map<UUID, String> players;
 

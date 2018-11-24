@@ -5,8 +5,7 @@ package net.nevercloud.lib.utility;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import net.nevercloud.lib.INeverCloudAPI;
-import net.nevercloud.lib.network.packet.FilePacket;
+import net.nevercloud.lib.NeverCloudAPI;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,8 +18,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 public class SystemUtils {
 
@@ -31,9 +28,9 @@ public class SystemUtils {
     private static final char[] values = "abcdefghijklmnopqrstuvwxyzäöüABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890".toCharArray();
 
     @Getter
-    private static INeverCloudAPI api;
+    private static NeverCloudAPI api;
 
-    public static void setApi(INeverCloudAPI api) {
+    public static void setApi(NeverCloudAPI api) {
         Preconditions.checkArgument(SystemUtils.api == null, "api is already initialized");
         SystemUtils.api = api;
     }
