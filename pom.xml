@@ -16,6 +16,10 @@
         <module>nevercloud-addons</module>
     </modules>
 
+    <properties>
+            <cloud.version>1.0</cloud.version>
+    </properties>
+
 
     <dependencies>
         <dependency>
