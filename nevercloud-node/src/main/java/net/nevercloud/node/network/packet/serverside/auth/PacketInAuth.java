@@ -4,7 +4,7 @@ package net.nevercloud.node.network.packet.serverside.auth;
  */
 
 import lombok.AllArgsConstructor;
-import net.nevercloud.lib.conf.json.SimpleJsonObject;
+import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.network.NetworkParticipant;
 import net.nevercloud.lib.network.auth.Auth;
 import net.nevercloud.lib.network.packet.JsonPacket;

@@ -6,7 +6,7 @@ package net.nevercloud.node.updater;
 import io.netty.util.internal.PlatformDependent;
 import io.netty.util.internal.ThreadLocalRandom;
 import net.md_5.bungee.http.HttpClient;
-import net.nevercloud.lib.conf.json.SimpleJsonObject;
+import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.utility.SystemUtils;
 
 import java.nio.file.Path;

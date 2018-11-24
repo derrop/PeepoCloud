@@ -6,7 +6,7 @@ package net.nevercloud.node.database.defaults;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import lombok.*;
-import net.nevercloud.lib.conf.json.SimpleJsonObject;
+import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.database.Database;
 import org.bson.Document;
