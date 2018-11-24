@@ -24,7 +24,7 @@ import java.util.Collection;
 public class CloudConfig {
 
     private final Path networkPath = Paths.get("networking.yml");
-    private final Path mainPath = Paths.get("main.yml");
+    private final Path mainPath = Paths.get("config.yml");
 
     //Network
     private Collection<NetworkAddress> connectableNodes;
