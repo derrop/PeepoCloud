@@ -7,10 +7,7 @@ import com.google.common.base.Preconditions;
 import com.google.gson.*;
 import net.nevercloud.lib.config.IConfigurable;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -149,7 +146,7 @@ public class SimpleJsonObject implements IConfigurable<SimpleJsonObject> {
             }
         }
 
-        try (OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path, StandardOpenOption.CREATE), StandardCharsets.UTF_8)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
             GSON.toJson(this.jsonObject, writer);
         } catch (IOException e) {
             e.printStackTrace();
