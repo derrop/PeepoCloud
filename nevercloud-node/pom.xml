@@ -42,8 +42,8 @@
                     <archive>
                         <manifestEntries>
                             <Main-Class>net.nevercloud.node.NeverCloudBootstrap</Main-Class>
-                            <Version>1.1</Version>
-                            <Implementation-Version>1.1</Implementation-Version>
+                            <Version>${cloud.version}</Version>
+                            <Implementation-Version>${cloud.version}</Implementation-Version>
                         </manifestEntries>
                     </archive>
                 </configuration>
