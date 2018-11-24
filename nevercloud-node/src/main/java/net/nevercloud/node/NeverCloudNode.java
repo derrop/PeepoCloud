@@ -17,6 +17,7 @@ import net.nevercloud.lib.network.packet.PacketInfo;
 import net.nevercloud.lib.network.packet.PacketManager;
 import net.nevercloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.nevercloud.lib.node.NodeInfo;
+import net.nevercloud.lib.server.BungeeCordProxyInfo;
 import net.nevercloud.lib.server.BungeeGroup;
 import net.nevercloud.lib.server.MinecraftGroup;
 import net.nevercloud.lib.server.MinecraftServerInfo;
@@ -44,6 +45,7 @@ import net.nevercloud.node.network.participants.BungeeCordParticipant;
 import net.nevercloud.node.network.participants.MinecraftServerParticipant;
 import net.nevercloud.node.network.participants.NodeParticipant;
 import net.nevercloud.node.server.ServerFilesLoader;
+import net.nevercloud.node.server.processes.ServerQueue;
 import net.nevercloud.node.statistics.StatisticsManager;
 import net.nevercloud.node.updater.AutoUpdaterManager;
 
@@ -92,21 +94,82 @@ public class NeverCloudNode implements NeverCloudAPI {
     private PacketManager networkServerPacketManager = new PacketManager();
     private PacketManager networkClientPacketManager = new PacketManager();
 
-    private Collection<NetworkAddress> connectableNodes;
-
-    private String networkName;
-
     private EventManager eventManager;
 
     private StatisticsManager statisticsManager = new StatisticsManager();
 
     private NodeInfo nodeInfo;
 
+    private ServerQueue serverQueue;
+
+    private CloudConfig cloudConfig;
+
     private Map<String, MinecraftGroup> minecraftGroups;
     private Map<String, BungeeGroup> bungeeGroups;
 
-    private Map<String, MinecraftServerParticipant> serversOnThisNode = new HashMap<>();
-    private Map<String, BungeeCordParticipant> proxiesOnThisNode = new HashMap<>();
+    private Map<String, MinecraftServerParticipant> serversOnThisNode = new HashMap<String, MinecraftServerParticipant>() {
+        @Override
+        public MinecraftServerParticipant put(String key, MinecraftServerParticipant value) {
+            memoryUsedOnThisInstanceByServer += value.getServerInfo().getMemory();
+            return super.put(key, value);
+        }
+
+        @Override
+        public boolean remove(Object key, Object value) {
+            if (value instanceof MinecraftServerParticipant) {
+                memoryUsedOnThisInstanceByServer -= ((MinecraftServerParticipant) value).getServerInfo().getMemory();
+            }
+            return super.remove(key, value);
+        }
+
+        @Override
+        public MinecraftServerParticipant remove(Object key) {
+            MinecraftServerParticipant participant = this.get(key);
+            if (participant != null) {
+                memoryUsedOnThisInstanceByServer -= participant.getServerInfo().getMemory();
+            }
+            return super.remove(key);
+        }
+
+        @Override
+        public void clear() {
+            memoryUsedOnThisInstanceByServer = 0;
+            super.clear();
+        }
+    };
+    private Map<String, BungeeCordParticipant> proxiesOnThisNode = new HashMap<String, BungeeCordParticipant>() {
+        @Override
+        public BungeeCordParticipant put(String key, BungeeCordParticipant value) {
+            memoryUsedOnThisInstanceByBungee += value.getProxyInfo().getMemory();
+            return super.put(key, value);
+        }
+
+        @Override
+        public boolean remove(Object key, Object value) {
+            if (value instanceof BungeeCordParticipant) {
+                memoryUsedOnThisInstanceByBungee -= ((BungeeCordParticipant) value).getProxyInfo().getMemory();
+            }
+            return super.remove(key, value);
+        }
+
+        @Override
+        public BungeeCordParticipant remove(Object key) {
+            BungeeCordParticipant participant = this.get(key);
+            if (participant != null) {
+                memoryUsedOnThisInstanceByBungee -= participant.getProxyInfo().getMemory();
+            }
+            return super.remove(key);
+        }
+
+        @Override
+        public void clear() {
+            memoryUsedOnThisInstanceByBungee = 0;
+            super.clear();
+        }
+    };
+
+    private int memoryUsedOnThisInstanceByBungee = 0;
+    private int memoryUsedOnThisInstanceByServer = 0;
 
     private boolean running = true;
 
@@ -154,6 +217,8 @@ public class NeverCloudNode implements NeverCloudAPI {
 
         ServerFilesLoader.tryInstallSpigot();
         ServerFilesLoader.tryInstallBungee();
+
+        this.serverQueue = ServerQueue.start();
 
         this.initCommands(this.commandManager);
         this.initPacketHandlers();
@@ -216,44 +281,35 @@ public class NeverCloudNode implements NeverCloudAPI {
     }
 
     private void loadNetworkConfig() {
-        Path path = Paths.get("networking.yml");
-        YamlConfigurable configurable = null;
-        if (Files.exists(path)) {
-            configurable = YamlConfigurable.load(path);
-        } else {
-            configurable = new YamlConfigurable()
-                    .append("nodes", Arrays.asList(new NetworkAddress(getLocalAddress(), 0)))
-                    .append("host", new NetworkAddress(getLocalAddress(), 2580))
-                    .append("nodeName", "Node-1");
-            configurable.saveAsFile(path);
+        Collection<NetworkAddress> oldNodes = this.cloudConfig == null ? null : this.cloudConfig.getConnectableNodes();
+        if (this.cloudConfig == null) {
+            this.cloudConfig = new CloudConfig();
         }
+        this.cloudConfig.load();
+        Collection<NetworkAddress> newNodes = this.cloudConfig.getConnectableNodes();
 
-        this.networkName = configurable.getString("nodeName");
-
-        Collection<NetworkAddress> nodes = (Collection<NetworkAddress>) configurable.get("nodes");
-        NetworkAddress host = (NetworkAddress) configurable.get("host");
         if (this.networkServer == null) {
-            this.networkServer = new NetworkServer(host.getHost().equals("*") ? new InetSocketAddress(host.getPort())
-                    : new InetSocketAddress(host.getHost(), host.getPort()), this.networkServerPacketManager);
+            this.networkServer = new NetworkServer(this.cloudConfig.getHost().getHost().equals("*") ? new InetSocketAddress(this.cloudConfig.getHost().getPort())
+                    : new InetSocketAddress(this.cloudConfig.getHost().getHost(), this.cloudConfig.getHost().getPort()), this.networkServerPacketManager);
             this.networkServer.run();
         }
 
-        if (this.connectableNodes == null || !this.connectableNodes.equals(nodes)) {
-            if (this.connectableNodes == null) {
-                this.connectableNodes = nodes;
-                for (NetworkAddress node : this.connectableNodes) {
+        if (oldNodes == null || !oldNodes.equals(newNodes)) {
+            if (oldNodes == null) {
+                oldNodes = newNodes;
+                for (NetworkAddress node : oldNodes) {
                     this.connectToNode(node);
                 }
             } else {
-                for (NetworkAddress connectableNode : new ArrayList<>(this.connectableNodes)) {
-                    if (!nodes.contains(connectableNode)) {
-                        this.connectableNodes.remove(connectableNode);
+                for (NetworkAddress connectableNode : new ArrayList<>(oldNodes)) {
+                    if (!newNodes.contains(connectableNode)) {
+                        oldNodes.remove(connectableNode);
                         this.networkServer.closeNodeConnection(connectableNode.getHost());
                     }
                 }
-                for (NetworkAddress node : new ArrayList<>(nodes)) {
-                    if (!this.connectableNodes.contains(node)) {
-                        this.connectableNodes.add(node);
+                for (NetworkAddress node : new ArrayList<>(newNodes)) {
+                    if (!oldNodes.contains(node)) {
+                        oldNodes.add(node);
                         this.connectToNode(node);
                     }
                 }
@@ -266,7 +322,7 @@ public class NeverCloudNode implements NeverCloudAPI {
         if (this.connectedNodes.containsKey(host))
             return;
 
-        for (NetworkAddress node : this.connectableNodes) {
+        for (NetworkAddress node : this.cloudConfig.getConnectableNodes()) {
             if (node.getHost().equals(host)) {
                 this.connectToNode(node);
                 break;
@@ -276,7 +332,7 @@ public class NeverCloudNode implements NeverCloudAPI {
 
     private void connectToNode(NetworkAddress node) {
         ClientNode client = new ClientNode(new InetSocketAddress(node.getHost(), node.getPort()), this.networkClientPacketManager, new ChannelHandlerAdapter(),
-                new Auth(this.networkAuthKey, this.networkName, NetworkComponentType.NODE, null, new SimpleJsonObject().append("nodeInfo", this.nodeInfo)),
+                new Auth(this.networkAuthKey, this.cloudConfig.getNodeName(), NetworkComponentType.NODE, null, new SimpleJsonObject().append("nodeInfo", this.nodeInfo)),
                 null);
         this.connectedNodes.put(node.getHost(), client);
         new Thread(client, "Node client @" + node.toString()).start();
@@ -366,6 +422,10 @@ public class NeverCloudNode implements NeverCloudAPI {
         } catch (UnknownHostException e) {
             return "could not detect local address";
         }
+    }
+
+    public int getMemoryUsedOnThisInstance() {
+        return this.memoryUsedOnThisInstanceByBungee + this.memoryUsedOnThisInstanceByServer + this.serverQueue.getMemoryNeededForProcessesInQueue();
     }
 
     public void saveInternalConfigFile() {

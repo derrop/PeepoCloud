@@ -7,9 +7,7 @@ import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 
 import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class ServerQueue implements Runnable {
 
@@ -22,6 +20,22 @@ public class ServerQueue implements Runnable {
         return serverQueue;
     }
 
+    public void queueProcess(ICloudProcess process, boolean priorityHigh) {
+        if (priorityHigh) {
+            this.serverProcesses.offerFirst(process);
+        } else {
+            this.serverProcesses.offerLast(process);
+        }
+    }
+
+    public int getMemoryNeededForProcessesInQueue() {
+        int i = 0;
+        for (ICloudProcess serverProcess : this.serverProcesses) {
+            i += serverProcess.getMemory();
+        }
+        return i;
+    }
+
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
@@ -29,9 +43,7 @@ public class ServerQueue implements Runnable {
 
             try {
                 ICloudProcess process = this.serverProcesses.take();
-                //TODO check free memory
-                boolean memoryAvailable = false;
-                if (!memoryAvailable) {
+                if (process.getMemory() > NeverCloudNode.getInstance().getCloudConfig().getMaxMemory() - NeverCloudNode.getInstance().getMemoryUsedOnThisInstance()) {
                     this.serverProcesses.offerFirst(process);
                     continue;
                 }
