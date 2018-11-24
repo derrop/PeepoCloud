@@ -185,8 +185,7 @@ public class NeverCloudNode implements NeverCloudAPI {
         this.nodeAddonManager = new AddonManager<>();
         this.nodeAddonManager.loadAddons("nodeAddons");
 
-        this.loadAuthKey();
-        this.loadNetworkConfig();
+        this.loadConfigs();
 
         this.eventManager = new EventManager();
 
@@ -262,7 +261,7 @@ public class NeverCloudNode implements NeverCloudAPI {
         this.logger.getConsoleReader().close();
     }
 
-    private void loadAuthKey() {
+    private void loadConfigs() {
         Path path = Paths.get("AUTH_KEY.node");
         if (Files.exists(path)) {
             try {
@@ -278,9 +277,7 @@ public class NeverCloudNode implements NeverCloudAPI {
                 e.printStackTrace();
             }
         }
-    }
 
-    private void loadNetworkConfig() {
         Collection<NetworkAddress> oldNodes = this.cloudConfig == null ? null : this.cloudConfig.getConnectableNodes();
         if (this.cloudConfig == null) {
             this.cloudConfig = new CloudConfig();
@@ -396,8 +393,7 @@ public class NeverCloudNode implements NeverCloudAPI {
     }
 
     public void reloadConfigs() {
-        this.loadAuthKey();
-        this.loadNetworkConfig();
+        this.loadConfigs();
     }
 
     public void reloadModules() {
