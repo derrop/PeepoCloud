@@ -8,11 +8,11 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 public class ServerVersion {
-    private String name;
+    private String version;
     private String url;
 
     @Override
     public String toString() {
-        return name;
+        return version;
     }
 }

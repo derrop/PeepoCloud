@@ -187,8 +187,6 @@ public class NeverCloudNode implements NeverCloudAPI {
 
         this.nodeAddonManager.disableAndUnloadAddons();
 
-        this.installUpdatesWithoutPrintingErrors(this.commandManager.getConsole());
-
         try {
             this.logger.getConsoleReader().print(ConsoleColor.RESET.toString());
             this.logger.getConsoleReader().drawLine();
