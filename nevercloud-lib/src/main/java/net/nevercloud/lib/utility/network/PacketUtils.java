@@ -40,6 +40,21 @@ public class PacketUtils {
         return new UUID(dataInput.readLong(), dataInput.readLong());
     }
 
+    public static void writeBytes(DataOutput dataOutput, byte[] bytes) throws IOException {
+        dataOutput.writeInt(bytes.length);
+        for (byte aByte : bytes) {
+            dataOutput.writeByte(aByte);
+        }
+    }
+
+    public static byte[] readBytes(DataInput dataInput) throws IOException {
+        byte[] bytes = new byte[dataInput.readInt()];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = dataInput.readByte();
+        }
+        return bytes;
+    }
+
     public static void writeVarInt(ByteBuf byteBuf, int value) {
         do {
             byte temp = (byte) (value & 0b01111111);

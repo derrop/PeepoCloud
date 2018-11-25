@@ -43,12 +43,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 if(isQuery)
                     this.packetManager.convertToQueryPacket(packet, PacketUtils.readUUID(byteArrayDataInput));
 
-                byte[] b = new byte[byteArrayDataInput.readInt()];
-                for (int i = 0; i < b.length; i++) {
-                    b[i] = byteArrayDataInput.readByte();
-                }
-                ByteBuf buf = Unpooled.wrappedBuffer(b);
-                packet.read(buf);
+                packet.read(byteArrayDataInput);
                 list.add(packet);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 e.printStackTrace();
