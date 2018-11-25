@@ -30,7 +30,7 @@ public class FileDownloading {
         logger.startAnimation(animation);
 
         int read = 0;
-        byte[] buf = new byte[128];
+        byte[] buf = new byte[16];
         int len;
         while ((len = inputStream.read(buf)) != -1) {
             read += len;

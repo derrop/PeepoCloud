@@ -60,7 +60,7 @@ public class CloudConfig {
             configurable = YamlConfigurable.load(networkPath);
         } else {
             configurable = new YamlConfigurable()
-                    .append("nodes", Arrays.asList(new NetworkAddress(NeverCloudNode.getInstance().getLocalAddress(), 0)))
+                    .append("nodes", Arrays.asList(new NetworkAddress("host", 1234)))
                     .append("host", new NetworkAddress(NeverCloudNode.getInstance().getLocalAddress(), 2580))
                     .append("nodeName", "Node-1");
             configurable.saveAsFile(networkPath);

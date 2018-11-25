@@ -184,20 +184,20 @@ public class NeverCloudNode implements NeverCloudAPI {
 
         this.nodeAddonManager = new AddonManager<>();
 
+        this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
+
+        this.languagesManager = new LanguagesManager();
+
         this.loadConfigs();
 
         this.eventManager = new EventManager();
 
-        this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
-
         this.autoUpdaterManager = new AutoUpdaterManager();
 
-        this.languagesManager = new LanguagesManager();
+        this.commandManager = new CommandManager(this.logger);
 
         this.databaseLoader = new DatabaseLoader("databaseAddons");
         this.databaseManager = this.databaseLoader.loadDatabaseManager(this);
-
-        this.commandManager = new CommandManager(this.logger);
 
         this.installUpdates(this.commandManager.getConsole());
 
@@ -213,13 +213,13 @@ public class NeverCloudNode implements NeverCloudAPI {
             }
         });
 
-        ServerFilesLoader.tryInstallSpigot();
-        ServerFilesLoader.tryInstallBungee();
-
         this.serverQueue = ServerQueue.start();
 
         this.initCommands(this.commandManager);
         this.initPacketHandlers();
+
+        ServerFilesLoader.tryInstallSpigot();
+        ServerFilesLoader.tryInstallBungee();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown0));
 
@@ -295,6 +295,8 @@ public class NeverCloudNode implements NeverCloudAPI {
             if (oldNodes == null) {
                 oldNodes = newNodes;
                 for (NetworkAddress node : oldNodes) {
+                    if (node.getHost() == null || node.getHost().equalsIgnoreCase("host"))
+                        continue;
                     this.connectToNode(node);
                 }
             } else {
@@ -305,6 +307,8 @@ public class NeverCloudNode implements NeverCloudAPI {
                     }
                 }
                 for (NetworkAddress node : new ArrayList<>(newNodes)) {
+                    if (node.getHost() == null || node.getHost().equalsIgnoreCase("host"))
+                        continue;
                     if (!oldNodes.contains(node)) {
                         oldNodes.add(node);
                         this.connectToNode(node);

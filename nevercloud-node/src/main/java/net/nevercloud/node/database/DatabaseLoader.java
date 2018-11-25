@@ -6,11 +6,14 @@ package net.nevercloud.node.database;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import net.nevercloud.lib.config.yaml.YamlConfigurable;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.addon.AddonManager;
 import net.nevercloud.node.database.defaults.ArangoDatabaseManager;
 import net.nevercloud.node.database.defaults.MongoDatabaseManager;
 import net.nevercloud.node.database.defaults.MySQLDatabaseManager;
+import net.nevercloud.node.setup.ArraySetupAcceptable;
+import net.nevercloud.node.setup.Setup;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -62,13 +65,17 @@ public class DatabaseLoader { //TODO implement languagesystem
 
     public DatabaseManager loadDatabaseManager(NeverCloudNode node) {
         if (!node.getInternalConfig().contains("databaseManager")) {
-            System.out.println("Please specify the database that you want to use: MYSQL, ARANGODB, MONGODB");
-            String line = node.getLogger().readLineUntil(s -> s.equalsIgnoreCase("mysql") ||
-                            s.equalsIgnoreCase("arangodb") ||
-                            s.equalsIgnoreCase("mongodb"),
-                    "Invalid input, please choose one of the following and if you want more databases than those, make suggestions or write your own: MYSQL, ARANGODB, MONGODB");
-            node.getInternalConfig().append("databaseManager", line.toLowerCase());
-            node.saveInternalConfigFile();
+            Setup.startSetupSync(new YamlConfigurable(), NeverCloudNode.getInstance().getLogger(),
+                    setup -> {
+                        setup.request(
+                                "db",
+                                "Please specify the database that you want to use: MYSQL, ARANGODB, MONGODB",
+                                "Invalid input, please choose one of the following and if you want more databases than those, make suggestions or write your own: MYSQL, ARANGODB, MONGODB",
+                                new ArraySetupAcceptable<>(new String[]{"mysql", "arangodb", "mongodb"})
+                        );
+                        node.getInternalConfig().append("databaseManager", setup.getData().getString("db").toLowerCase());
+                        node.saveInternalConfigFile();
+                    });
         }
 
         DatabaseManager databaseManager = null;
@@ -119,18 +126,14 @@ public class DatabaseLoader { //TODO implement languagesystem
 
         Path path = Paths.get("database.yml");
         if (Files.exists(path)) {
-            try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(path), "UTF-8")) {
-                Configuration configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(reader);
-                config = new DatabaseConfig(
-                        configuration.getString("host"),
-                        configuration.getInt("port"),
-                        configuration.getString("username"),
-                        configuration.getString("password"),
-                        configuration.getString("database")
-                );
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            YamlConfigurable configurable = YamlConfigurable.load(path);
+            config = new DatabaseConfig(
+                    configurable.getString("host"),
+                    configurable.getInt("port"),
+                    configurable.getString("username"),
+                    configurable.getString("password"),
+                    configurable.getString("database")
+            );
         } else {
             config = new DatabaseConfig(
                     "127.0.0.1",
@@ -140,19 +143,15 @@ public class DatabaseLoader { //TODO implement languagesystem
                     "nevercloud"
             );
 
-            Configuration configuration = new Configuration();
-            configuration.set("host", config.getHost());
-            configuration.set("port", config.getPort());
-            configuration.set("username", config.getUsername());
-            configuration.set("password", config.getPassword());
-            configuration.set("database", config.getDatabase());
+            new YamlConfigurable()
+                    .append("host", config.getHost())
+                    .append("port", config.getPort())
+                    .append("username", config.getUsername())
+                    .append("password", config.getPassword())
+                    .append("database", config.getDatabase())
+                    .saveAsFile(path);
 
-            try (OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path, StandardOpenOption.CREATE_NEW), "UTF-8")) {
-                ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, writer);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("&4Your database configuration file was created, please configure it and restart the Cloud");
+            System.out.println("&4Your database configuration file was created, please configure it and restart the System");
             System.out.println("&aThe System will exit in 5 seconds...");
             try {
                 Thread.sleep(5000);

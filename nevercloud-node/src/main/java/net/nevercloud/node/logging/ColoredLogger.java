@@ -64,7 +64,7 @@ public class ColoredLogger extends Logger {
     }
 
     private String readLine0() {
-        this.waitForNonAnimation();
+        this.updateAnimation();
         String line = null;
         try {
             line = this.consoleReader.readLine(this.prompt);
@@ -114,34 +114,34 @@ public class ColoredLogger extends Logger {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if (this.runningAnimation != null)
+            this.runningAnimation.cursorUp = 2;
     }
 
     public void print(String line) {
         line = ConsoleColor.toColouredString(line);
 
         try {
-            this.waitForNonAnimation();
-
             consoleReader.print(Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + ConsoleReader.RESET_LINE + line + Ansi.ansi().reset().toString());
             consoleReader.drawLine();
             consoleReader.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.updateAnimation();
     }
 
     public void printRaw(String line) {
         line = ConsoleColor.toColouredString(line);
 
         try {
-            this.waitForNonAnimation();
-
             consoleReader.print(line + Ansi.ansi().reset().toString());
             consoleReader.drawLine();
             consoleReader.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.updateAnimation();
     }
 
     void print0(String line) {
@@ -171,14 +171,9 @@ public class ColoredLogger extends Logger {
         thread.start();
     }
 
-    private void waitForNonAnimation() {
-        while (this.runningAnimation != null) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+    private void updateAnimation() {
+        if (this.runningAnimation != null)
+            this.runningAnimation.cursorUp++;
     }
 
     private class LogFileFormatter extends Formatter {
