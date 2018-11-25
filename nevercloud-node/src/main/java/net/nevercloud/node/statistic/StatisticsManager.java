@@ -1,4 +1,4 @@
-package net.nevercloud.node.statistics;
+package net.nevercloud.node.statistic;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */
@@ -6,11 +6,11 @@ package net.nevercloud.node.statistics;
 import lombok.Getter;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.node.NeverCloudNode;
-import net.nevercloud.node.api.events.network.bungeecord.BungeeStartEvent;
-import net.nevercloud.node.api.events.network.minecraftserver.ServerStartEvent;
-import net.nevercloud.node.api.events.network.node.NodeConnectEvent;
+import net.nevercloud.node.api.event.network.bungeecord.BungeeStartEvent;
+import net.nevercloud.node.api.event.network.minecraftserver.ServerStartEvent;
+import net.nevercloud.node.api.event.network.node.NodeConnectEvent;
 import net.nevercloud.node.database.Database;
-import net.nevercloud.node.api.events.internal.EventHandler;
+import net.nevercloud.node.api.event.internal.EventHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,19 +55,19 @@ public class StatisticsManager {
 
     private void update(String key, long add) {
         Database database = this.getDatabase();
-        database.get("statistics", jsonObject -> {
+        database.get("statistic", jsonObject -> {
             if (jsonObject == null) {
                 jsonObject = new SimpleJsonObject();
                 long oldValue = jsonObject.contains(key) ? jsonObject.getLong(key) : 0;
                 long newValue = oldValue + add;
                 jsonObject.append(key, add);
-                database.insert("statistics", jsonObject);
+                database.insert("statistic", jsonObject);
                 this.listeners.forEach(listener -> listener.call(key, oldValue, newValue));
             } else {
                 long oldValue = jsonObject.contains(key) ? jsonObject.getLong(key) : 0;
                 long newValue = oldValue + add;
                 jsonObject.append(key, add);
-                database.update("statistics", jsonObject);
+                database.update("statistic", jsonObject);
                 this.listeners.forEach(listener -> listener.call(key, oldValue, newValue));
             }
             this.statistics = jsonObject;

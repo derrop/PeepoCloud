@@ -26,9 +26,9 @@ import net.nevercloud.lib.network.packet.handler.ChannelHandler;
 import net.nevercloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.nevercloud.lib.network.packet.handler.MainChannelHandler;
 import net.nevercloud.node.NeverCloudNode;
-import net.nevercloud.node.api.events.network.bungeecord.BungeeConnectEvent;
-import net.nevercloud.node.api.events.network.minecraftserver.ServerConnectEvent;
-import net.nevercloud.node.api.events.network.node.NodeConnectEvent;
+import net.nevercloud.node.api.event.network.bungeecord.BungeeConnectEvent;
+import net.nevercloud.node.api.event.network.minecraftserver.ServerConnectEvent;
+import net.nevercloud.node.api.event.network.node.NodeConnectEvent;
 import net.nevercloud.node.network.packet.serverside.auth.PacketInAuth;
 import net.nevercloud.node.network.participants.*;
 

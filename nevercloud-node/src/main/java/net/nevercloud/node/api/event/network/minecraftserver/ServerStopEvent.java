@@ -1,14 +1,14 @@
-package net.nevercloud.node.api.events.network.minecraftserver;
+package net.nevercloud.node.api.event.network.minecraftserver;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */
 
 import lombok.*;
-import net.nevercloud.node.api.events.internal.Event;
+import net.nevercloud.node.api.event.internal.Event;
 import net.nevercloud.node.network.participants.MinecraftServerParticipant;
 
 @Getter
 @AllArgsConstructor
-public class ServerConnectEvent extends Event {
+public class ServerStopEvent extends Event {
     private MinecraftServerParticipant participant;
 }

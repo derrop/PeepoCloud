@@ -6,8 +6,8 @@ package net.nevercloud.node.server;
 import net.nevercloud.lib.server.BungeeCordProxyInfo;
 import net.nevercloud.lib.server.MinecraftServerInfo;
 import net.nevercloud.node.NeverCloudNode;
-import net.nevercloud.node.api.events.server.BungeeCordStartupFileCopyEvent;
-import net.nevercloud.node.api.events.server.MinecraftServerStartupFileCopyEvent;
+import net.nevercloud.node.api.event.server.BungeeCordStartupFileCopyEvent;
+import net.nevercloud.node.api.event.server.MinecraftServerStartupFileCopyEvent;
 import net.nevercloud.node.server.bungeefiles.SetupBungeeStartupFile;
 import net.nevercloud.node.server.minecraftserverfiles.SetupMinecraftServerStartupFile;
 

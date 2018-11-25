@@ -11,12 +11,12 @@ import lombok.ToString;
  * <br>
  * Multiple targets may be obtained, and with commas separating each one and a
  * final "and" for the last target. The resulting format cannot be overwritten.
- * This includes all styling from team prefixes, insertions, click events, and
- * hover events.
+ * This includes all styling from team prefixes, insertions, click event, and
+ * hover event.
  * <br>
  * These values are filled in by the server-side implementation.
  * <br>
- * As of 1.12.2, a bug ( MC-56373 ) prevents full usage within hover events.
+ * As of 1.12.2, a bug ( MC-56373 ) prevents full usage within hover event.
  */
 @Getter
 @Setter

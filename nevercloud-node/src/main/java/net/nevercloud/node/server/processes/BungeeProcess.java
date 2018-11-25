@@ -9,7 +9,7 @@ import net.nevercloud.lib.server.GroupMode;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.lib.utility.ZipUtils;
 import net.nevercloud.node.NeverCloudNode;
-import net.nevercloud.node.api.events.server.BungeeCordTemplateCopyEvent;
+import net.nevercloud.node.api.event.server.BungeeCordTemplateCopyEvent;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

@@ -20,7 +20,7 @@ import lombok.ToString;
  * <br>
  * These values are filled in by the server-side implementation.
  * <br>
- * As of 1.12.2, a bug ( MC-56373 ) prevents full usage within hover events.
+ * As of 1.12.2, a bug ( MC-56373 ) prevents full usage within hover event.
  */
 @Getter
 @Setter

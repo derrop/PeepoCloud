@@ -1,11 +1,11 @@
-package net.nevercloud.node.api.events.server;
+package net.nevercloud.node.api.event.server;
 /*
  * Created by Mc_Ruben on 23.11.2018
  */
 
 import lombok.*;
 import net.nevercloud.lib.server.MinecraftServerInfo;
-import net.nevercloud.node.api.events.internal.Event;
+import net.nevercloud.node.api.event.internal.Event;
 
 import java.io.InputStream;
 
