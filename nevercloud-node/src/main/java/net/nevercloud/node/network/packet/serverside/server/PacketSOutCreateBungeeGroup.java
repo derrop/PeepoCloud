@@ -5,8 +5,7 @@ package net.nevercloud.node.network.packet.serverside.server;
 
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.network.packet.JsonPacket;
-import net.nevercloud.lib.server.BungeeGroup;
-import net.nevercloud.lib.server.MinecraftGroup;
+import net.nevercloud.lib.server.bungee.BungeeGroup;
 
 public class PacketSOutCreateBungeeGroup extends JsonPacket {
     public PacketSOutCreateBungeeGroup(int id) {

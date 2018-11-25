@@ -3,25 +3,19 @@ package net.nevercloud.node.database;
  * Created by Mc_Ruben on 05.11.2018
  */
 
-import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
 import net.nevercloud.lib.config.yaml.YamlConfigurable;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.addon.AddonManager;
 import net.nevercloud.node.database.defaults.ArangoDatabaseManager;
 import net.nevercloud.node.database.defaults.MongoDatabaseManager;
 import net.nevercloud.node.database.defaults.MySQLDatabaseManager;
-import net.nevercloud.node.setup.ArraySetupAcceptable;
+import net.nevercloud.node.setup.type.ArraySetupAcceptable;
 import net.nevercloud.node.setup.Setup;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
 public class DatabaseLoader { //TODO implement languagesystem
 

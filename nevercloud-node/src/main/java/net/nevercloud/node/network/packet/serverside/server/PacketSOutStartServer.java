@@ -5,7 +5,7 @@ package net.nevercloud.node.network.packet.serverside.server;
 
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.network.packet.JsonPacket;
-import net.nevercloud.lib.server.MinecraftServerInfo;
+import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 
 public class PacketSOutStartServer extends JsonPacket {
     public PacketSOutStartServer(MinecraftServerInfo serverInfo) {

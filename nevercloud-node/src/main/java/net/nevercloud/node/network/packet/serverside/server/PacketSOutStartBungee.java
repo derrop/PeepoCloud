@@ -5,7 +5,7 @@ package net.nevercloud.node.network.packet.serverside.server;
 
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.network.packet.JsonPacket;
-import net.nevercloud.lib.server.BungeeCordProxyInfo;
+import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
 
 public class PacketSOutStartBungee extends JsonPacket {
     public PacketSOutStartBungee(BungeeCordProxyInfo proxyInfo) {

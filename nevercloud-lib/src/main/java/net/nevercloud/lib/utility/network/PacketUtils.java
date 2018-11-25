@@ -11,12 +11,12 @@ public class PacketUtils {
     public static void writeString(ByteBuf byteBuf, String string) {
         byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
 
-        writeVarLong(byteBuf, bytes.length);
+        writeVarInt(byteBuf, bytes.length);
         byteBuf.writeBytes(bytes);
     }
 
     public static String readString(ByteBuf byteBuf) {
-        return byteBuf.readBytes((int) readVarLong(byteBuf)).toString(StandardCharsets.UTF_8);
+        return byteBuf.readBytes(readVarInt(byteBuf)).toString(StandardCharsets.UTF_8);
     }
 
     public static void writeUUID(ByteBuf byteBuf, UUID uuid) {

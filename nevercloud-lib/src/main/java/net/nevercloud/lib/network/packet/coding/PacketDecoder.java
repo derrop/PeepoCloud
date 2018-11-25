@@ -30,6 +30,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
             if (packetInfo == null)
                 return;
+
             Class<? extends Packet> packetClass = packetInfo.getPacketClass();
             try {
                 Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);

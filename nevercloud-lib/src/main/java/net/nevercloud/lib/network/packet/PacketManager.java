@@ -57,12 +57,10 @@ public class PacketManager {
             lock.notify();
         });
 
-        while (reference.get() == null) {
-            try {
-                lock.wait(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        try {
+            lock.wait(TimeUnit.SECONDS.toMillis(6));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         return reference.get();

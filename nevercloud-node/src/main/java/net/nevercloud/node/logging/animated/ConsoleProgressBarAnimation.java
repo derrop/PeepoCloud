@@ -38,9 +38,7 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
             return null;
         ConsoleProgressBarAnimation animation = new ConsoleProgressBarAnimation(logger, fullLength, startValue, progressChar, lastProgressChar, prefix, suffix);
         logger.startAnimation(animation);
-        return integer -> {
-            animation.currentValue = integer;
-        };
+        return integer -> animation.currentValue = integer;
     }
 
     @Deprecated

@@ -5,7 +5,7 @@ package net.nevercloud.node.api.events.network.minecraftserver;
 
 import lombok.*;
 import net.nevercloud.node.api.events.internal.Event;
-import net.nevercloud.node.network.participants.MinecraftServerParticipant;
+import net.nevercloud.node.network.participant.MinecraftServerParticipant;
 
 @Getter
 @AllArgsConstructor

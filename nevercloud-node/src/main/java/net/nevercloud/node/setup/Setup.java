@@ -3,32 +3,35 @@ package net.nevercloud.node.setup;
  * Created by Mc_Ruben on 12.11.2018
  */
 
-import net.nevercloud.lib.config.IConfigurable;
+import net.nevercloud.lib.config.Configurable;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.logging.ColoredLogger;
+import net.nevercloud.node.setup.type.BooleanSetupAcceptable;
+import net.nevercloud.node.setup.type.IntegerSetupAcceptable;
+import net.nevercloud.node.setup.type.StringSetupAcceptable;
 
 import java.util.function.Consumer;
 
 public class Setup {
 
     private ColoredLogger logger;
-    private IConfigurable configurable;
+    private Configurable configurable;
     private boolean cancellable = false;
     private boolean cancelled = false;
 
-    public Setup(IConfigurable configurable, ColoredLogger logger) {
+    public Setup(Configurable configurable, ColoredLogger logger) {
         this.logger = logger;
         this.configurable = configurable;
     }
 
-    public static void startSetupAsync(IConfigurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
+    public static void startSetupAsync(Configurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
         NeverCloudNode.getInstance().getExecutorService().execute(() -> {
             consumer.accept(new Setup(configurable, logger));
         });
     }
 
-    public static void startSetupSync(IConfigurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
+    public static void startSetupSync(Configurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
         consumer.accept(new Setup(configurable, logger));
     }
 
@@ -93,7 +96,7 @@ public class Setup {
         return this;
     }
 
-    public IConfigurable getData() {
+    public Configurable getData() {
         return this.configurable;
     }
 

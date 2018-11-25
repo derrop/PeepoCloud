@@ -6,7 +6,7 @@ package net.nevercloud.node.api.events.server;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.nevercloud.lib.server.MinecraftServerInfo;
+import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.lib.server.Template;
 import net.nevercloud.node.api.events.internal.Event;
 

@@ -30,7 +30,7 @@ import net.nevercloud.node.api.events.network.bungeecord.BungeeConnectEvent;
 import net.nevercloud.node.api.events.network.minecraftserver.ServerConnectEvent;
 import net.nevercloud.node.api.events.network.node.NodeConnectEvent;
 import net.nevercloud.node.network.packet.serverside.auth.PacketInAuth;
-import net.nevercloud.node.network.participants.*;
+import net.nevercloud.node.network.participant.*;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;

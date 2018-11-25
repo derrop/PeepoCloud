@@ -5,7 +5,7 @@ package net.nevercloud.node.network.packet.serverside.server;
 
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.network.packet.JsonPacket;
-import net.nevercloud.lib.server.MinecraftGroup;
+import net.nevercloud.lib.server.minecraft.MinecraftGroup;
 
 public class PacketSOutCreateMinecraftGroup extends JsonPacket {
     public PacketSOutCreateMinecraftGroup(MinecraftGroup group) {
