@@ -5,6 +5,7 @@ package net.nevercloud.node.languagesystem;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import lombok.*;
 import net.md_5.bungee.http.HttpClient;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
@@ -12,6 +13,13 @@ import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -56,6 +64,34 @@ public class LanguagesManager {
         Properties properties = new Properties();
         properties.load(LanguagesManager.class.getClassLoader().getResourceAsStream("languages/default-language-en_US.properties"));
         this.defaultLanguage = Language.load(properties);
+    }
+
+    public void getAvailableLanguages(Consumer<Collection<String>> consumer) {
+        HttpClient.get(SystemUtils.CENTRAL_SERVER_URL + "languages?all=response", null, (s, throwable) -> {
+            if (throwable == null) {
+                Collection<String> languages = SimpleJsonObject.GSON.fromJson(s, new TypeToken<Collection<String>>() {
+                }.getType());
+                consumer.accept(languages);
+            } else {
+                consumer.accept(null);
+            }
+        });
+    }
+
+    public Collection<String> getAvailableLanguages() {
+        Collection<String> languages = Collections.emptyList();
+        try {
+            URLConnection connection = new URL(SystemUtils.CENTRAL_SERVER_URL + "languages?all=response").openConnection();
+            connection.connect();
+            try (InputStream inputStream = connection.getInputStream();
+                 Reader reader = new InputStreamReader(inputStream)) {
+                languages = SimpleJsonObject.GSON.fromJson(reader, new TypeToken<Collection<String>>() {
+                }.getType());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return languages;
     }
 
     public void setSelectedLanguage(String name, Consumer<Language> consumer) {

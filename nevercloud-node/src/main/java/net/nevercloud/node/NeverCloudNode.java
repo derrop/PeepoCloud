@@ -239,7 +239,8 @@ public class NeverCloudNode implements NeverCloudAPI {
                 new CommandLanguage(),
                 new CommandUpdate(),
                 new CommandVersion(),
-                new CommandReload()
+                new CommandReload(),
+                new CommandClear()
         );
     }
 

@@ -47,7 +47,7 @@ public class DatabaseLoader {
         try {
             databaseManager.connect(config);
             System.out.println("&aSuccessfully loaded database &9" + databaseManager.getClass().getSimpleName() + " &eby &6" + addon.getAddonConfig().getAuthor());
-            System.out.println("&aSuccessfully connected to database &7@" + config.getHost() + ":" + config.getPort()+" &c(MAKE SURE THAT ALL NODES ARE CONNECTED TO THE SAME DATABASE)");
+            System.out.println("&aSuccessfully connected to database &7@" + config.getHost() + ":" + config.getPort() + " &c(MAKE SURE THAT ALL NODES ARE CONNECTED TO THE SAME DATABASE)");
         } catch (Exception e) {
             System.err.println("&cCould not connect to database, system will exit in 5 seconds...");
             e.printStackTrace();
@@ -99,7 +99,7 @@ public class DatabaseLoader {
         System.out.println("&eTrying to connect to database &7@" + config.getHost() + ":" + config.getPort() + "&e...");
         try {
             databaseManager.connect(config);
-            System.out.println("&aSuccessfully connected to database &7@" + config.getHost() + ":" + config.getPort());
+            System.out.println("&aSuccessfully connected to database &7@" + config.getHost() + ":" + config.getPort() + " &c(MAKE SURE THAT ALL NODES ARE CONNECTED TO THE SAME DATABASE)");
         } catch (Exception e) {
             System.err.println("&cCould not connect to database, system will exit in 5 seconds...");
             e.printStackTrace();
