@@ -53,7 +53,7 @@ public abstract class BaseComponent
     private String insertion;
 
     /**
-     * Appended components that inherit this component's formatting and events
+     * Appended components that inherit this component's formatting and event
      */
     @Getter
     private List<BaseComponent> extra;
@@ -85,7 +85,7 @@ public abstract class BaseComponent
     }
 
     /**
-     * Copies the events and formatting of a BaseComponent. Already set
+     * Copies the event and formatting of a BaseComponent. Already set
      * formatting will be replaced.
      *
      * @param component the component to copy from
@@ -96,7 +96,7 @@ public abstract class BaseComponent
     }
 
     /**
-     * Copies the events and formatting of a BaseComponent.
+     * Copies the event and formatting of a BaseComponent.
      *
      * @param component the component to copy from
      * @param replace if already set formatting should be replaced by the new
@@ -442,9 +442,9 @@ public abstract class BaseComponent
     }
 
     /**
-     * Returns whether the component has any formatting or events applied to it
+     * Returns whether the component has any formatting or event applied to it
      *
-     * @return Whether any formatting or events are applied
+     * @return Whether any formatting or event are applied
      */
     public boolean hasFormatting()
     {

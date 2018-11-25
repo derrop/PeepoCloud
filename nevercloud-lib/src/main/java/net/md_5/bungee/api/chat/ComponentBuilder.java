@@ -355,7 +355,7 @@ public final class ComponentBuilder
          */
         FORMATTING,
         /**
-         * Specify that we want the events retained from the previous component.
+         * Specify that we want the event retained from the previous component.
          */
         EVENTS,
         /**

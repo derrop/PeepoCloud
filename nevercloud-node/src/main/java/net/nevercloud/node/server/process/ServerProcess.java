@@ -9,7 +9,7 @@ import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.lib.utility.ZipUtils;
 import net.nevercloud.node.NeverCloudNode;
-import net.nevercloud.node.api.events.server.MinecraftServerTemplateCopyEvent;
+import net.nevercloud.node.api.event.server.MinecraftServerTemplateCopyEvent;
 import net.nevercloud.node.server.ServerFilesLoader;
 
 import java.nio.file.Path;

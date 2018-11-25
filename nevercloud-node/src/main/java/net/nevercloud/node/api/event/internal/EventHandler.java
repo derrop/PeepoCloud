@@ -1,4 +1,4 @@
-package net.nevercloud.node.api.events.internal;
+package net.nevercloud.node.api.event.internal;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */

@@ -3,9 +3,11 @@ package net.nevercloud.lib.network.packet;
  * Created by Mc_Ruben on 11.11.2018
  */
 
-import io.netty.buffer.ByteBuf;
 import net.nevercloud.lib.utility.ZipUtils;
+import net.nevercloud.lib.utility.network.PacketUtils;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -84,16 +86,15 @@ public class FilePacket extends Packet {
     }
 
     @Override
-    public void write(ByteBuf byteBuf) {
-        byteBuf.writeBoolean(this.directory);
-        byteBuf.writeInt(this.bytes.length);
-        byteBuf.writeBytes(this.bytes);
+    public void write(DataOutput dataOutput) throws IOException {
+        dataOutput.writeBoolean(this.directory);
+        dataOutput.writeInt(this.bytes.length);
+        PacketUtils.writeBytes(dataOutput, this.bytes);
     }
 
     @Override
-    public void read(ByteBuf byteBuf) {
-        this.directory = byteBuf.readBoolean();
-        this.bytes = new byte[byteBuf.readInt()];
-        byteBuf.readBytes(this.bytes);
+    public void read(DataInput dataInput) throws IOException {
+        this.directory = dataInput.readBoolean();
+        this.bytes = PacketUtils.readBytes(dataInput);
     }
 }

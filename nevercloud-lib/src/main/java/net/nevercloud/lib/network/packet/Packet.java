@@ -1,7 +1,9 @@
 package net.nevercloud.lib.network.packet;
 
-import io.netty.buffer.ByteBuf;
+import com.google.common.io.ByteArrayDataOutput;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.util.UUID;
 
 public abstract class Packet {
@@ -12,8 +14,8 @@ public abstract class Packet {
         this.id = id;
     }
 
-    public abstract void write(ByteBuf byteBuf);
-    public abstract void read(ByteBuf byteBuf);
+    public abstract void write(DataOutput dataOutput) throws Exception;
+    public abstract void read(DataInput dataInput) throws Exception;
 
     public int getId() {
         return id;

@@ -3,6 +3,9 @@ package net.nevercloud.lib.utility.network;
 
 import io.netty.buffer.ByteBuf;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -26,6 +29,30 @@ public class PacketUtils {
 
     public static UUID readUUID(ByteBuf byteBuf) {
         return new UUID(byteBuf.readLong(), byteBuf.readLong());
+    }
+
+    public static void writeUUID(DataOutput dataOutput, UUID uuid) throws IOException {
+        dataOutput.writeLong(uuid.getMostSignificantBits());
+        dataOutput.writeLong(uuid.getLeastSignificantBits());
+    }
+
+    public static UUID readUUID(DataInput dataInput) throws IOException {
+        return new UUID(dataInput.readLong(), dataInput.readLong());
+    }
+
+    public static void writeBytes(DataOutput dataOutput, byte[] bytes) throws IOException {
+        dataOutput.writeInt(bytes.length);
+        for (byte aByte : bytes) {
+            dataOutput.writeByte(aByte);
+        }
+    }
+
+    public static byte[] readBytes(DataInput dataInput) throws IOException {
+        byte[] bytes = new byte[dataInput.readInt()];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = dataInput.readByte();
+        }
+        return bytes;
     }
 
     public static void writeVarInt(ByteBuf byteBuf, int value) {

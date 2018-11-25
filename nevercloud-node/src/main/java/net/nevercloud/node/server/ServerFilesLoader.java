@@ -3,13 +3,13 @@ package net.nevercloud.node.server;
  * Created by Mc_Ruben on 23.11.2018
  */
 
-import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
-import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
+import net.nevercloud.lib.server.BungeeCordProxyInfo;
+import net.nevercloud.lib.server.MinecraftServerInfo;
 import net.nevercloud.node.NeverCloudNode;
-import net.nevercloud.node.api.events.server.BungeeCordStartupFileCopyEvent;
-import net.nevercloud.node.api.events.server.MinecraftServerStartupFileCopyEvent;
-import net.nevercloud.node.server.bungeefile.SetupBungeeStartupFile;
-import net.nevercloud.node.server.minecraftserverfile.SetupMinecraftServerStartupFile;
+import net.nevercloud.node.api.event.server.BungeeCordStartupFileCopyEvent;
+import net.nevercloud.node.api.event.server.MinecraftServerStartupFileCopyEvent;
+import net.nevercloud.node.server.bungeefiles.SetupBungeeStartupFile;
+import net.nevercloud.node.server.minecraftserverfiles.SetupMinecraftServerStartupFile;
 
 import java.io.IOException;
 import java.io.InputStream;

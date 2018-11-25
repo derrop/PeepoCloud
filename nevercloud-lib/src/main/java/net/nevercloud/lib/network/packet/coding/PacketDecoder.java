@@ -1,7 +1,10 @@
 package net.nevercloud.lib.network.packet.coding;
 
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteStreams;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.EmptyByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.nevercloud.lib.network.packet.Packet;
@@ -20,12 +23,15 @@ public class PacketDecoder extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
         if(!(byteBuf instanceof EmptyByteBuf)) {
             byteBuf.resetReaderIndex();
+            byte[] bytes = new byte[byteBuf.readableBytes()];
+            byteBuf.readBytes(bytes);
 
-            int id = PacketUtils.readVarInt(byteBuf);
-            boolean isQuery = byteBuf.readBoolean();
+            ByteArrayDataInput byteArrayDataInput = ByteStreams.newDataInput(bytes);
+            int id = byteArrayDataInput.readInt();
+            boolean isQuery = byteArrayDataInput.readBoolean();
 
             PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
             if (packetInfo == null)
@@ -36,9 +42,9 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
 
                 if(isQuery)
-                    this.packetManager.convertToQueryPacket(packet, PacketUtils.readUUID(byteBuf));
+                    this.packetManager.convertToQueryPacket(packet, PacketUtils.readUUID(byteArrayDataInput));
 
-                packet.read(byteBuf);
+                packet.read(byteArrayDataInput);
                 list.add(packet);
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 e.printStackTrace();

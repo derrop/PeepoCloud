@@ -26,28 +26,6 @@ import java.util.function.Consumer;
 public class AutoUpdaterManager {
 
     public void checkUpdates(Consumer<UpdateCheckResponse> consumer) {
-        try {
-            URLConnection connection = new URL(SystemUtils.CENTRAL_SERVER_URL + "updatecheck?version=" + SystemUtils.getCurrentVersion()).openConnection();
-            connection.connect();
-
-            try (InputStream inputStream = connection.getInputStream();
-                 Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                SimpleJsonObject jsonObject = new SimpleJsonObject(reader);
-                if (jsonObject.getBoolean("success")) {
-                    UpdateCheckResponse response = new UpdateCheckResponse(
-                            jsonObject.getInt("versionsBehind"),
-                            jsonObject.getString("newestVersion"),
-                            jsonObject.getBoolean("upToDate")
-                    );
-                    consumer.accept(response);
-                } else {
-                    consumer.accept(null);
-                    System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("autoupdate.checkFailed").replace("%reason%", jsonObject.getString("reason")));
-                }
-            };
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         HttpClient.get(SystemUtils.CENTRAL_SERVER_URL + "updatecheck?version=" + SystemUtils.getCurrentVersion(), null, (s, throwable) -> {
             if (throwable != null) {
                 consumer.accept(null);

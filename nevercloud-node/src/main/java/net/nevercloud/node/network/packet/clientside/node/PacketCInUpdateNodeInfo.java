@@ -19,7 +19,7 @@ public class PacketCInUpdateNodeInfo extends JsonPacket implements PacketHandler
     }
 
     public PacketCInUpdateNodeInfo() {
-        super(-1);
+        super(14);
     }
 
     @Override
