@@ -1,10 +1,11 @@
-package net.nevercloud.node.server;
+package net.nevercloud.node.server.minecraftserverfiles;
 /*
  * Created by Mc_Ruben on 23.11.2018
  */
 
 import net.nevercloud.lib.config.yaml.YamlConfigurable;
 import net.nevercloud.node.logging.ColoredLogger;
+import net.nevercloud.node.server.ServerVersion;
 import net.nevercloud.node.setup.ArraySetupAcceptable;
 import net.nevercloud.node.setup.Setup;
 import net.nevercloud.node.utility.FileDownloading;

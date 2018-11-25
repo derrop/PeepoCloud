@@ -1,11 +1,10 @@
-package net.nevercloud.node.logging.animated;
+package net.nevercloud.node.logging;
 /*
  * Created by Mc_Ruben on 23.11.2018
  */
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.nevercloud.node.logging.ColoredLogger;
 import org.fusesource.jansi.Ansi;
 
 @Getter
@@ -23,7 +22,7 @@ public abstract class AbstractConsoleAnimation {
         for (String a : input) {
             ansi.a(a);
         }
-        this.logger.print(
+        this.logger.print0(
                 ansi
                         .restoreCursorPosition()
                         .toString()

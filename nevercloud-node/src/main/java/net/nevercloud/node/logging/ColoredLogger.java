@@ -7,7 +7,6 @@ import com.google.common.base.Preconditions;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.nevercloud.node.logging.animated.AbstractConsoleAnimation;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -65,13 +64,7 @@ public class ColoredLogger extends Logger {
     }
 
     private String readLine0() {
-        while (this.runningAnimation != null) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        this.waitForNonAnimation();
         String line = null;
         try {
             line = this.consoleReader.readLine(this.prompt);
@@ -127,6 +120,8 @@ public class ColoredLogger extends Logger {
         line = ConsoleColor.toColouredString(line);
 
         try {
+            this.waitForNonAnimation();
+
             consoleReader.print(Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + ConsoleReader.RESET_LINE + line + Ansi.ansi().reset().toString());
             consoleReader.drawLine();
             consoleReader.flush();
@@ -139,7 +134,21 @@ public class ColoredLogger extends Logger {
         line = ConsoleColor.toColouredString(line);
 
         try {
+            this.waitForNonAnimation();
+
             consoleReader.print(line + Ansi.ansi().reset().toString());
+            consoleReader.drawLine();
+            consoleReader.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void print0(String line) {
+        line = ConsoleColor.toColouredString(line);
+
+        try {
+            consoleReader.print(Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + ConsoleReader.RESET_LINE + line + Ansi.ansi().reset().toString());
             consoleReader.drawLine();
             consoleReader.flush();
         } catch (IOException e) {
@@ -160,6 +169,16 @@ public class ColoredLogger extends Logger {
         });
         thread.setDaemon(true);
         thread.start();
+    }
+
+    private void waitForNonAnimation() {
+        while (this.runningAnimation != null) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private class LogFileFormatter extends Formatter {

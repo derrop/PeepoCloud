@@ -25,9 +25,8 @@ import java.nio.file.Path;
 @EqualsAndHashCode
 public class FileDownloading {
     public static void copyStreamWithProgessBar(ColoredLogger logger, int length, InputStream inputStream, OutputStream outputStream) throws IOException {
-        ConsoleProgressBarAnimation animation = new ConsoleProgressBarAnimation(logger, 0, 0, '=', '>', "<!", "!> %value% bytes / %length% bytes | %percent%, %time%, %bps%");
+        ConsoleProgressBarAnimation animation = new ConsoleProgressBarAnimation(logger, length, 0, '=', '>', "<!", "!> %value% bytes / %length% bytes | %percent%%, %time% seconds, %bps% KBit/s");
 
-        animation.setLength(length);
         logger.startAnimation(animation);
 
         int read = 0;
@@ -41,11 +40,19 @@ public class FileDownloading {
                 outputStream.flush();
             }
         }
+        SystemUtils.sleepUninterruptedly(50);
     }
 
     public static boolean downloadFileWithProgressBar(ColoredLogger logger, String url, Path path, Runnable finished, Runnable error) {
         try (OutputStream outputStream = Files.newOutputStream(path)) {
-            return downloadFileWithProgressBar(logger, url, outputStream, finished, error);
+            return downloadFileWithProgressBar(logger, url, outputStream, finished, () -> {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                error.run();
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }

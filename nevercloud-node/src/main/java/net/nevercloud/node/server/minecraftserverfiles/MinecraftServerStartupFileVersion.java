@@ -1,4 +1,4 @@
-package net.nevercloud.node.server;
+package net.nevercloud.node.server.minecraftserverfiles;
 /*
  * Created by Mc_Ruben on 23.11.2018
  */
@@ -6,9 +6,9 @@ package net.nevercloud.node.server;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.reflect.TypeToken;
 import lombok.*;
-import net.md_5.bungee.http.HttpClient;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.utility.SystemUtils;
+import net.nevercloud.node.server.ServerVersion;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -5,6 +5,7 @@ package net.nevercloud.node.logging.animated;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.nevercloud.node.logging.AbstractConsoleAnimation;
 import net.nevercloud.node.logging.ColoredLogger;
 
 import java.util.function.Consumer;
@@ -55,6 +56,11 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
             }
         }
         this.doUpdate(100.0D);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void doUpdate(double percent) {
@@ -82,8 +88,8 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
         return input == null ? "" : input
                 .replace("%value%", String.valueOf(this.currentValue))
                 .replace("%length%", String.valueOf(this.length))
-                .replace("%percent%", String.format("%.2f", percent) + "%")
-                .replace("%time%", String.valueOf(time) + " seconds")
-                .replace("%bps%", time == 0 ? "0" : ((currentValue / 1000) / time) * 8 + " KBit/s"); //bits per second
+                .replace("%percent%", String.format("%.2f", percent))
+                .replace("%time%", String.valueOf(time))
+                .replace("%bps%", String.valueOf(time == 0 ? "0" : ((currentValue / 1000) / time) * 8)); //bits per second
     }
 }

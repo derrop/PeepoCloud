@@ -8,6 +8,8 @@ import net.nevercloud.lib.server.MinecraftServerInfo;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.api.events.server.BungeeCordStartupFileCopyEvent;
 import net.nevercloud.node.api.events.server.MinecraftServerStartupFileCopyEvent;
+import net.nevercloud.node.server.bungeefiles.SetupBungeeStartupFile;
+import net.nevercloud.node.server.minecraftserverfiles.SetupMinecraftServerStartupFile;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +21,10 @@ public class ServerFilesLoader {
 
     public static void tryInstallSpigot() {
         Path source = Paths.get("files/server.jar");
+        installServer(source);
+    }
+
+    private static void installServer(Path source) {
         if (!Files.exists(source)) {
             if (!Files.exists(source.getParent())) {
                 try {
@@ -32,22 +38,27 @@ public class ServerFilesLoader {
     }
 
     public static void tryInstallBungee() {
+        Path source = Paths.get("files/bungee.jar");
+        installBungee(source);
+    }
 
+    private static void installBungee(Path source) {
+        if (!Files.exists(source)) {
+            if (!Files.exists(source.getParent())) {
+                try {
+                    Files.createDirectory(source.getParent());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            SetupBungeeStartupFile.installBungee(NeverCloudNode.getInstance().getLogger(), source);
+        }
     }
 
     public static void copySpigot(MinecraftServerInfo serverInfo, Path path) {
         if (!Files.exists(path)) {
             Path source = Paths.get("files/server.jar");
-            if (!Files.exists(source)) {
-                if (!Files.exists(source.getParent())) {
-                    try {
-                        Files.createDirectory(source.getParent());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                SetupMinecraftServerStartupFile.installServer(NeverCloudNode.getInstance().getLogger(), source);
-            }
+            installServer(source);
             InputStream inputStream = null;
             try {
                 inputStream = Files.newInputStream(source);
@@ -61,31 +72,14 @@ public class ServerFilesLoader {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try {
-                if (inputStream == null) {
-                    inputStream = Files.newInputStream(source);
-                }
-                Files.copy(inputStream, path);
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            copy(path, source, inputStream);
         }
     }
 
     public static void copyBungee(BungeeCordProxyInfo proxyInfo, Path path) {
         if (!Files.exists(path)) {
             Path source = Paths.get("files/bungee.jar");
-            if (!Files.exists(source)) {
-                if (!Files.exists(source.getParent())) {
-                    try {
-                        Files.createDirectory(source.getParent());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                //TODO
-            }
+            installBungee(source);
             InputStream inputStream = null;
             try {
                 inputStream = Files.newInputStream(source);
@@ -99,15 +93,19 @@ public class ServerFilesLoader {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try {
-                if (inputStream == null) {
-                    inputStream = Files.newInputStream(source);
-                }
-                Files.copy(inputStream, path);
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            copy(path, source, inputStream);
+        }
+    }
+
+    private static void copy(Path path, Path source, InputStream inputStream) {
+        try {
+            if (inputStream == null) {
+                inputStream = Files.newInputStream(source);
             }
+            Files.copy(inputStream, path);
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
