@@ -36,7 +36,7 @@ public class SystemUtils {
     }
 
     public static String getCurrentVersion() {
-        return "1.0";
+        return SystemUtils.class.getPackage().getImplementationVersion();
     }
 
     public static String getPathOfInternalJarFile() {
