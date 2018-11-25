@@ -6,8 +6,8 @@ package net.nevercloud.node.api.event.server;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.nevercloud.lib.server.BungeeCordProxyInfo;
 import net.nevercloud.lib.server.Template;
+import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.nevercloud.node.api.event.internal.Event;
 
 import java.io.InputStream;

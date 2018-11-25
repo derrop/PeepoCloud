@@ -1,4 +1,4 @@
-package net.nevercloud.node.network.packet.clientside.node;
+package net.nevercloud.node.network.packet.in;
 /*
  * Created by Mc_Ruben on 14.11.2018
  */

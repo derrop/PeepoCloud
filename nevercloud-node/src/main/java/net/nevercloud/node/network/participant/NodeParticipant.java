@@ -11,8 +11,8 @@ import net.nevercloud.lib.network.auth.Auth;
 import net.nevercloud.lib.network.packet.Packet;
 import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
-import net.nevercloud.node.network.packet.serverside.server.PacketSOutStartBungee;
-import net.nevercloud.node.network.packet.serverside.server.PacketSOutStartServer;
+import net.nevercloud.node.network.packet.out.server.PacketOutStartBungee;
+import net.nevercloud.node.network.packet.out.server.PacketOutStartServer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,13 +39,13 @@ public class NodeParticipant extends NetworkParticipant {
     public void startMinecraftServer(MinecraftServerInfo serverInfo) {
         Preconditions.checkArgument(serverInfo.getParentComponentName().equals(this.auth.getComponentName()), "serverInfo parent componentName is not equal with the name of the node to start on");
         this.waitingServers.put(serverInfo.getComponentName(), serverInfo);
-        this.sendPacket(new PacketSOutStartServer(serverInfo));
+        this.sendPacket(new PacketOutStartServer(serverInfo));
     }
 
     public void startBungeeCordProxy(BungeeCordProxyInfo proxyInfo) {
         Preconditions.checkArgument(proxyInfo.getParentComponentName().equals(this.auth.getComponentName()), "proxyInfo parent componentName is not equal with the name of the node to start on");
         this.waitingProxies.put(proxyInfo.getComponentName(), proxyInfo);
-        this.sendPacket(new PacketSOutStartBungee(proxyInfo));
+        this.sendPacket(new PacketOutStartBungee(proxyInfo));
     }
 
     public void closeConnection() {

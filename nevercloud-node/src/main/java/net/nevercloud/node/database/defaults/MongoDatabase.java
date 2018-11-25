@@ -42,9 +42,25 @@ public class MongoDatabase implements Database {
     }
 
     @Override
+    public void contains(String name, Consumer<Boolean> consumer) {
+        NeverCloudNode.getInstance().getExecutorService().execute(() -> {
+            consumer.accept(collection.find(Filters.eq("name", name)).first() != null);
+        });
+    }
+
+    @Override
     public void get(String name, Consumer<SimpleJsonObject> consumer) {
         NeverCloudNode.getInstance().getExecutorService().execute(() -> {
             Document document = collection.find(Filters.eq("name", name)).first();
+            if (document != null) {
+                consumer.accept(new SimpleJsonObject(document.getString("value")));
+            }
+        });
+    }
+
+    @Override
+    public void forEach(Consumer<SimpleJsonObject> consumer) {
+        collection.find().forEach((Consumer<? super Document>) document -> {
             if (document != null) {
                 consumer.accept(new SimpleJsonObject(document.getString("value")));
             }

@@ -5,6 +5,7 @@ package net.nevercloud.node.database;
 
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 public interface Database {
@@ -17,6 +18,9 @@ public interface Database {
 
     void update(String name, SimpleJsonObject jsonObject);
 
+    void contains(String name, Consumer<Boolean> consumer);
+
     void get(String name, Consumer<SimpleJsonObject> consumer);
 
+    void forEach(Consumer<SimpleJsonObject> consumer);
 }

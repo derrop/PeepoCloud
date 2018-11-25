@@ -5,6 +5,8 @@ package net.nevercloud.node.server.process;
 
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
+import net.nevercloud.node.api.event.network.bungeecord.BungeeQueuedEvent;
+import net.nevercloud.node.api.event.network.minecraftserver.ServerQueuedEvent;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -21,6 +23,12 @@ public class ServerQueue implements Runnable {
     }
 
     public void queueProcess(CloudProcess process, boolean priorityHigh) {
+        if (process instanceof BungeeProcess) {
+            NeverCloudNode.getInstance().getEventManager().callEvent(new BungeeQueuedEvent(((BungeeProcess) process).getProxyInfo()));
+        } else if (process instanceof ServerProcess){
+            NeverCloudNode.getInstance().getEventManager().callEvent(new ServerQueuedEvent(((ServerProcess) process).getServerInfo()));
+        }
+
         if (priorityHigh) {
             this.serverProcesses.offerFirst(process);
         } else {

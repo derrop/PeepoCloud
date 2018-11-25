@@ -29,7 +29,17 @@ public class ArangoDatabase implements Database {
     }
 
     @Override
+    public void contains(String name, Consumer<Boolean> consumer) {
+
+    }
+
+    @Override
     public void get(String name, Consumer<SimpleJsonObject> consumer) {
+
+    }
+
+    @Override
+    public void forEach(Consumer<SimpleJsonObject> consumer) {
 
     }
 }

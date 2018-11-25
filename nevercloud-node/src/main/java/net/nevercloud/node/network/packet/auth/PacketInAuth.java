@@ -1,4 +1,4 @@
-package net.nevercloud.node.network.packet.serverside.auth;
+package net.nevercloud.node.network.packet.auth;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */

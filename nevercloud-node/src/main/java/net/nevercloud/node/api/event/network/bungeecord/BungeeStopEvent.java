@@ -5,9 +5,9 @@ package net.nevercloud.node.api.event.network.bungeecord;
 
 import lombok.*;
 import net.nevercloud.node.api.event.internal.Event;
-import net.nevercloud.node.network.participants.BungeeCordParticipant;
+import net.nevercloud.node.network.participant.BungeeCordParticipant;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class BungeeStopEvent extends Event {
     private BungeeCordParticipant participant;

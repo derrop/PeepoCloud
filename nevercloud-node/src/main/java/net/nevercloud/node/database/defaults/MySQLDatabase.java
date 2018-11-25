@@ -78,6 +78,22 @@ public class MySQLDatabase implements Database {
     }
 
     @Override
+    public void contains(String name, Consumer<Boolean> consumer) {
+        NeverCloudNode.getInstance().getExecutorService().execute(() -> {
+            try {
+                PreparedStatement statement = databaseManager.getConnection().prepareStatement("SELECT `name` FROM `" + this.name + "` WHERE `name` = ?");
+                statement.setString(1, name);
+                ResultSet resultSet = statement.executeQuery();
+                consumer.accept(resultSet.next());
+                statement.close();
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Override
     public void get(String name, Consumer<SimpleJsonObject> consumer) {
         NeverCloudNode.getInstance().getExecutorService().execute(() -> {
             try {
@@ -102,5 +118,27 @@ public class MySQLDatabase implements Database {
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void forEach(Consumer<SimpleJsonObject> consumer) {
+        try {
+            PreparedStatement statement = databaseManager.getConnection().prepareStatement("SELECT `value` FROM `" + this.name + "`");
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                byte[] bytes = resultSet.getBytes("value");
+                if (bytes.length != 0) {
+                    try (InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(bytes), "UTF-8")) {
+                        consumer.accept(new SimpleJsonObject(reader));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            statement.close();
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

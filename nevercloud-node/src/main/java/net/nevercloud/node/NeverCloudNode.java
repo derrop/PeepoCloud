@@ -6,7 +6,6 @@ package net.nevercloud.node;
 import com.google.common.base.Preconditions;
 import jline.console.ConsoleReader;
 import lombok.Getter;
-import net.nevercloud.lib.NeverCloudAPI;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.network.auth.Auth;
 import net.nevercloud.lib.network.auth.NetworkComponentType;
@@ -15,9 +14,9 @@ import net.nevercloud.lib.network.packet.PacketInfo;
 import net.nevercloud.lib.network.packet.PacketManager;
 import net.nevercloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.nevercloud.lib.node.NodeInfo;
-import net.nevercloud.lib.server.BungeeGroup;
-import net.nevercloud.lib.server.MinecraftGroup;
-import net.nevercloud.lib.server.MinecraftServerInfo;
+import net.nevercloud.lib.server.bungee.BungeeGroup;
+import net.nevercloud.lib.server.minecraft.MinecraftGroup;
+import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.lib.utility.network.NetworkAddress;
 import net.nevercloud.node.addon.AddonManager;
@@ -34,15 +33,15 @@ import net.nevercloud.node.logging.ColoredLogger;
 import net.nevercloud.node.logging.ConsoleColor;
 import net.nevercloud.node.network.ClientNode;
 import net.nevercloud.node.network.NetworkServer;
-import net.nevercloud.node.network.packet.clientside.node.PacketCInUpdateNodeInfo;
-import net.nevercloud.node.network.packet.serverside.server.PacketSOutCreateBungeeGroup;
-import net.nevercloud.node.network.packet.serverside.server.PacketSOutCreateMinecraftGroup;
-import net.nevercloud.node.network.packet.serverside.server.PacketSOutUpdateNodeInfo;
-import net.nevercloud.node.network.participants.BungeeCordParticipant;
-import net.nevercloud.node.network.participants.MinecraftServerParticipant;
-import net.nevercloud.node.network.participants.NodeParticipant;
+import net.nevercloud.node.network.packet.in.PacketCInUpdateNodeInfo;
+import net.nevercloud.node.network.packet.out.group.PacketOutCreateBungeeGroup;
+import net.nevercloud.node.network.packet.out.group.PacketOutCreateMinecraftGroup;
+import net.nevercloud.node.network.packet.out.PacketOutUpdateNodeInfo;
+import net.nevercloud.node.network.participant.BungeeCordParticipant;
+import net.nevercloud.node.network.participant.MinecraftServerParticipant;
+import net.nevercloud.node.network.participant.NodeParticipant;
 import net.nevercloud.node.server.ServerFilesLoader;
-import net.nevercloud.node.server.processes.ServerQueue;
+import net.nevercloud.node.server.process.ServerQueue;
 import net.nevercloud.node.statistic.StatisticsManager;
 import net.nevercloud.node.updater.AutoUpdaterManager;
 import net.nevercloud.node.updater.UpdateCheckResponse;
@@ -62,7 +61,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Getter
-public class NeverCloudNode implements NeverCloudAPI {
+public class NeverCloudNode {
 
     @Getter
     private static NeverCloudNode instance;
@@ -100,6 +99,7 @@ public class NeverCloudNode implements NeverCloudAPI {
     private ServerQueue serverQueue;
 
     private CloudConfig cloudConfig;
+    private GroupsConfig groupsConfig = new GroupsConfig();
 
     private Map<String, MinecraftGroup> minecraftGroups;
     private Map<String, BungeeGroup> bungeeGroups;
@@ -174,8 +174,6 @@ public class NeverCloudNode implements NeverCloudAPI {
         Preconditions.checkArgument(instance == null, "instance is already defined");
         instance = this;
 
-        SystemUtils.setApi(this);
-
         ConsoleReader consoleReader = new ConsoleReader(System.in, System.out);
         this.logger = new ColoredLogger(consoleReader);
 
@@ -209,9 +207,12 @@ public class NeverCloudNode implements NeverCloudAPI {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                this.sendPacketToNodes(new PacketSOutUpdateNodeInfo(this.nodeInfo));
+                this.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
             }
         });
+
+        this.minecraftGroups = this.groupsConfig.loadMinecraftGroups();
+        this.bungeeGroups = this.groupsConfig.loadBungeeGroups();
 
         this.serverQueue = ServerQueue.start();
 
@@ -431,12 +432,10 @@ public class NeverCloudNode implements NeverCloudAPI {
     }
 
 
-    @Override
     public BungeeGroup getBungeeGroup(String name) {
         return this.bungeeGroups.get(name);
     }
 
-    @Override
     public MinecraftGroup getMinecraftGroup(String name) {
         return this.minecraftGroups.get(name);
     }
@@ -447,12 +446,12 @@ public class NeverCloudNode implements NeverCloudAPI {
 
     public void updateMinecraftGroup(MinecraftGroup group) {
         this.minecraftGroups.put(group.getName(), group);
-        this.sendPacketToNodes(new PacketSOutCreateMinecraftGroup(group));
+        this.sendPacketToNodes(new PacketOutCreateMinecraftGroup(group));
     }
 
     public void updateBungeeGroup(BungeeGroup group) {
         this.bungeeGroups.put(group.getName(), group);
-        this.sendPacketToNodes(new PacketSOutCreateBungeeGroup(group));
+        this.sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
     }
 
     public NodeInfo getBestNodeInfo(int memoryNeeded) {
