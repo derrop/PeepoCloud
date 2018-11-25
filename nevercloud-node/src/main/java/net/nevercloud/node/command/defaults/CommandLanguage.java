@@ -47,7 +47,7 @@ public class CommandLanguage extends Command implements TabCompletable {
 
     @Override
     public String getUsage() {
-        return NeverCloudNode.getInstance().getMessage("command.usage.language");
+        return NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.usage.language");
     }
 
     @Override

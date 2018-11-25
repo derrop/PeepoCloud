@@ -31,6 +31,8 @@ public class PacketInAuth extends JsonPacket {
                 return;
             }
             SimpleJsonObject jsonObject = ((PacketInAuth) packet).getSimpleJsonObject();
+            if (jsonObject == null)
+                return;
             Auth auth = SimpleJsonObject.GSON.fromJson(jsonObject.asJsonObject(), Auth.class);
             if (auth == null) {
                 networkParticipant.getChannel().close();

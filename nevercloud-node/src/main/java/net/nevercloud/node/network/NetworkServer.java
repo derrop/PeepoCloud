@@ -77,8 +77,8 @@ public class NetworkServer implements Runnable {
                         channel.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,
                                         0, 4, 0, 4),
                                 new LengthFieldPrepender(4))
-                                .addLast(new PacketEncoder())
                                 .addLast(new PacketDecoder(NetworkServer.this.packetManager))
+                                .addLast(new PacketEncoder())
                                 .addLast(new MainChannelHandler(NetworkServer.this.packetManager, NetworkServer.this.authHandler));
                     }
                 })

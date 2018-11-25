@@ -12,7 +12,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Packet packet, ByteBuf byteBuf) {
-        byteBuf.writeInt(packet.getId());
+        PacketUtils.writeVarInt(byteBuf, packet.getId());
         boolean isQuery = packet.getQueryUUID() != null;
         byteBuf.writeBoolean(isQuery);
         if(isQuery)

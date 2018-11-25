@@ -48,6 +48,7 @@ import net.nevercloud.node.server.ServerFilesLoader;
 import net.nevercloud.node.server.processes.ServerQueue;
 import net.nevercloud.node.statistics.StatisticsManager;
 import net.nevercloud.node.updater.AutoUpdaterManager;
+import net.nevercloud.node.updater.UpdateCheckResponse;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -182,24 +183,27 @@ public class NeverCloudNode implements NeverCloudAPI {
         ConsoleReader consoleReader = new ConsoleReader(System.in, System.out);
         this.logger = new ColoredLogger(consoleReader);
 
-        this.nodeAddonManager = new AddonManager<>();
-
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
 
         this.languagesManager = new LanguagesManager();
 
         this.loadConfigs();
 
-        this.eventManager = new EventManager();
-
         this.autoUpdaterManager = new AutoUpdaterManager();
 
         this.commandManager = new CommandManager(this.logger);
 
+        this.initCommands(this.commandManager);
+        this.initPacketHandlers();
+
+        this.eventManager = new EventManager();
+
+        this.nodeAddonManager = new AddonManager<>();
+
         this.databaseLoader = new DatabaseLoader("databaseAddons");
         this.databaseManager = this.databaseLoader.loadDatabaseManager(this);
 
-        this.installUpdates(this.commandManager.getConsole());
+        this.installUpdatesSync(this.commandManager.getConsole());
 
         this.executorService.execute(() -> {
             Thread thread = Thread.currentThread();
@@ -214,9 +218,6 @@ public class NeverCloudNode implements NeverCloudAPI {
         });
 
         this.serverQueue = ServerQueue.start();
-
-        this.initCommands(this.commandManager);
-        this.initPacketHandlers();
 
         ServerFilesLoader.tryInstallSpigot();
         ServerFilesLoader.tryInstallBungee();
@@ -340,34 +341,40 @@ public class NeverCloudNode implements NeverCloudAPI {
     }
 
     public void installUpdates(CommandSender sender) {
-        NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdates(updateCheckResponse -> {
-            if (updateCheckResponse != null) {
-                if (updateCheckResponse.isUpToDate()) {
-                    sender.sendMessageLanguageKey("autoupdate.upToDate");
-                } else {
-                    sender.createLanguageMessage("autoupdate.versionsBehind").replace("%versionsBehind%", String.valueOf(updateCheckResponse.getVersionsBehind())
-                            .replace("%newestVersion%", updateCheckResponse.getNewestVersion())).send();
-                    NeverCloudNode.getInstance().getAutoUpdaterManager().update((success, path) -> {
-                        if (success) {
-                            sender.createLanguageMessage("autoupdate.successfullyUpdated").replace("%newestVersion%", updateCheckResponse.getNewestVersion()).send();
-                            if (path != null) {
-                                sender.createLanguageMessage("autoupdate.onWindows").replace("%path%", path.toString()).replace("%target%", SystemUtils.getPathOfInternalJarFile()).send();
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            NeverCloudNode.getInstance().shutdown();
-                        } else {
-                            sender.createLanguageMessage("autoupdate.couldNotUpdate").replace("%newestVersion%", updateCheckResponse.getNewestVersion()).send();
-                        }
-                    });
-                }
+        NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdates(updateCheckResponse -> this.installUpdates0(sender, updateCheckResponse));
+    }
+
+    public void installUpdatesSync(CommandSender sender) {
+        this.installUpdates0(sender, NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdatesSync());
+    }
+
+    private void installUpdates0(CommandSender sender, UpdateCheckResponse updateCheckResponse) {
+        if (updateCheckResponse != null) {
+            if (updateCheckResponse.isUpToDate()) {
+                sender.sendMessageLanguageKey("autoupdate.upToDate");
             } else {
-                sender.sendMessageLanguageKey("autoupdate.error");
+                sender.createLanguageMessage("autoupdate.versionsBehind").replace("%versionsBehind%", String.valueOf(updateCheckResponse.getVersionsBehind())
+                        .replace("%newestVersion%", updateCheckResponse.getNewestVersion())).send(); //TODO %newestVersion% is not replaced with the version
+                NeverCloudNode.getInstance().getAutoUpdaterManager().update((success, path) -> {
+                    if (success) {
+                        sender.createLanguageMessage("autoupdate.successfullyUpdated").replace("%newestVersion%", updateCheckResponse.getNewestVersion()).send();
+                        if (path != null) {
+                            sender.createLanguageMessage("autoupdate.onWindows").replace("%path%", path.toString()).replace("%target%", SystemUtils.getPathOfInternalJarFile()).send();
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        NeverCloudNode.getInstance().shutdown();
+                    } else {
+                        sender.createLanguageMessage("autoupdate.couldNotUpdate").replace("%newestVersion%", updateCheckResponse.getNewestVersion()).send();
+                    }
+                });
             }
-        });
+        } else {
+            sender.sendMessageLanguageKey("autoupdate.error");
+        }
     }
 
     public void shutdown() {
@@ -414,10 +421,6 @@ public class NeverCloudNode implements NeverCloudAPI {
 
     public void saveInternalConfigFile() {
         this.internalConfig.saveAsFile("internal/internalData.json");
-    }
-
-    public String getMessage(String key) {
-        return this.languagesManager.getMessage(key);
     }
 
     @Deprecated

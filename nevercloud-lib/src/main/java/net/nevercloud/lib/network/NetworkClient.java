@@ -52,8 +52,8 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
                             channel.pipeline().addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,
                                     0, 4, 0, 4),
                                     new LengthFieldPrepender(4))
-                                    .addLast(new PacketEncoder())
                                     .addLast(new PacketDecoder(NetworkClient.this.packetManager))
+                                    .addLast(new PacketEncoder())
                                     .addLast(new MainChannelHandler(NetworkClient.this.packetManager, NetworkClient.this.firstHandler));
                         }
                     });

@@ -22,10 +22,16 @@ public class CommandManager {
         this.commandReaderThread = new Thread("ConsoleCommand Reader") {
             @Override
             public void run() {
-                String line;
-                while (!isInterrupted() && NeverCloudNode.getInstance().isRunning() && (line = logger.readLine()) != null) {
-                    if (!"".equals(line) && !dispatchCommand(console, line)) {
-                        System.out.println("Command not found, type &ehelp &rfor a list of all commands");
+                try {
+                    String line;
+                    while (!isInterrupted() && NeverCloudNode.getInstance().isRunning() && (line = logger.readLine()) != null) {
+                        if (!"".equals(line) && !dispatchCommand(console, line)) {
+                            System.out.println("Command not found, type &ehelp &rfor a list of all commands");
+                        }
+                    }
+                } catch (UnsupportedOperationException e) {
+                    if (e.getMessage().equalsIgnoreCase("read() with timeout cannot be called as non-blocking operation is disabled")) {
+                        System.exit(0);
                     }
                 }
             }

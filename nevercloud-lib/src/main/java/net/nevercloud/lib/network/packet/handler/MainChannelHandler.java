@@ -36,9 +36,11 @@ public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        if(!(cause instanceof IOException))
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (!(cause instanceof IOException)) {
             System.err.println("Exception with " + ctx.channel().remoteAddress() + ": " + cause.getClass().getSimpleName() + ", " + cause.getMessage());
+            super.exceptionCaught(ctx, cause);
+        }
 
         ctx.close();
         this.channelHandler.exception(this.participant, cause);

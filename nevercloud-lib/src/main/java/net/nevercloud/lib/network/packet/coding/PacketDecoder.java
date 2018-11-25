@@ -1,9 +1,11 @@
 package net.nevercloud.lib.network.packet.coding;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.EmptyByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.nevercloud.lib.network.packet.Packet;
+import net.nevercloud.lib.network.packet.PacketInfo;
 import net.nevercloud.lib.network.packet.PacketManager;
 import net.nevercloud.lib.utility.network.PacketUtils;
 
@@ -19,11 +21,16 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
-        if(byteBuf.isReadable()) {
-            int id = byteBuf.readInt();
+        if(!(byteBuf instanceof EmptyByteBuf)) {
+            byteBuf.resetReaderIndex();
+
+            int id = PacketUtils.readVarInt(byteBuf);
             boolean isQuery = byteBuf.readBoolean();
 
-            Class<? extends Packet> packetClass = this.packetManager.getPacketInfo(id).getPacketClass();
+            PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
+            if (packetInfo == null)
+                return;
+            Class<? extends Packet> packetClass = packetInfo.getPacketClass();
             try {
                 Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
 
