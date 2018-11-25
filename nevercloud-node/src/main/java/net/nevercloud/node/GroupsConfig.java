@@ -15,6 +15,9 @@ import java.util.function.Consumer;
 
 public class GroupsConfig {
 
+    private Map<String, MinecraftGroup> minecraftGroups;
+    private Map<String, BungeeGroup> bungeeGroups;
+
     public Map<String, MinecraftGroup> loadMinecraftGroups() {
         Map<String, MinecraftGroup> groups = new HashMap<>();
         Database database = NeverCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups");
@@ -24,6 +27,7 @@ public class GroupsConfig {
                 groups.put(group.getName(), group);
             }
         });
+        this.minecraftGroups = groups;
         return groups;
     }
 
@@ -36,22 +40,31 @@ public class GroupsConfig {
                 groups.put(group.getName(), group);
             }
         });
+        this.bungeeGroups = groups;
         return groups;
     }
 
     public void createGroup(BungeeGroup group, Consumer<Boolean> success) {
         Database database = NeverCloudNode.getInstance().getDatabaseManager().getDatabase("bungeeGroups");
-        doCreate(success, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
+        doCreate(aBoolean -> {
+            if (aBoolean)
+                this.bungeeGroups.put(group.getName(), group);
+            success.accept(aBoolean);
+        }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
     }
 
     public void createGroup(MinecraftGroup group, Consumer<Boolean> success) {
         Database database = NeverCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups");
-        doCreate(success, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
+        doCreate(aBoolean -> {
+            if (aBoolean)
+                this.minecraftGroups.put(group.getName(), group);
+            success.accept(aBoolean);
+        }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
     }
 
     private void doCreate(Consumer<Boolean> success, Database database, String name, JsonElement jsonElement) {
         database.contains(name, aBoolean -> {
-            if (!aBoolean) {
+            if (aBoolean) {
                 success.accept(false);
             } else {
                 database.insert(name, new SimpleJsonObject(jsonElement.getAsJsonObject()));

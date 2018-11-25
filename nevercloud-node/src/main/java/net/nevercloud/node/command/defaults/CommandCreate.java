@@ -42,7 +42,7 @@ public class CommandCreate extends Command {
                             new EnumSetupAcceptable(GroupMode.class)
                     );
 
-                    GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode"));
+                    GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode").toUpperCase());
 
                     Collection<Template> templates = new ArrayList<>(); //not Arrays.asList because we cannot use the add method with this (for the create template command)
                     templates.add(new Template("default"));
@@ -54,7 +54,7 @@ public class CommandCreate extends Command {
                             (IntegerSetupAcceptable) input -> true
                     );
                     int memory = setup.getData().getInt("memory");
-                    memory = memory >= 64 ? memory * 1024 : memory; //>= 64 = gb; < 64 = mb
+                    memory = memory >= 64 ? memory : memory * 1024; //>= 64 = gb; < 64 = mb
 
                     setup.request(
                             "minServers",
@@ -95,7 +95,7 @@ public class CommandCreate extends Command {
                             new EnumSetupAcceptable(GroupMode.class)
                     );
 
-                    GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode"));
+                    GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode").toUpperCase());
 
                     Collection<Template> templates = new ArrayList<>(); //not Arrays.asList because we cannot use the add method with this (for the create template command)
                     templates.add(new Template("default"));
@@ -107,7 +107,7 @@ public class CommandCreate extends Command {
                             (IntegerSetupAcceptable) input -> true
                     );
                     int memory = setup.getData().getInt("memory");
-                    memory = memory >= 64 ? memory * 1024 : memory; //>= 64 = gb; < 64 = mb
+                    memory = memory >= 64 ? memory : memory * 1024; //>= 64 = gb; < 64 = mb
 
                     setup.request(
                             "minServers",

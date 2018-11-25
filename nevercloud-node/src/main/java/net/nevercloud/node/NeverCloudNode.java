@@ -226,7 +226,6 @@ public class NeverCloudNode {
 
     private void initPacketHandlers() {
         this.packetManager.registerPacket(new PacketInfo(14, PacketCInUpdateNodeInfo.class, new PacketCInUpdateNodeInfo()));
-        System.out.println(this.packetManager.getPacketInfo(14));
     }
 
     private void initCommands(CommandManager commandManager) {
@@ -238,7 +237,8 @@ public class NeverCloudNode {
                 new CommandUpdate(),
                 new CommandVersion(),
                 new CommandReload(),
-                new CommandClear()
+                new CommandClear(),
+                new CommandCreate()
         );
     }
 
