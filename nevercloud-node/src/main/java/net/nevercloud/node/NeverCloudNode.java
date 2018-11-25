@@ -89,8 +89,7 @@ public class NeverCloudNode implements NeverCloudAPI {
     private NetworkServer networkServer;
     private Map<String, ClientNode> connectedNodes = new HashMap<>();
 
-    private PacketManager networkServerPacketManager = new PacketManager();
-    private PacketManager networkClientPacketManager = new PacketManager();
+    private PacketManager packetManager = new PacketManager();
 
     private EventManager eventManager;
 
@@ -225,7 +224,8 @@ public class NeverCloudNode implements NeverCloudAPI {
     }
 
     private void initPacketHandlers() {
-        this.networkClientPacketManager.registerPacket(new PacketInfo(14, PacketCInUpdateNodeInfo.class, new PacketCInUpdateNodeInfo()));
+        this.packetManager.registerPacket(new PacketInfo(14, PacketCInUpdateNodeInfo.class, new PacketCInUpdateNodeInfo()));
+        System.out.println(this.packetManager.getPacketInfo(14));
     }
 
     private void initCommands(CommandManager commandManager) {
@@ -285,7 +285,7 @@ public class NeverCloudNode implements NeverCloudAPI {
 
         if (this.networkServer == null) {
             this.networkServer = new NetworkServer(this.cloudConfig.getHost().getHost().equals("*") ? new InetSocketAddress(this.cloudConfig.getHost().getPort())
-                    : new InetSocketAddress(this.cloudConfig.getHost().getHost(), this.cloudConfig.getHost().getPort()), this.networkServerPacketManager);
+                    : new InetSocketAddress(this.cloudConfig.getHost().getHost(), this.cloudConfig.getHost().getPort()), this.packetManager);
             this.networkServer.run();
         }
 
@@ -330,7 +330,7 @@ public class NeverCloudNode implements NeverCloudAPI {
     }
 
     private void connectToNode(NetworkAddress node) {
-        ClientNode client = new ClientNode(new InetSocketAddress(node.getHost(), node.getPort()), this.networkClientPacketManager, new ChannelHandlerAdapter(),
+        ClientNode client = new ClientNode(new InetSocketAddress(node.getHost(), node.getPort()), this.packetManager, new ChannelHandlerAdapter(),
                 new Auth(this.networkAuthKey, this.cloudConfig.getNodeName(), NetworkComponentType.NODE, null, new SimpleJsonObject().append("nodeInfo", this.nodeInfo)),
                 null);
         this.connectedNodes.put(node.getHost(), client);
