@@ -183,7 +183,6 @@ public class NeverCloudNode implements NeverCloudAPI {
         this.logger = new ColoredLogger(consoleReader);
 
         this.nodeAddonManager = new AddonManager<>();
-        this.nodeAddonManager.loadAddons("nodeAddons");
 
         this.loadConfigs();
 
@@ -340,14 +339,15 @@ public class NeverCloudNode implements NeverCloudAPI {
         NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdates(updateCheckResponse -> {
             if (updateCheckResponse != null) {
                 if (updateCheckResponse.isUpToDate()) {
-                    sender.sendMessage("&aYou are using the newest version of the System");
+                    sender.sendMessageLanguageKey("autoupdate.upToDate");
                 } else {
-                    sender.sendMessage("&eYou are &c" + updateCheckResponse.getVersionsBehind() + " &eversions behind, updating to &c" + updateCheckResponse.getNewestVersion() + "&e...");
-                    NeverCloudNode.getInstance().getAutoUpdaterManager().update(success -> {
+                    sender.createLanguageMessage("autoupdate.versionsBehind").replace("%versionsBehind%", String.valueOf(updateCheckResponse.getVersionsBehind())
+                            .replace("%newestVersion%", updateCheckResponse.getNewestVersion())).send();
+                    NeverCloudNode.getInstance().getAutoUpdaterManager().update((success, path) -> {
                         if (success) {
-                            sender.sendMessage("&aSuccessfully updated to &c" + updateCheckResponse.getNewestVersion());
-                            if (PlatformDependent.isWindows()) {
-                                sender.sendMessage("&eYou're on windows, please copy the new created Jar &b\"" + SystemUtils.getPathOfInternalJarFile().replaceFirst(".jar", "") + "-update-....jar\" &eto &b\"" + SystemUtils.getPathOfInternalJarFile() + "\"&e, the system will exit...");
+                            sender.createLanguageMessage("autoupdate.successfullyUpdated").replace("%newestVersion%", updateCheckResponse.getNewestVersion()).send();
+                            if (path != null) {
+                                sender.createLanguageMessage("autoupdate.onWindows").replace("%path%", path.toString()).replace("%target%", SystemUtils.getPathOfInternalJarFile()).send();
                                 try {
                                     Thread.sleep(1000);
                                 } catch (InterruptedException e) {
@@ -356,29 +356,12 @@ public class NeverCloudNode implements NeverCloudAPI {
                             }
                             NeverCloudNode.getInstance().shutdown();
                         } else {
-                            sender.sendMessage("&cCould not update to &e" + updateCheckResponse.getNewestVersion());
+                            sender.createLanguageMessage("autoupdate.couldNotUpdate").replace("%newestVersion%", updateCheckResponse.getNewestVersion()).send();
                         }
                     });
                 }
             } else {
-                sender.sendMessage("&cThere was an error while trying to check for updates");
-            }
-        });
-    }
-
-    public void installUpdatesWithoutPrintingErrors(CommandSender sender) {
-        NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdates(updateCheckResponse -> {
-            if (updateCheckResponse != null) {
-                sender.sendMessage("&eYou are &c" + updateCheckResponse.getVersionsBehind() + " &eversions behind, updating to &c" + updateCheckResponse.getNewestVersion() + "&e...");
-                NeverCloudNode.getInstance().getAutoUpdaterManager().update(success -> {
-                    if (success) {
-                        sender.sendMessage("&aSuccessfully updated to &c" + updateCheckResponse.getNewestVersion());
-                        if (PlatformDependent.isWindows()) {
-                            sender.sendMessage("&eYou're on windows, please copy the new created Jar &b\"" + SystemUtils.getPathOfInternalJarFile().replaceFirst(".jar", "") + "-update-....jar\" &eto &b\"" + SystemUtils.getPathOfInternalJarFile() + "\"");
-                        }
-                        NeverCloudNode.getInstance().shutdown();
-                    }
-                });
+                sender.sendMessageLanguageKey("autoupdate.error");
             }
         });
     }

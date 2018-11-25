@@ -3,6 +3,8 @@ package net.nevercloud.node.command;
  * Created by Mc_Ruben on 04.11.2018
  */
 
+import net.nevercloud.node.NeverCloudNode;
+
 public abstract class Command {
 
     public Command(String name, String permission, String... aliases) {
@@ -38,7 +40,10 @@ public abstract class Command {
     public abstract void execute(CommandSender sender, String commandLine, String[] args);
 
     public String getUsage() {
-        return "no usage defined";
+        String usage = NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.usage." + this.name);
+        if (usage != null)
+            return usage;
+        return NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.usage.notDefined");
     }
 
 }

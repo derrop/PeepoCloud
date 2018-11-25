@@ -50,7 +50,7 @@ public class CloudConfig {
 
         this.maxMemory = configurable.getInt("maxMemoryForServers");
         if (this.maxMemory < 1024) {
-            System.err.println("&cYOU CANNOT USE THE SYSTEM WITH SUCH A SMALL MEMORY SIZE IN YOUR CONFIG (&e" + this.maxMemory + "&c)");
+            System.err.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("config.memory.notEnough").replace("%memory%", String.valueOf(this.maxMemory)));
         }
     }
 

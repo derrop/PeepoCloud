@@ -26,18 +26,18 @@ public class CommandHelp extends Command {
             sent.add(command.getName());
             sender.sendMessage(command.getName());
             if (command.getPermission() != null) {
-                sender.sendMessage("  - Permission: " + command.getPermission());
+                sender.createLanguageMessage("command.help.permission").replace("%permission%", command.getPermission()).send();
             }
             if (command.getAliases() != null && command.getAliases().length != 0) {
                 StringBuilder aliasesBuilder = new StringBuilder();
                 for (String alias : command.getAliases()) {
                     aliasesBuilder.append(alias).append(", ");
                 }
-                sender.sendMessage("  - Aliases: " + aliasesBuilder.substring(0, aliasesBuilder.length() - 2));
+                sender.createLanguageMessage("command.help.aliases").replace("%aliases%", aliasesBuilder.substring(0, aliasesBuilder.length() - 2)).send();
             }
             String usage = command.getUsage();
             if (usage != null)
-                sender.sendMessage("  - Usage: " + usage);
+                sender.createLanguageMessage("command.help.usage").replace("%usage%", usage).send();
         }
     }
 }

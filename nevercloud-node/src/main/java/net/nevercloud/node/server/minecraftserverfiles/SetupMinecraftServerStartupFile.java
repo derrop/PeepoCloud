@@ -13,7 +13,7 @@ import net.nevercloud.node.utility.FileDownloading;
 import java.nio.file.Path;
 import java.util.Collection;
 
-public class SetupMinecraftServerStartupFile {
+public class SetupMinecraftServerStartupFile { //TODO implement languagesystem
 
     public static void installServer(ColoredLogger logger, Path path) {
         Setup.startSetupSync(new YamlConfigurable(), logger, setup -> {

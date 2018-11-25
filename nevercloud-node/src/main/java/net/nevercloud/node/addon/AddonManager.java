@@ -8,6 +8,7 @@ import net.jodah.typetools.TypeResolver;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import net.nevercloud.node.NeverCloudNode;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -83,13 +84,16 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
                 if (this.loadedAddons.containsKey(config.getName()))
                     return this.loadedAddons.get(config.getName());
 
-                System.out.println("&eLoading addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &eversion &b" + config.getVersion() + "&e...");
+                System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("addons.loadingAddon")
+                        .replace("%name%", config.getName()).replace("%author%", config.getAuthor()).replace("%version%", config.getVersion()));
                 long start = System.nanoTime();
                 Addon addon = (Addon) addonLoader.loadAddon(config);
                 if (addon != null) {
                     this.loadedAddons.put(config.getName(), addon);
                     addon.onLoad();
-                    System.out.println("&aSuccessfully loaded addon &9" + config.getName() + " &eby &6" + config.getAuthor() + " &eversion &b" + config.getVersion() + "&a, took &c" + (System.nanoTime() - start) + "ns");
+                    System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("addons.successfullyLoadedAddon")
+                            .replace("%name%", config.getName()).replace("%author%", config.getAuthor()).replace("%version%", config.getVersion())
+                            .replace("%time%", String.valueOf(System.nanoTime() - start)));
                     return addon;
                 }
             }
@@ -132,10 +136,15 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
         if (!addon.enabled)
             return;
         long start = System.nanoTime();
-        System.out.println("&eDisabling addon &9" + addon.getAddonConfig().getName() + " &eby &6" + addon.getAddonConfig().getAuthor() + " &eversion &b" + addon.getAddonConfig().getVersion() + "&e...");
+        System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("addons.disablingAddon")
+                .replace("%name%", addon.getAddonConfig().getName()).replace("%author%", addon.getAddonConfig().getAuthor())
+                .replace("%version%", addon.getAddonConfig().getVersion()));
         addon.enabled = false;
         addon.onDisable();
-        System.out.println("&aDisabled addon &9" + addon.getAddonConfig().getName() + " &aby &6" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion() + "&a, took &c" + (System.nanoTime() - start) + "ns");
+        System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("addons.disabledAddon")
+                .replace("%name%", addon.getAddonConfig().getName()).replace("%author%", addon.getAddonConfig().getAuthor())
+                .replace("%version%", addon.getAddonConfig().getVersion())
+                .replace("%time%", String.valueOf(System.nanoTime() - start)));
     }
 
     public void unloadAddon(Addon addon) {
@@ -154,10 +163,14 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
         if (addon.enabled)
             return;
         long start = System.nanoTime();
-        System.out.println("&eEnabling addon &9" + addon.getAddonConfig().getName() + " &aby &9" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion() + "&e...");
+        System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("addons.enablingAddon")
+                .replace("%name%", addon.getAddonConfig().getName()).replace("%author%", addon.getAddonConfig().getAuthor())
+                .replace("%version%", addon.getAddonConfig().getVersion()));
         addon.enabled = true;
         addon.onEnable();
-        System.out.println("&aEnabled addon &9" + addon.getAddonConfig().getName() + " &aby &6" + addon.getAddonConfig().getAuthor() + " &aversion &b" + addon.getAddonConfig().getVersion() + "&a, took &c" + (System.nanoTime() - start) + "ns");
+        System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("addons.enabledAddon")
+                .replace("%name%", addon.getAddonConfig().getName()).replace("%author%", addon.getAddonConfig().getAuthor())
+                .replace("%version%", addon.getAddonConfig().getVersion()).replace("%time%", String.valueOf(System.nanoTime() - start)));
     }
 
     public Addon getAddonByName(String name) {

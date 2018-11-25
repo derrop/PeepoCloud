@@ -13,6 +13,7 @@ import net.nevercloud.node.utility.FileDownloading;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class AutoUpdaterManager {
@@ -34,23 +35,23 @@ public class AutoUpdaterManager {
                 consumer.accept(response);
             } else {
                 consumer.accept(null);
-                System.out.println("&cUpdate check failed: " + jsonObject.getString("reason"));
+                System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("autoupdate.checkFailed").replace("%reason%", jsonObject.getString("reason")));
             }
         });
     }
 
-    public void update(Consumer<Boolean> consumer) {
+    public void update(BiConsumer<Boolean, Path> consumer) {
         if (PlatformDependent.isWindows()) {
             Path path = Paths.get(SystemUtils.getPathOfInternalJarFile().replaceFirst(".jar", "") + "-update-" + ThreadLocalRandom.current().nextLong(Long.MAX_VALUE) + ".jar");
             consumer.accept(FileDownloading.downloadFileWithProgressBar(NeverCloudNode.getInstance().getLogger(), SystemUtils.CENTRAL_SERVER_URL + "updatenode", path,
                     () -> {
                     }, () -> {
-                    }));
+                    }), path);
         } else {
             consumer.accept(FileDownloading.downloadFileWithProgressBar(NeverCloudNode.getInstance().getLogger(), SystemUtils.CENTRAL_SERVER_URL + "updatenode", Paths.get(SystemUtils.getPathOfInternalJarFile()),
                     () -> {
                     }, () -> {
-                    }));
+                    }), null);
         }
 
     }

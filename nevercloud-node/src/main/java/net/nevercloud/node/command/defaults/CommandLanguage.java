@@ -8,6 +8,7 @@ import net.nevercloud.node.command.Command;
 import net.nevercloud.node.command.CommandSender;
 import net.nevercloud.node.command.TabCompletable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -46,12 +47,13 @@ public class CommandLanguage extends Command implements TabCompletable {
 
     @Override
     public String getUsage() {
-        return "Sets the language of the System";
+        return NeverCloudNode.getInstance().getMessage("command.usage.language");
     }
 
     @Override
     public Collection<String> tabComplete(CommandSender sender, String commandLine, String[] args) {
-        Collection<String> collection = Arrays.asList("available");
+        Collection<String> collection = new ArrayList<>();
+        collection.add("available");
         collection.addAll(NeverCloudNode.getInstance().getLanguagesManager().getAvailableLanguages());
         return collection;
     }

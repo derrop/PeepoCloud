@@ -83,7 +83,7 @@ public class Setup {
             throw new IllegalArgumentException("setupAcceptable must be an instance of BooleanSetupAcceptable, IntegerSetupAcceptable or StringSetupAcceptable");
         }
         if (response == null && this.cancellable) {
-            System.out.println("&cThe setup was cancelled");
+            System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("setup.cancelled"));
             this.cancelled = true;
             return this;
         }

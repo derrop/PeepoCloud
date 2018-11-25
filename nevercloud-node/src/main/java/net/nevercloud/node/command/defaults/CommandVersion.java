@@ -15,6 +15,6 @@ public class CommandVersion extends Command {
 
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
-        sender.sendMessage("You are currently using the version &e" + SystemUtils.getCurrentVersion());
+        sender.createLanguageMessage("command.version.message").replace("%version%", SystemUtils.getCurrentVersion()).send();
     }
 }

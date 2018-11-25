@@ -16,9 +16,4 @@ public class CommandStop extends Command {
     public void execute(CommandSender sender, String commandLine, String[] args) {
         NeverCloudNode.getInstance().shutdown();
     }
-
-    @Override
-    public String getUsage() {
-        return "Stops the system";
-    }
 }

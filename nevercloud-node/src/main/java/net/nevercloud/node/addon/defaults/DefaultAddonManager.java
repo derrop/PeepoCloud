@@ -5,11 +5,13 @@ package net.nevercloud.node.addon.defaults;
 
 import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.md_5.bungee.http.HttpClient;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.addon.node.NodeAddon;
+import net.nevercloud.node.utility.FileDownloading;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -49,7 +51,7 @@ public class DefaultAddonManager {
         if (Files.exists(path))
             return InstallAddonResult.ADDON_ALREADY_INSTALLED;
 
-        if (!HttpClient.downloadFile(SystemUtils.CENTRAL_SERVER_URL + "file?addonName=" + defaultAddonConfig.getName() + "&addonVersion=" + defaultAddonConfig.getVersion(), path))
+        if (!FileDownloading.downloadFileWithProgressBar(NeverCloudNode.getInstance().getLogger(), SystemUtils.CENTRAL_SERVER_URL + "file?addonName=" + defaultAddonConfig.getName() + "&addonVersion=" + defaultAddonConfig.getVersion(), path, null, null))
             return InstallAddonResult.DOWNLOAD_FAILED;
         if (!NeverCloudNode.getInstance().getNodeAddonManager().loadAndEnableAddon(path))
             return InstallAddonResult.ADDON_LOAD_FAILED;
@@ -114,16 +116,18 @@ public class DefaultAddonManager {
     @AllArgsConstructor
     public static enum UpdateAddonResult {
 
-        ADDON_NOT_FOUND("&cThe specified addon is not installed"),
-        ADDON_UP_TO_DATE("&cThe specified addon is already on the newest version"),
-        DOWNLOAD_FAILED("&cThe download of the addon %s-%s failed, please report this message to the support that we can fix this issue"),
-        ADDON_ALREADY_INSTALLED("&cThe specified addon is already installed"),
-        ADDON_LOAD_FAILED("&cAn error occurred while loading and enabling the addon"),
-        SUCCESS("&aThe addon was successfully updated");
+        ADDON_NOT_FOUND("addons.defaults.update.notInstalled"),
+        ADDON_UP_TO_DATE("addons.defaults.update.alreadyUpToDate"),
+        DOWNLOAD_FAILED("addons.defaults.update.downloadFailed"),
+        ADDON_ALREADY_INSTALLED("addons.defaults.update.alreadyInstalled"),
+        ADDON_LOAD_FAILED("addons.defaults.update.loadFailed"),
+        SUCCESS("addons.defaults.update.success");
 
-        private String message;
+        private String key;
 
         public String formatMessage(DefaultAddonConfig addonConfig) {
+            String message = NeverCloudNode.getInstance().getLanguagesManager().getMessage(key);
+
             if (this == DOWNLOAD_FAILED) {
                 return String.format(message, addonConfig.getName(), addonConfig.getVersion());
             }
@@ -135,14 +139,16 @@ public class DefaultAddonManager {
     @AllArgsConstructor
     public static enum InstallAddonResult {
 
-        ADDON_ALREADY_INSTALLED("&cThe specified addon is already installed"),
-        DOWNLOAD_FAILED("&cThe download of the addon %s-%s failed, please report this message to the support that we can fix this issue"),
-        ADDON_LOAD_FAILED("&cAn error occurred while loading and enabling the addon"),
-        SUCCESS("&aThe addon was successfully installed");
+        ADDON_ALREADY_INSTALLED("addons.defaults.install.alreadyInstalled"),
+        DOWNLOAD_FAILED("addons.defaults.install.downloadFailed"),
+        ADDON_LOAD_FAILED("addons.defaults.install.loadFailed"),
+        SUCCESS("addons.defaults.install.success");
 
-        private String message;
+        private String key;
 
         public String formatMessage(DefaultAddonConfig addonConfig) {
+            String message = NeverCloudNode.getInstance().getLanguagesManager().getMessage(key);
+
             if (this == DOWNLOAD_FAILED) {
                 return String.format(message, addonConfig.getName(), addonConfig.getVersion());
             }

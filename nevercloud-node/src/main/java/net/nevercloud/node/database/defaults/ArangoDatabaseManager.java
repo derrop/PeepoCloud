@@ -5,6 +5,7 @@ package net.nevercloud.node.database.defaults;
 
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDatabase;
+import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.database.Database;
 import net.nevercloud.node.database.DatabaseConfig;
 import net.nevercloud.node.database.DatabaseManager;
@@ -53,7 +54,7 @@ public class ArangoDatabaseManager implements DatabaseManager {
                 .user(config.getUsername())
                 .password(config.getPassword())
                 .build();
-        System.out.println("&aSuccessfully connected to arangodb &7@" + config.getHost() + ":" + config.getPort());
+        System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("database.arangodb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
 
         this.arangoDatabase = this.arangoDB.db(config.getDatabase());
     }

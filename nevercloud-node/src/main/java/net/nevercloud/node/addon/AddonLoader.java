@@ -5,6 +5,7 @@ package net.nevercloud.node.addon;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.nevercloud.node.NeverCloudNode;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -40,7 +41,8 @@ public class AddonLoader {
                 t.setAddonLoader(this);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            System.err.println("&cThere was an error while loading the main class &e" + config.getMain() + " &cof addon &9" + config.getName());
+            System.err.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("addons.loadingMainClassError")
+                    .replace("%main%", config.getMain()).replace("%addon%", config.getName()));
             e.printStackTrace();
         }
         return t;

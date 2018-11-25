@@ -106,7 +106,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
                         "?autoReconnect=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
                 config.getUsername(),
                 config.getPassword());
-        System.out.println("&aSuccessfully connected to mysql database &7@" + config.getHost() + ":" + config.getPort());
+        System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("database.mysqldb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import lombok.*;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
 import net.nevercloud.lib.utility.SystemUtils;
+import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.server.ServerVersion;
 
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class MinecraftServerStartupFileVersion {
                 return versionMap.values();
             }
         } catch (IOException e) {
-            System.out.println("&cNo connection to the central server could be established, using default spigot versions...");
+            System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("startupfiles.spigot.noConnection"));
         }
         return DEFAULTS;
     }

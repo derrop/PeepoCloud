@@ -82,7 +82,7 @@ public class MongoDatabaseManager implements DatabaseManager {
                         )
                 )
         );
-        System.out.println("&aSuccessfully connected to mongodb &7@" + config.getHost() + ":" + config.getPort());
+        System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("database.mongodb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
         this.mongoDatabase = this.mongoClient.getDatabase(config.getDatabase());
     }
 

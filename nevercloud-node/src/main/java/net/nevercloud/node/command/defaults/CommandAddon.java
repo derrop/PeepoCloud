@@ -18,7 +18,7 @@ public class CommandAddon extends Command {
         if (args.length == 1 && args[0].equalsIgnoreCase("list")) {
             NeverCloudNode.getInstance().getDefaultAddonManager().getDefaultAddons(defaultAddonConfigs -> {
                 if (defaultAddonConfigs == null) {
-                    sender.sendMessage("&cAn internal error occurred while trying to get the addons");
+                    sender.sendMessageLanguageKey("command.addons.internalError");
                     return;
                 }
                 for (DefaultAddonConfig defaultAddonConfig : defaultAddonConfigs) {
@@ -30,16 +30,17 @@ public class CommandAddon extends Command {
                     for (String version : defaultAddonConfig.getAllVersions()) {
                         allVersions.append(version).append(", ");
                     }
-                    sender.sendMessage(defaultAddonConfig.getName() + " by " + authors.substring(0, authors.length() - 2) + ":");
-                    sender.sendMessage("  - newest version: " + defaultAddonConfig.getVersion());
-                    sender.sendMessage("  - all versions: " + allVersions.substring(0, allVersions.length() - 2));
+                    sender.createLanguageMessage("command.addons.defaultList0").replace("%name%", defaultAddonConfig.getName())
+                            .replace("%authors%", authors.substring(0, authors.length() - 2)).send();
+                    sender.createLanguageMessage("command.addons.defaultList1").replace("%version%", defaultAddonConfig.getVersion()).send();
+                    sender.createLanguageMessage("command.addons.defaultList2").replace("%versions%", allVersions.substring(0, allVersions.length() - 2)).send();
                     sender.sendMessage(" ");
                 }
             });
         } else if (args.length == 2 && args[0].equalsIgnoreCase("install")) {
             NeverCloudNode.getInstance().getDefaultAddonManager().getDefaultAddon(args[1], defaultAddonConfig -> {
                 if (defaultAddonConfig == null) {
-                    sender.sendMessage("&cNo addon with that name was found");
+                    sender.sendMessageLanguageKey("command.addons.defaultNoAddonFound");
                     return;
                 }
 
@@ -48,20 +49,20 @@ public class CommandAddon extends Command {
         } else if (args.length == 2 && args[0].equalsIgnoreCase("remove")) {
             NeverCloudNode.getInstance().getDefaultAddonManager().getDefaultAddon(args[1], defaultAddonConfig -> {
                 if (defaultAddonConfig == null) {
-                    sender.sendMessage("&cNo addon with that name was found");
+                    sender.sendMessageLanguageKey("command.addons.defaultNoAddonFound");
                     return;
                 }
 
                 if (NeverCloudNode.getInstance().getDefaultAddonManager().uninstallAddon(defaultAddonConfig)) {
-                    sender.sendMessage("&aThe addon was successfully uninstalled");
+                    sender.sendMessageLanguageKey("command.addons.defaultUninstalledSuccess");
                 } else {
-                    sender.sendMessage("&cThe specified addon is not installed");
+                    sender.sendMessageLanguageKey("command.addons.defaultNotInstalled");
                 }
             });
         } else if (args.length == 2 && args[0].equalsIgnoreCase("update")) {
             NeverCloudNode.getInstance().getDefaultAddonManager().getDefaultAddon(args[1], defaultAddonConfig -> {
                 if (defaultAddonConfig == null) {
-                    sender.sendMessage("&cNo addon with that name was found");
+                    sender.sendMessageLanguageKey("command.addons.defaultNoAddonFound");
                     return;
                 }
 
@@ -77,8 +78,4 @@ public class CommandAddon extends Command {
         }
     }
 
-    @Override
-    public String getUsage() {
-        return "Installs, updates or deletes addons from the system";
-    }
 }
