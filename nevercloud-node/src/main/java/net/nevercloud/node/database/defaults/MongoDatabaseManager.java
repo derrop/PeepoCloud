@@ -63,6 +63,11 @@ public class MongoDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public String getName() {
+        return "MongoDB";
+    }
+
+    @Override
     public boolean isConnected() {
         return true; //TODO
     }

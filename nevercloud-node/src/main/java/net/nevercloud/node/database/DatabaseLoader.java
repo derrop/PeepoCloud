@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.*;
 
 public class DatabaseLoader { //TODO implement languagesystem
 
@@ -58,41 +59,50 @@ public class DatabaseLoader { //TODO implement languagesystem
     }
 
     public DatabaseManager loadDatabaseManager(NeverCloudNode node) {
-        if (!node.getInternalConfig().contains("databaseManager")) {
+        Map<String, DatabaseManager> databases = new HashMap<>();
+        this.addonManager.getLoadedAddons().values().forEach(databaseAddon -> {
+            DatabaseManager databaseManager = databaseAddon.loadDatabaseManager();
+            if (databaseManager != null) {
+                databases.put(databaseManager.getName(), databaseManager);
+            }
+        });
+        Arrays.asList(new MySQLDatabaseManager(), new ArangoDatabaseManager(), new MongoDatabaseManager())
+                .forEach(databaseManager -> databases.put(databaseManager.getName(), databaseManager));
+
+        DatabaseManager databaseManager = null;
+
+        if (node.getInternalConfig().contains("databaseManager")) {
+            for (DatabaseManager value : databases.values()) {
+                if (value.getName().equalsIgnoreCase(node.getInternalConfig().getString("databaseManager"))) {
+                    databaseManager = value;
+                    break;
+                }
+            }
+        }
+
+        if (databaseManager == null) {
             Setup.startSetupSync(new YamlConfigurable(), NeverCloudNode.getInstance().getLogger(),
                     setup -> {
+                        StringBuilder dbsBuilder = new StringBuilder();
+                        for (String s : databases.keySet()) {
+                            dbsBuilder.append(s).append(", ");
+                        }
+                        String dbs = dbsBuilder.substring(0, dbsBuilder.length() - 2);
                         setup.request(
                                 "db",
-                                "Please specify the database that you want to use: MYSQL, ARANGODB, MONGODB",
-                                "Invalid input, please choose one of the following and if you want more databases than those, make suggestions or write your own: MYSQL, ARANGODB, MONGODB",
-                                new ArraySetupAcceptable<>(new String[]{"mysql", "arangodb", "mongodb"})
+                                "Please specify the database that you want to use: " + dbs,
+                                "Invalid input, please choose one of the following and if you want more databases than those, make suggestions on our discord or write your own: " + dbs,
+                                new ArraySetupAcceptable<>(databases.keySet().toArray())
                         );
                         node.getInternalConfig().append("databaseManager", setup.getData().getString("db").toLowerCase());
                         node.saveInternalConfigFile();
                     });
-        }
-
-        DatabaseManager databaseManager = null;
-
-        switch (node.getInternalConfig().getString("databaseManager").toLowerCase()) {
-            case "mysql": {
-                databaseManager = new MySQLDatabaseManager();
+            for (DatabaseManager value : databases.values()) {
+                if (value.getName().equalsIgnoreCase(node.getInternalConfig().getString("databaseManager"))) {
+                    databaseManager = value;
+                    break;
+                }
             }
-            break;
-
-            case "arangodb": {
-                databaseManager = new ArangoDatabaseManager();
-            }
-            break;
-
-            case "mongodb": {
-                databaseManager = new MongoDatabaseManager();
-            }
-            break;
-        }
-
-        if (databaseManager == null) {
-            databaseManager = new MySQLDatabaseManager();
         }
 
         DatabaseConfig config = loadConfig(databaseManager);

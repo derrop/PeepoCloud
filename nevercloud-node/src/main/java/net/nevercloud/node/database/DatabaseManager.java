@@ -18,6 +18,8 @@ public interface DatabaseManager {
 
     int getDefaultPort();
 
+    String getName();
+
     boolean isConnected();
 
     void connect(DatabaseConfig config) throws Exception;

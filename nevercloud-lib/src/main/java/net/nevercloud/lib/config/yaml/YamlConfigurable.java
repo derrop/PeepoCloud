@@ -29,11 +29,21 @@ public class YamlConfigurable implements Configurable<YamlConfigurable> {
     }
 
     public YamlConfigurable(Reader reader) {
-        this.configuration = configurationProvider.load(reader);
+        try {
+            this.configuration = configurationProvider.load(reader);
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.configuration = new Configuration();
+        }
     }
 
     public YamlConfigurable(String input) {
-        this.configuration = configurationProvider.load(input);
+        try {
+            this.configuration = configurationProvider.load(input);
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.configuration = new Configuration();
+        }
     }
     
     @Override

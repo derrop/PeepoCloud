@@ -32,13 +32,31 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
     }
 
     public SimpleJsonObject(String input) {
-        JsonElement jsonElement = PARSER.parse(input);
+        JsonElement jsonElement;
+        try {
+            jsonElement = PARSER.parse(input);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonElement = new JsonObject();
+        }
         Preconditions.checkArgument(jsonElement.isJsonObject(), "JsonInput must be an json object, not " + jsonElement.getClass().getSimpleName());
         this.jsonObject = jsonElement.getAsJsonObject();
     }
 
     public SimpleJsonObject(Reader reader) {
-        JsonElement jsonElement = PARSER.parse(reader);
+        JsonElement jsonElement;
+        try {
+            jsonElement = PARSER.parse(reader);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonElement = new JsonObject();
+        }
+        Preconditions.checkArgument(jsonElement.isJsonObject(), "JsonInput must be an json object, not " + jsonElement.getClass().getSimpleName());
+        this.jsonObject = jsonElement.getAsJsonObject();
+    }
+
+    public SimpleJsonObject(Object object) {
+        JsonElement jsonElement = GSON.toJsonTree(object);
         Preconditions.checkArgument(jsonElement.isJsonObject(), "JsonInput must be an json object, not " + jsonElement.getClass().getSimpleName());
         this.jsonObject = jsonElement.getAsJsonObject();
     }

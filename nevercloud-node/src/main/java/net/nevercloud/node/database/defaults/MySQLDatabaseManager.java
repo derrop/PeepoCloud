@@ -81,6 +81,11 @@ public class MySQLDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public String getName() {
+        return "MySQL";
+    }
+
+    @Override
     public boolean isConnected() {
         try {
             return connection != null && !connection.isClosed();

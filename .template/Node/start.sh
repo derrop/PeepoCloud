@@ -1,0 +1,1 @@
+screen -S NeverCloud java -Xmx256M -jar NeverCloud-Node.jar

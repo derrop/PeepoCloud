@@ -19,36 +19,34 @@ public class GroupsConfig {
     private Map<String, BungeeGroup> bungeeGroups;
 
     public Map<String, MinecraftGroup> loadMinecraftGroups() {
-        Map<String, MinecraftGroup> groups = new HashMap<>();
+        this.minecraftGroups = new HashMap<>();
         Database database = NeverCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups");
         database.forEach(simpleJsonObject -> {
             MinecraftGroup group = SimpleJsonObject.GSON.fromJson(simpleJsonObject.asJsonObject(), MinecraftGroup.class);
             if (group != null) {
-                groups.put(group.getName(), group);
+                this.loadGroup(group);
             }
         });
-        this.minecraftGroups = groups;
-        return groups;
+        return this.minecraftGroups;
     }
 
     public Map<String, BungeeGroup> loadBungeeGroups() {
-        Map<String, BungeeGroup> groups = new HashMap<>();
+        this.bungeeGroups = new HashMap<>();
         Database database = NeverCloudNode.getInstance().getDatabaseManager().getDatabase("bungeeGroups");
         database.forEach(simpleJsonObject -> {
             BungeeGroup group = SimpleJsonObject.GSON.fromJson(simpleJsonObject.asJsonObject(), BungeeGroup.class);
             if (group != null) {
-                groups.put(group.getName(), group);
+                this.loadGroup(group);
             }
         });
-        this.bungeeGroups = groups;
-        return groups;
+        return this.bungeeGroups;
     }
 
     public void createGroup(BungeeGroup group, Consumer<Boolean> success) {
         Database database = NeverCloudNode.getInstance().getDatabaseManager().getDatabase("bungeeGroups");
         doCreate(aBoolean -> {
             if (aBoolean)
-                this.bungeeGroups.put(group.getName(), group);
+                this.loadGroup(group);
             success.accept(aBoolean);
         }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
     }
@@ -57,7 +55,7 @@ public class GroupsConfig {
         Database database = NeverCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups");
         doCreate(aBoolean -> {
             if (aBoolean)
-                this.minecraftGroups.put(group.getName(), group);
+                this.loadGroup(group);
             success.accept(aBoolean);
         }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
     }
@@ -71,6 +69,16 @@ public class GroupsConfig {
                 success.accept(true);
             }
         });
+    }
+
+    private void loadGroup(BungeeGroup group) {
+        System.out.println("&aLoading BungeeGroup &e" + group.getName() + "&a...");
+        this.bungeeGroups.put(group.getName(), group);
+    }
+
+    private void loadGroup(MinecraftGroup group) {
+        System.out.println("&aLoading MinecraftGroup &e" + group.getName() + "&a...");
+        this.minecraftGroups.put(group.getName(), group);
     }
 
 }

@@ -3,11 +3,14 @@ package net.nevercloud.lib.server.bungee;
  * Created by Mc_Ruben on 14.11.2018
  */
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import net.nevercloud.lib.server.GroupMode;
 import net.nevercloud.lib.server.Template;
 
-import java.util.Collection;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +19,7 @@ import java.util.Collection;
 public class BungeeGroup {
     private String name;
     private GroupMode groupMode;
-    private Collection<Template> templates;
+    private List<Template> templates;
     private int memory;
     private int minServers;
     private int maxServers;

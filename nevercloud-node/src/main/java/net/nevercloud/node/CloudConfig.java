@@ -6,6 +6,8 @@ package net.nevercloud.node;
 import com.sun.management.OperatingSystemMXBean;
 import lombok.*;
 import net.nevercloud.lib.config.yaml.YamlConfigurable;
+import net.nevercloud.lib.node.NodeInfo;
+import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.lib.utility.network.NetworkAddress;
 import net.nevercloud.node.network.NetworkServer;
 import sun.management.BaseOperatingSystemImpl;
@@ -25,6 +27,7 @@ public class CloudConfig {
 
     private final Path networkPath = Paths.get("networking.yml");
     private final Path mainPath = Paths.get("config.yml");
+    private final Path processPath = Paths.get("processes.yml");
 
     //Network
     private Collection<NetworkAddress> connectableNodes;
@@ -33,9 +36,18 @@ public class CloudConfig {
 
     private int maxMemory;
 
+    //Process
+    private String bungeeStartCmd;
+    private String serverStartCmd;
+
+    NodeInfo loadNodeInfo(int usedMemory) {
+        return new NodeInfo(this.nodeName, this.maxMemory, usedMemory, SystemUtils.cpuUsageProcess());
+    }
+
     void load() {
         this.loadNetwork();
         this.loadMain();
+        this.loadProcesses();
     }
 
     private void loadMain() {
@@ -74,9 +86,25 @@ public class CloudConfig {
         this.host = (NetworkAddress) configurable.get("host");
     }
 
+    private void loadProcesses() {
+        YamlConfigurable configurable = null;
+        if (Files.exists(processPath)) {
+            configurable = YamlConfigurable.load(processPath);
+        } else {
+            configurable = new YamlConfigurable()
+                    .append("bungeeStartCommand", "java -Xmx%memory%M -jar bungee.jar")
+                    .append("serverStartCommand", "java -Dcom.mojang.eula.agree=true -Xmx%memory%M -jar server.jar");
+            configurable.saveAsFile(processPath);
+        }
+
+        this.bungeeStartCmd = configurable.getString("bungeeStartCommand");
+        this.serverStartCmd = configurable.getString("serverStartCommand");
+    }
+
     public void save() {
         this.saveNetwork();
         this.saveMain();
+        this.saveProcesses();
     }
 
     private void saveNetwork() {
@@ -91,6 +119,13 @@ public class CloudConfig {
         new YamlConfigurable()
                 .append("maxMemoryForServers", this.maxMemory)
                 .saveAsFile(mainPath);
+    }
+
+    private void saveProcesses() {
+        new YamlConfigurable()
+                .append("bungeeStartCommand", this.bungeeStartCmd)
+                .append("serverStartCommand", this.serverStartCmd)
+                .saveAsFile(processPath);
     }
 
 }

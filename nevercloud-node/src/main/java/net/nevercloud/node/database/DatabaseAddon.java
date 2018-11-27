@@ -5,7 +5,7 @@ package net.nevercloud.node.database;
 
 import net.nevercloud.node.addon.Addon;
 
-public class DatabaseAddon extends Addon {
+public abstract class DatabaseAddon extends Addon {
 
     protected DatabaseLoader databaseLoader;
 
@@ -24,7 +24,5 @@ public class DatabaseAddon extends Addon {
 
     }
 
-    protected void enableDatabaseManager(DatabaseManager databaseManager) {
-        this.databaseLoader.enableDatabase(this, databaseManager);
-    }
+    public abstract DatabaseManager loadDatabaseManager();
 }

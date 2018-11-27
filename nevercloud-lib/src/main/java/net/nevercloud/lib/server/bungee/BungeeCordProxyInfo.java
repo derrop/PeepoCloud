@@ -26,6 +26,9 @@ public class BungeeCordProxyInfo {
 
     private Template template;
 
+    @Setter
+    private long startup;
+
     public BungeeGroup getGroup() {
         throw new UnsupportedOperationException("Stub!");
     }

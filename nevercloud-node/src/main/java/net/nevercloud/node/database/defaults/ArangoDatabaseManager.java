@@ -43,6 +43,11 @@ public class ArangoDatabaseManager implements DatabaseManager {
     }
 
     @Override
+    public String getName() {
+        return "ArangoDB";
+    }
+
+    @Override
     public boolean isConnected() {
         return true;//TODO
     }

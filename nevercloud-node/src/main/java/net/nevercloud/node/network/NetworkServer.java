@@ -51,7 +51,7 @@ public class NetworkServer implements Runnable {
     private InetSocketAddress serverHost;
 
     private ChannelHandler authHandler = new ServerAuthChannelHandler();
-    private ChannelHandler defaultHandler = new ChannelHandlerAdapter();
+    private ChannelHandler defaultHandler = new ServerDefaultHandler();
 
     public NetworkServer(InetSocketAddress address, PacketManager packetManager) {
         this.address = address;
@@ -132,17 +132,15 @@ public class NetworkServer implements Runnable {
                     if (auth.getParentComponentName() == null)
                         break;
 
-                    NodeParticipant parent = this.getConnectedNode(auth.getParentComponentName());
-                    if (parent == null)
+                    if (!auth.getParentComponentName().equals(NeverCloudNode.getInstance().getNodeInfo().getName()))
                         break;
 
-                    if (!parent.getStartingServers().containsKey(auth.getComponentName()))
+                    if (!NeverCloudNode.getInstance().getProcessManager().getProcesses().containsKey(auth.getComponentName()))
                         break;
 
-                    networkParticipant = new MinecraftServerParticipant(networkParticipant.getChannel(), auth, parent);
+                    networkParticipant = new MinecraftServerParticipant(networkParticipant.getChannel(), auth);
 
-                    parent.getStartingServers().remove(auth.getComponentName());
-                    parent.getServers().put(auth.getComponentName(), (MinecraftServerParticipant) networkParticipant);
+                    NeverCloudNode.getInstance().getServersOnThisNode().put(auth.getComponentName(), (MinecraftServerParticipant) networkParticipant);
                     successful = true;
                     NeverCloudNode.getInstance().getEventManager().callEvent(new ServerConnectEvent((MinecraftServerParticipant) networkParticipant));
 
@@ -153,17 +151,16 @@ public class NetworkServer implements Runnable {
                     if (auth.getParentComponentName() == null)
                         break;
 
-                    NodeParticipant parent = this.getConnectedNode(auth.getParentComponentName());
-                    if (parent == null)
+                    if (!auth.getParentComponentName().equals(NeverCloudNode.getInstance().getNodeInfo().getName()))
                         break;
 
-                    if (!parent.getStartingProxies().containsKey(auth.getComponentName()))
+                    if (!NeverCloudNode.getInstance().getProcessManager().getProcesses().containsKey(auth.getComponentName()))
                         break;
 
-                    networkParticipant = new BungeeCordParticipant(networkParticipant.getChannel(), auth, parent);
+                    networkParticipant = new BungeeCordParticipant(networkParticipant.getChannel(), auth);
 
-                    parent.getStartingProxies().remove(auth.getComponentName());
-                    parent.getProxies().put(auth.getComponentName(), (BungeeCordParticipant) networkParticipant);
+                    NeverCloudNode.getInstance().getProxiesOnThisNode().put(auth.getComponentName(), (BungeeCordParticipant) networkParticipant);
+
                     successful = true;
                     NeverCloudNode.getInstance().getEventManager().callEvent(new BungeeConnectEvent((BungeeCordParticipant) networkParticipant));
 

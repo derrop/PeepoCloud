@@ -69,7 +69,7 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
         for (int i = (int) percent; i < 100; i++) {
             chars[i] = ' ';
         }
-        if ((int) percent > 0 && lastProgressChar != -1) {
+        if ((int) percent > 0 && lastProgressChar != (char) -1) {
             chars[(int) percent - 1] = lastProgressChar;
         } else {
             chars[0] = lastProgressChar;

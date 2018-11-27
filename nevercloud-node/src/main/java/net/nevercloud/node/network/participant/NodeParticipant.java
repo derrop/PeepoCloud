@@ -27,8 +27,8 @@ public class NodeParticipant extends NetworkParticipant {
 
     private Auth auth;
 
-    private Map<String, MinecraftServerParticipant> servers = new HashMap<>();
-    private Map<String, BungeeCordParticipant> proxies = new HashMap<>();
+    private Map<String, MinecraftServerInfo> servers = new HashMap<>();
+    private Map<String, BungeeCordProxyInfo> proxies = new HashMap<>();
 
     private Map<String, MinecraftServerInfo> startingServers = new HashMap<>();
     private Map<String, BungeeCordProxyInfo> startingProxies = new HashMap<>();
@@ -49,8 +49,6 @@ public class NodeParticipant extends NetworkParticipant {
     }
 
     public void closeConnection() {
-        this.proxies.values().forEach(bungeeCordParticipant -> bungeeCordParticipant.getChannel().close());
-        this.servers.values().forEach(minecraftServerParticipant -> minecraftServerParticipant.getChannel().close());
         this.proxies.clear();
         this.servers.clear();
         this.waitingProxies.clear();
@@ -60,11 +58,4 @@ public class NodeParticipant extends NetworkParticipant {
         this.getChannel().close();
     }
 
-    public void sendBungees(Packet packet) {
-        this.proxies.values().forEach(bungeeCordParticipant -> bungeeCordParticipant.sendPacket(packet));
-    }
-
-    public void sendMinecraftServers(Packet packet) {
-        this.servers.values().forEach(minecraftServerParticipant -> minecraftServerParticipant.sendPacket(packet));
-    }
 }

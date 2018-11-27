@@ -16,7 +16,7 @@ import net.nevercloud.node.setup.type.EnumSetupAcceptable;
 import net.nevercloud.node.setup.type.IntegerSetupAcceptable;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 public class CommandCreate extends Command {
     public CommandCreate() {
@@ -44,7 +44,7 @@ public class CommandCreate extends Command {
 
                     GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode").toUpperCase());
 
-                    Collection<Template> templates = new ArrayList<>(); //not Arrays.asList because we cannot use the add method with this (for the create template command)
+                    List<Template> templates = new ArrayList<>(); //not Arrays.asList because we cannot use the add method with this (for the create template command)
                     templates.add(new Template("default"));
 
                     setup.request(
@@ -97,7 +97,7 @@ public class CommandCreate extends Command {
 
                     GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode").toUpperCase());
 
-                    Collection<Template> templates = new ArrayList<>(); //not Arrays.asList because we cannot use the add method with this (for the create template command)
+                    List<Template> templates = new ArrayList<>(); //not Arrays.asList because we cannot use the add method with this (for the create template command)
                     templates.add(new Template("default"));
 
                     setup.request(

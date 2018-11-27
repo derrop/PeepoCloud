@@ -3,6 +3,9 @@ package net.nevercloud.node.server.process;
  * Created by Mc_Ruben on 23.11.2018
  */
 
+import lombok.Getter;
+import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
+import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.api.event.network.bungeecord.BungeeQueuedEvent;
@@ -13,13 +16,30 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class ServerQueue implements Runnable {
 
+    private ProcessManager processManager;
+    @Getter
     private BlockingDeque<CloudProcess> serverProcesses = new LinkedBlockingDeque<>();
 
-    public static ServerQueue start() {
+    public static ServerQueue start(ProcessManager processManager) {
         ServerQueue serverQueue = new ServerQueue();
+        serverQueue.processManager = processManager;
         Thread thread = new Thread(serverQueue, "NeverCloud ServerQueue");
         thread.start();
         return serverQueue;
+    }
+
+    public CloudProcess createProcess(BungeeCordProxyInfo proxyInfo) {
+        return new BungeeProcess(
+                proxyInfo,
+                this.processManager
+        );
+    }
+
+    public CloudProcess createProcess(MinecraftServerInfo serverInfo) {
+        return new ServerProcess(
+                serverInfo,
+                this.processManager
+        );
     }
 
     public void queueProcess(CloudProcess process, boolean priorityHigh) {
@@ -34,6 +54,8 @@ public class ServerQueue implements Runnable {
         } else {
             this.serverProcesses.offerLast(process);
         }
+
+        System.out.println("&aServer process queued [" + process + "]");
     }
 
     public int getMemoryNeededForProcessesInQueue() {

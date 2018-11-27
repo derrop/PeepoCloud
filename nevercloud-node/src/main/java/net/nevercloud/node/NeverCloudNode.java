@@ -4,6 +4,7 @@ package net.nevercloud.node;
  */
 
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
@@ -14,6 +15,8 @@ import net.nevercloud.lib.network.packet.PacketInfo;
 import net.nevercloud.lib.network.packet.PacketManager;
 import net.nevercloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.nevercloud.lib.node.NodeInfo;
+import net.nevercloud.lib.server.Template;
+import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.nevercloud.lib.server.bungee.BungeeGroup;
 import net.nevercloud.lib.server.minecraft.MinecraftGroup;
 import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
@@ -22,43 +25,50 @@ import net.nevercloud.lib.utility.network.NetworkAddress;
 import net.nevercloud.node.addon.AddonManager;
 import net.nevercloud.node.addon.defaults.DefaultAddonManager;
 import net.nevercloud.node.addon.node.NodeAddon;
+import net.nevercloud.node.api.event.internal.EventManager;
 import net.nevercloud.node.command.CommandManager;
 import net.nevercloud.node.command.CommandSender;
 import net.nevercloud.node.command.defaults.*;
 import net.nevercloud.node.database.DatabaseLoader;
 import net.nevercloud.node.database.DatabaseManager;
-import net.nevercloud.node.api.event.internal.EventManager;
 import net.nevercloud.node.languagesystem.LanguagesManager;
 import net.nevercloud.node.logging.ColoredLogger;
 import net.nevercloud.node.logging.ConsoleColor;
 import net.nevercloud.node.network.ClientNode;
 import net.nevercloud.node.network.NetworkServer;
 import net.nevercloud.node.network.packet.in.PacketCInUpdateNodeInfo;
+import net.nevercloud.node.network.packet.out.PacketOutUpdateNodeInfo;
 import net.nevercloud.node.network.packet.out.group.PacketOutCreateBungeeGroup;
 import net.nevercloud.node.network.packet.out.group.PacketOutCreateMinecraftGroup;
-import net.nevercloud.node.network.packet.out.PacketOutUpdateNodeInfo;
 import net.nevercloud.node.network.participant.BungeeCordParticipant;
 import net.nevercloud.node.network.participant.MinecraftServerParticipant;
 import net.nevercloud.node.network.participant.NodeParticipant;
+import net.nevercloud.node.screen.ScreenManager;
 import net.nevercloud.node.server.ServerFilesLoader;
-import net.nevercloud.node.server.process.ServerQueue;
+import net.nevercloud.node.server.process.ProcessManager;
 import net.nevercloud.node.statistic.StatisticsManager;
 import net.nevercloud.node.updater.AutoUpdaterManager;
 import net.nevercloud.node.updater.UpdateCheckResponse;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
 public class NeverCloudNode {
@@ -87,8 +97,11 @@ public class NeverCloudNode {
     private String networkAuthKey;
     private NetworkServer networkServer;
     private Map<String, ClientNode> connectedNodes = new HashMap<>();
+    private Map<String, NodeParticipant> serverNodes = new HashMap<>();
 
     private PacketManager packetManager = new PacketManager();
+
+    private ScreenManager screenManager = new ScreenManager();
 
     private EventManager eventManager;
 
@@ -96,13 +109,13 @@ public class NeverCloudNode {
 
     private NodeInfo nodeInfo;
 
-    private ServerQueue serverQueue;
-
     private CloudConfig cloudConfig;
     private GroupsConfig groupsConfig = new GroupsConfig();
 
     private Map<String, MinecraftGroup> minecraftGroups;
     private Map<String, BungeeGroup> bungeeGroups;
+
+    private ProcessManager processManager;
 
     private Map<String, MinecraftServerParticipant> serversOnThisNode = new HashMap<String, MinecraftServerParticipant>() {
         @Override
@@ -177,11 +190,45 @@ public class NeverCloudNode {
         ConsoleReader consoleReader = new ConsoleReader(System.in, System.out);
         this.logger = new ColoredLogger(consoleReader);
 
+        {
+            try {
+                URLConnection connection = new URL(SystemUtils.CENTRAL_SERVER_URL + "banned").openConnection();
+                connection.connect();
+                try (InputStream inputStream = connection.getInputStream();
+                     Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+                    SimpleJsonObject jsonObject = new SimpleJsonObject(reader);
+                    JsonObject response = jsonObject.get("response").getAsJsonObject();
+                    if (response.get("banned").getAsBoolean()) {
+                        String reason = response.has("reason") ? response.get("reason").getAsString() : null;
+                        System.err.println("&4!!!");
+                        System.err.println("&4!!!");
+                        if (reason != null) {
+                            System.err.println("&4YOUR CLOUD GOT BANNED, SOME FUNCTIONS WON'T WORK ANYMORE, REASON: &e" + reason);
+                        } else {
+                            System.err.println("&4YOUR CLOUD GOT BANNED, SOME FUNCTIONS WON'T WORK ANYMORE");
+                        }
+                        System.err.println("&4!!!");
+                        System.err.println("&4!!!");
+                        System.err.println("&4The Cloud will start in 5 seconds...");
+                        SystemUtils.sleepUninterruptedly(5000);
+                    }
+                }
+            } catch (Exception e) {
+                if (!SystemUtils.isServerOffline(e)) {
+                    e.printStackTrace();
+                } else {
+                    System.out.println("&cOur NeverCloud UpdateServer (&e" + SystemUtils.CENTRAL_SERVER_URL + "&c) is currently offline, some functions won't work, we'll try to get it online as soon as possible");
+                }
+            }
+        }
+
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
 
         this.languagesManager = new LanguagesManager();
 
         this.loadConfigs();
+
+        this.nodeInfo = this.cloudConfig.loadNodeInfo(0);
 
         this.autoUpdaterManager = new AutoUpdaterManager();
 
@@ -214,7 +261,11 @@ public class NeverCloudNode {
         this.minecraftGroups = this.groupsConfig.loadMinecraftGroups();
         this.bungeeGroups = this.groupsConfig.loadBungeeGroups();
 
-        this.serverQueue = ServerQueue.start();
+        this.processManager = new ProcessManager(
+                bungee -> this.memoryUsedOnThisInstanceByBungee += bungee,
+                server -> this.memoryUsedOnThisInstanceByServer += server,
+                this.cloudConfig
+        );
 
         ServerFilesLoader.tryInstallSpigot();
         ServerFilesLoader.tryInstallBungee();
@@ -238,12 +289,16 @@ public class NeverCloudNode {
                 new CommandVersion(),
                 new CommandReload(),
                 new CommandClear(),
-                new CommandCreate()
+                new CommandCreate(),
+                new CommandStart(),
+                new CommandScreen()
         );
     }
 
     private void shutdown0() {
         running = false;
+        if (this.processManager != null)
+            this.processManager.shutdown();
         this.commandManager.shutdown();
         this.databaseLoader.shutdown();
         this.databaseManager.shutdown();
@@ -387,6 +442,7 @@ public class NeverCloudNode {
 
     public void reloadConfigs() {
         this.loadConfigs();
+        this.nodeInfo = this.cloudConfig.loadNodeInfo(this.getMemoryUsedOnThisInstance());
     }
 
     public void reloadModules() {
@@ -414,7 +470,7 @@ public class NeverCloudNode {
     }
 
     public int getMemoryUsedOnThisInstance() {
-        return this.memoryUsedOnThisInstanceByBungee + this.memoryUsedOnThisInstanceByServer + this.serverQueue.getMemoryNeededForProcessesInQueue();
+        return this.memoryUsedOnThisInstanceByBungee + this.memoryUsedOnThisInstanceByServer + this.processManager.getServerQueue().getMemoryNeededForProcessesInQueue();
     }
 
     public void saveInternalConfigFile() {
@@ -454,6 +510,14 @@ public class NeverCloudNode {
         this.sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
     }
 
+    public void updateServerInfo(MinecraftServerInfo serverInfo) {
+        //TODO
+    }
+
+    public void updateProxyInfo(BungeeCordProxyInfo proxyInfo) {
+        //TODO
+    }
+
     public NodeInfo getBestNodeInfo(int memoryNeeded) {
         NodeInfo best = null;
         Collection<NodeInfo> infos = new ArrayList<>();
@@ -477,24 +541,27 @@ public class NeverCloudNode {
         return best;
     }
 
-    public Collection<MinecraftServerParticipant> getMinecraftServers() {
-        Collection<MinecraftServerParticipant> participants = new ArrayList<>(this.serversOnThisNode.values());
+    public Collection<MinecraftServerInfo> getMinecraftServers() {
+        Collection<MinecraftServerInfo> participants = new ArrayList<>();
+        for (MinecraftServerParticipant value : this.serversOnThisNode.values()) {
+            participants.add(value.getServerInfo());
+        }
         for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
             participants.addAll(value.getServers().values());
         }
         return participants;
     }
 
-    public Collection<MinecraftServerParticipant> getMinecraftServers(String group) {
-        Collection<MinecraftServerParticipant> participants = new ArrayList<>();
+    public Collection<MinecraftServerInfo> getMinecraftServers(String group) {
+        Collection<MinecraftServerInfo> participants = new ArrayList<>();
         for (MinecraftServerParticipant value : this.serversOnThisNode.values()) {
             if (value.getServerInfo().getGroupName().equalsIgnoreCase(group)) {
-                participants.add(value);
+                participants.add(value.getServerInfo());
             }
         }
         for (NodeParticipant node : this.networkServer.getConnectedNodes().values()) {
-            for (MinecraftServerParticipant value : node.getServers().values()) {
-                if (value.getServerInfo().getGroupName().equalsIgnoreCase(group)) {
+            for (MinecraftServerInfo value : node.getServers().values()) {
+                if (value.getGroupName().equalsIgnoreCase(group)) {
                     participants.add(value);
                 }
             }
@@ -502,29 +569,51 @@ public class NeverCloudNode {
         return participants;
     }
 
-    public Collection<BungeeCordParticipant> getBungeeProxies() {
-        Collection<BungeeCordParticipant> participants = new ArrayList<>(this.proxiesOnThisNode.values());
+    public Collection<BungeeCordProxyInfo> getBungeeProxies() {
+        Collection<BungeeCordProxyInfo> participants = new ArrayList<>();
+        for (BungeeCordParticipant value : this.proxiesOnThisNode.values()) {
+            participants.add(value.getProxyInfo());
+        }
         for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
             participants.addAll(value.getProxies().values());
         }
         return participants;
     }
 
-    public Collection<BungeeCordParticipant> getBungeeProxies(String group) {
-        Collection<BungeeCordParticipant> participants = new ArrayList<>();
+    public Collection<BungeeCordProxyInfo> getBungeeProxies(String group) {
+        Collection<BungeeCordProxyInfo> participants = new ArrayList<>();
         for (BungeeCordParticipant value : this.proxiesOnThisNode.values()) {
             if (value.getProxyInfo().getGroupName().equalsIgnoreCase(group)) {
-                participants.add(value);
+                participants.add(value.getProxyInfo());
             }
         }
         for (NodeParticipant node : this.networkServer.getConnectedNodes().values()) {
-            for (BungeeCordParticipant value : node.getProxies().values()) {
-                if (value.getProxyInfo().getGroupName().equalsIgnoreCase(group)) {
+            for (BungeeCordProxyInfo value : node.getProxies().values()) {
+                if (value.getGroupName().equalsIgnoreCase(group)) {
                     participants.add(value);
                 }
             }
         }
         return participants;
+    }
+
+    public int getNextServerId(String group) {
+        AtomicInteger i = new AtomicInteger();
+        this.networkServer.getConnectedNodes().values().forEach(participant -> i.addAndGet(participant.getServers().size() + participant.getStartingServers().size() + participant.getWaitingServers().size()));
+        return i.get() + this.processManager.getProcessesOfMinecraftGroup(group).size() + this.processManager.getProcessesOfMinecraftGroupQueued(group).size() + 1;
+    }
+
+    public boolean isServerStarted(String name) {
+        if (this.getMinecraftServers().stream().anyMatch(serverInfo -> serverInfo.getComponentName().equals(name)))
+            return true;
+        for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
+            if (value.getServers().containsKey(name) || value.getWaitingServers().containsKey(name) || value.getStartingServers().containsKey(name)) {
+                return true;
+            }
+        }
+        if (this.processManager.getProcesses().containsKey(name) || this.processManager.getServerQueue().getServerProcesses().stream().anyMatch(process -> process.getName().equals(name)))
+            return true;
+        return false;
     }
 
     public MinecraftServerInfo startMinecraftServer(MinecraftGroup group) {
@@ -532,11 +621,16 @@ public class NeverCloudNode {
     }
 
     public MinecraftServerInfo startMinecraftServer(MinecraftGroup group, int memory) {
-        return this.startMinecraftServer(group, group.getName() + "-" + (this.getMinecraftServers(group.getName()).size() + 1), memory);
+        int id = this.getNextServerId(group.getName());
+        return this.startMinecraftServer(group, group.getName() + "-" + id, id, memory);
     }
 
     public MinecraftServerInfo startMinecraftServer(MinecraftGroup group, String name) {
-        return this.startMinecraftServer(group, group.getName() + "-" + (this.getMinecraftServers(group.getName()).size() + 1), group.getMemory());
+        return this.startMinecraftServer(group, group.getName() + "-" + this.getNextServerId(group.getName()), group.getMemory());
+    }
+
+    public MinecraftServerInfo startMinecraftServer(MinecraftGroup group, String name, int id, int memory) {
+        return this.startMinecraftServer(this.getBestNodeInfo(memory), group, name, id, memory);
     }
 
     public MinecraftServerInfo startMinecraftServer(MinecraftGroup group, String name, int memory) {
@@ -548,22 +642,45 @@ public class NeverCloudNode {
     }
 
     public MinecraftServerInfo startMinecraftServer(NodeInfo nodeInfo, MinecraftGroup group, int memory) {
-        return this.startMinecraftServer(nodeInfo, group, group.getName() + "-" + (this.getMinecraftServers(group.getName()).size() + 1), memory);
+        int id = this.getNextServerId(group.getName());
+        return this.startMinecraftServer(nodeInfo, group, group.getName() + "-" + id, id, memory);
     }
 
     public MinecraftServerInfo startMinecraftServer(NodeInfo nodeInfo, MinecraftGroup group, String name) {
-        return this.startMinecraftServer(nodeInfo, group, group.getName() + "-" + (this.getMinecraftServers(group.getName()).size() + 1), group.getMemory());
+        return this.startMinecraftServer(nodeInfo, group, name, this.getNextServerId(group.getName()), group.getMemory());
     }
 
     public MinecraftServerInfo startMinecraftServer(NodeInfo nodeInfo, MinecraftGroup group, String name, int memory) {
-        if (nodeInfo == null)
-            return null;
-        if (this.nodeInfo.getName().equals(nodeInfo.getName())) {
+        return this.startMinecraftServer(nodeInfo, group, name, this.getNextServerId(group.getName()), memory);
+    }
 
+    public MinecraftServerInfo startMinecraftServer(NodeInfo nodeInfo, MinecraftGroup group, String name, int id, int memory) {
+        if (this.getNextServerId(group.getName()) - 1 >= group.getMaxServers() || this.isServerStarted(name))
+            return null;
+        if (nodeInfo == null)
+            nodeInfo = this.nodeInfo;
+
+        if (this.nodeInfo.getName().equals(nodeInfo.getName())) {
+            MinecraftServerInfo serverInfo = new MinecraftServerInfo(
+                    name,
+                    group.getName(),
+                    id,
+                    this.nodeInfo.getName(),
+                    memory,
+                    new HashMap<>(),
+                    this.findTemplate(group),
+                    -1L
+            );
+            this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(serverInfo), false);
+            return serverInfo;
         } else {
 
         }
         return null;
+    }
+
+    public Template findTemplate(MinecraftGroup group) {
+        return group.getTemplates().get(ThreadLocalRandom.current().nextInt(group.getTemplates().size()));
     }
 
 }

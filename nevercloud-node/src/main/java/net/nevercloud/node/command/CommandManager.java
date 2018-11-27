@@ -32,6 +32,8 @@ public class CommandManager {
                 } catch (UnsupportedOperationException e) {
                     if (e.getMessage().equalsIgnoreCase("read() with timeout cannot be called as non-blocking operation is disabled")) {
                         System.exit(0);
+                    } else {
+                        e.printStackTrace();
                     }
                 }
             }

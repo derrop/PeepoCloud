@@ -67,7 +67,8 @@ public class AutoUpdaterManager {
                 }
             };
         } catch (IOException e) {
-            e.printStackTrace();
+            if (!SystemUtils.isServerOffline(e))
+                e.printStackTrace();
         }
         return null;
     }

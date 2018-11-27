@@ -14,7 +14,7 @@ public abstract class AbstractConsoleAnimation {
 
     @Getter
     private ColoredLogger logger;
-    int cursorUp = 2;
+    int cursorUp = 1;
 
     protected void print(String... input) {
         if (input.length == 0)

@@ -12,6 +12,8 @@ public interface CloudProcess {
 
     Process getProcess();
 
+    String getName();
+
     int getMemory();
 
     default void dispatchCommand(String command) {
@@ -29,11 +31,7 @@ public interface CloudProcess {
 
     default boolean isRunning() {
         Process process = getProcess();
-        try {
-            return process != null && process.isAlive() && process.getInputStream().available() != -1;
-        } catch (IOException e) {
-            return false;
-        }
+        return process != null && process.isAlive();
     }
 
     void startup();

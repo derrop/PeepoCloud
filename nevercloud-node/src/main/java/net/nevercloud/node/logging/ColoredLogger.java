@@ -115,7 +115,7 @@ public class ColoredLogger extends Logger {
             e.printStackTrace();
         }
         if (this.runningAnimation != null)
-            this.runningAnimation.cursorUp = 2;
+            this.runningAnimation.cursorUp = 1;
     }
 
     public void print(String line) {

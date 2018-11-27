@@ -3,10 +3,15 @@ package net.nevercloud.lib.utility;
  * Created by Mc_Ruben on 07.11.2018
  */
 
+import com.sun.management.OperatingSystemMXBean;
+import sun.management.BaseOperatingSystemImpl;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
+import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.*;
@@ -66,6 +71,23 @@ public class SystemUtils {
         }
     }
 
+    public static double cpuUsageProcess() {
+        return ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getProcessCpuLoad();
+    }
+
+    public static double cpuUsageSystem() {
+        return ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getSystemCpuLoad();
+    }
+
+    public static long memoryUsageProcess() {
+        return ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+    }
+
+    public static long memoryUsageSystem() {
+        return ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize() -
+                ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getFreePhysicalMemorySize();
+    }
+
     public static void sleepUninterruptedly(long millis) {
         try {
             Thread.sleep(millis);
@@ -93,6 +115,33 @@ public class SystemUtils {
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                             Path target = Paths.get(targetDirectory, directory.relativize(file).toString());
                             Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
+                            return FileVisitResult.CONTINUE;
+                        }
+                    }
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteDirectory(Path directory) {
+        if (!Files.exists(directory))
+            return;
+        try {
+            Files.walkFileTree(
+                    directory,
+                    EnumSet.noneOf(FileVisitOption.class),
+                    Integer.MAX_VALUE,
+                    new SimpleFileVisitor<Path>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                            Files.delete(file);
+                            return FileVisitResult.CONTINUE;
+                        }
+
+                        @Override
+                        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                            Files.delete(dir);
                             return FileVisitResult.CONTINUE;
                         }
                     }
@@ -165,6 +214,10 @@ public class SystemUtils {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public static boolean isServerOffline(Exception e) {
+        return e instanceof ConnectException && e.getMessage().equalsIgnoreCase("Connection refused: connect");
     }
 
 

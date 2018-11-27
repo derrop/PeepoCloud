@@ -12,13 +12,11 @@ import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
 @Getter
 public class BungeeCordParticipant extends NetworkParticipant {
     private Auth auth;
-    private NodeParticipant parent;
     private BungeeCordProxyInfo proxyInfo;
 
-    public BungeeCordParticipant(Channel channel, Auth auth, NodeParticipant parent) {
+    public BungeeCordParticipant(Channel channel, Auth auth) {
         super(auth.getComponentName(), channel);
         this.auth = auth;
-        this.parent = parent;
         this.proxyInfo = auth.getExtraData().getObject("proxyInfo", BungeeCordProxyInfo.class);
     }
 

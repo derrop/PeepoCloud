@@ -26,6 +26,9 @@ public class MinecraftServerInfo {
 
     private Template template;
 
+    @Setter
+    private long startup;
+
     public MinecraftGroup getGroup() {
         throw new UnsupportedOperationException("Stub!");
     }
