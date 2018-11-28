@@ -8,7 +8,8 @@ import net.nevercloud.node.api.event.internal.Event;
 import net.nevercloud.node.network.participant.NodeParticipant;
 
 @Getter
-@AllArgsConstructor
-public class NodeConnectEvent extends Event {
-    private NodeParticipant participant;
+public class NodeConnectEvent extends NetworkNodeEvent {
+    public NodeConnectEvent(NodeParticipant participant) {
+        super(participant);
+    }
 }

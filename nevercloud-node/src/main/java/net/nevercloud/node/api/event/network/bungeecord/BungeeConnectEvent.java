@@ -4,11 +4,16 @@ package net.nevercloud.node.api.event.network.bungeecord;
  */
 
 import lombok.*;
+import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.nevercloud.node.api.event.internal.Event;
 import net.nevercloud.node.network.participant.BungeeCordParticipant;
 
 @Getter
-@AllArgsConstructor
-public class BungeeConnectEvent extends Event {
+public class BungeeConnectEvent extends NetworkBungeeEvent {
     private BungeeCordParticipant participant;
+
+    public BungeeConnectEvent(BungeeCordParticipant participant) {
+        super(participant.getProxyInfo());
+        this.participant = participant;
+    }
 }

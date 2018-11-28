@@ -84,12 +84,12 @@ public class BungeeProcess implements CloudProcess {
 
     private void loadBungee() {
         Path path = Paths.get(this.directory.toString(), "bungee.jar");
-        ServerFilesLoader.copyBungee(this.proxyInfo, path);
+        ServerFilesLoader.copyBungee(this, this.proxyInfo, path);
     }
 
     private void loadTemplate() {
         Path dir = Paths.get("templates/" + this.proxyInfo.getGroupName() + "/" + this.proxyInfo.getTemplate().getName());
-        BungeeCordTemplateCopyEvent copyEvent = new BungeeCordTemplateCopyEvent(this.proxyInfo, null);
+        BungeeCordTemplateCopyEvent copyEvent = new BungeeCordTemplateCopyEvent(this, this.proxyInfo, null);
         NeverCloudNode.getInstance().getEventManager().callEvent(copyEvent);
         if (copyEvent.getInputStream() != null) {
             ZipUtils.unzipDirectory(copyEvent.getInputStream(), this.directory.toString());

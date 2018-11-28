@@ -6,13 +6,19 @@ package net.nevercloud.node.api.event.server;
 import lombok.*;
 import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.node.api.event.internal.Event;
+import net.nevercloud.node.server.process.CloudProcess;
 
 import java.io.InputStream;
 
 @Getter
-@AllArgsConstructor
-public class MinecraftServerStartupFileCopyEvent extends Event {
+public class MinecraftServerStartupFileCopyEvent extends ProcessEvent {
     private MinecraftServerInfo serverInfo;
     @Setter
     private InputStream inputStream;
+
+    public MinecraftServerStartupFileCopyEvent(CloudProcess cloudProcess, MinecraftServerInfo serverInfo, InputStream inputStream) {
+        super(cloudProcess);
+        this.serverInfo = serverInfo;
+        this.inputStream = inputStream;
+    }
 }

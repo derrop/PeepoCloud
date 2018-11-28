@@ -61,8 +61,11 @@ public class EventManager {
         if (this.eventMethods.containsKey(event.getClass())) {
             this.eventMethods.get(event.getClass()).forEach(listenerMethod -> listenerMethod.invoke(event));
         }
-        if (this.eventMethods.containsKey(Event.class)) {
-            this.eventMethods.get(Event.class).forEach(listenerMethod -> listenerMethod.invoke(event));
+        Class<?> superClass = null;
+        while ((superClass = superClass != null ? superClass.getSuperclass() : event.getClass().getSuperclass()) != null) {
+            if (this.eventMethods.containsKey(superClass)) {
+                this.eventMethods.get(superClass).forEach(listenerMethod -> listenerMethod.invoke(event));
+            }
         }
         return event;
     }

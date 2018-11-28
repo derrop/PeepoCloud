@@ -8,7 +8,8 @@ import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
-@AllArgsConstructor
-public class ServerStartEvent extends Event {
-    private MinecraftServerInfo minecraftServerInfo;
+public class ServerStartEvent extends NetworkServerEvent {
+    public ServerStartEvent(MinecraftServerInfo serverInfo) {
+        super(serverInfo);
+    }
 }

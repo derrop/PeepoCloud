@@ -9,9 +9,11 @@ import net.nevercloud.node.api.event.internal.Cancellable;
 import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
-@RequiredArgsConstructor
-public class ServerQueuedEvent extends Event implements Cancellable {
-    private final MinecraftServerInfo minecraftServerInfo;
+public class ServerQueuedEvent extends NetworkServerEvent implements Cancellable {
     @Setter
     private boolean cancelled;
+
+    public ServerQueuedEvent(MinecraftServerInfo serverInfo) {
+        super(serverInfo);
+    }
 }

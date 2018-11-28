@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -26,10 +27,18 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
     private Map<String, Addon> loadedAddons = new HashMap<>();
 
     public void loadAddons(String directory) throws IOException {
-        this.loadAddons(Paths.get(directory));
+        this.loadAddons(directory, null);
     }
 
-    public Collection<Addon> loadAddons(Path directory) throws IOException {
+    public void loadAddons(Path directory) throws IOException {
+        this.loadAddons(directory, null);
+    }
+
+    public void loadAddons(String directory, Consumer<Addon> preLoadAddon) throws IOException {
+        this.loadAddons(Paths.get(directory), preLoadAddon);
+    }
+
+    public Collection<Addon> loadAddons(Path directory, Consumer<Addon> preLoadAddon) throws IOException {
         if (!Files.exists(directory)) {
             Files.createDirectories(directory);
             return Collections.emptyList();
@@ -55,7 +64,7 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
         Collection<Addon> addons = new ArrayList<>();
 
         for (Path path : paths) {
-            Addon addon = loadAddon(path);
+            Addon addon = loadAddon(path, preLoadAddon);
             if (addon != null) {
                 addons.add(addon);
             }
@@ -64,7 +73,7 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
         return addons;
     }
 
-    public Addon loadAddon(Path path) throws MalformedURLException {
+    public Addon loadAddon(Path path, Consumer<Addon> preLoadAddon) throws MalformedURLException {
         AddonLoader addonLoader = new AddonLoader(path);
 
         try (JarFile jarFile = new JarFile(path.toFile())) {
@@ -90,6 +99,8 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
                 Addon addon = (Addon) addonLoader.loadAddon(config);
                 if (addon != null) {
                     this.loadedAddons.put(config.getName(), addon);
+                    if (preLoadAddon != null)
+                        preLoadAddon.accept(addon);
                     addon.onLoad();
                     System.out.println(NeverCloudNode.getInstance().getLanguagesManager().getMessage("addons.successfullyLoadedAddon")
                             .replace("%name%", config.getName()).replace("%author%", config.getAuthor()).replace("%version%", config.getVersion())
@@ -105,7 +116,7 @@ public class AddonManager<Addon extends net.nevercloud.node.addon.Addon> {
 
     public boolean loadAndEnableAddon(Path path) {
         try {
-            Addon addon = this.loadAddon(path);
+            Addon addon = this.loadAddon(path, null);
             if (addon != null) {
                 this.enableAddon(addon);
                 return true;

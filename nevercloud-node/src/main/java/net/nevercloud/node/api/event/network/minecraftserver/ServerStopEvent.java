@@ -4,11 +4,13 @@ package net.nevercloud.node.api.event.network.minecraftserver;
  */
 
 import lombok.*;
+import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.node.api.event.internal.Event;
 import net.nevercloud.node.network.participant.MinecraftServerParticipant;
 
 @Getter
-@AllArgsConstructor
-public class ServerStopEvent extends Event {
-    private MinecraftServerParticipant participant;
+public class ServerStopEvent extends NetworkServerEvent {
+    public ServerStopEvent(MinecraftServerInfo serverInfo) {
+        super(serverInfo);
+    }
 }

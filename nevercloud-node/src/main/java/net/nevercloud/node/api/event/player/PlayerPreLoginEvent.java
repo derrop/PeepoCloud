@@ -9,7 +9,7 @@ import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
 @AllArgsConstructor
-public class PlayerPreLoginEvent extends Event implements Cancellable {
+public class PlayerPreLoginEvent extends PlayerEvent implements Cancellable {
     //TODO add player
     @Setter
     private boolean cancelled;

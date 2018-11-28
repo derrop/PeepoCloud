@@ -10,6 +10,7 @@ import net.nevercloud.node.api.event.server.BungeeCordStartupFileCopyEvent;
 import net.nevercloud.node.api.event.server.MinecraftServerStartupFileCopyEvent;
 import net.nevercloud.node.server.bungeefile.SetupBungeeStartupFile;
 import net.nevercloud.node.server.minecraftserverfile.SetupMinecraftServerStartupFile;
+import net.nevercloud.node.server.process.CloudProcess;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,14 +56,14 @@ public class ServerFilesLoader {
         }
     }
 
-    public static void copySpigot(MinecraftServerInfo serverInfo, Path path) {
+    public static void copySpigot(CloudProcess cloudProcess, MinecraftServerInfo serverInfo, Path path) {
         if (!Files.exists(path)) {
             Path source = Paths.get("files/server.jar");
             installServer(source);
             InputStream inputStream = null;
             try {
                 inputStream = Files.newInputStream(source);
-                MinecraftServerStartupFileCopyEvent copyEvent = new MinecraftServerStartupFileCopyEvent(serverInfo, inputStream);
+                MinecraftServerStartupFileCopyEvent copyEvent = new MinecraftServerStartupFileCopyEvent(cloudProcess, serverInfo, inputStream);
                 NeverCloudNode.getInstance().getEventManager().callEvent(copyEvent);
                 if (copyEvent.getInputStream() != null && copyEvent.getInputStream() != inputStream) {
                     inputStream.close();
@@ -76,14 +77,14 @@ public class ServerFilesLoader {
         }
     }
 
-    public static void copyBungee(BungeeCordProxyInfo proxyInfo, Path path) {
+    public static void copyBungee(CloudProcess cloudProcess, BungeeCordProxyInfo proxyInfo, Path path) {
         if (!Files.exists(path)) {
             Path source = Paths.get("files/bungee.jar");
             installBungee(source);
             InputStream inputStream = null;
             try {
                 inputStream = Files.newInputStream(source);
-                BungeeCordStartupFileCopyEvent copyEvent = new BungeeCordStartupFileCopyEvent(proxyInfo, inputStream);
+                BungeeCordStartupFileCopyEvent copyEvent = new BungeeCordStartupFileCopyEvent(cloudProcess, proxyInfo, inputStream);
                 NeverCloudNode.getInstance().getEventManager().callEvent(copyEvent);
                 if (copyEvent.getInputStream() != null && copyEvent.getInputStream() != inputStream) {
                     inputStream.close();

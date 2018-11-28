@@ -9,9 +9,11 @@ import net.nevercloud.node.api.event.internal.Cancellable;
 import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
-@RequiredArgsConstructor
-public class BungeeQueuedEvent extends Event implements Cancellable {
-    private final BungeeCordProxyInfo bungeeCordProxyInfo;
+public class BungeeQueuedEvent extends NetworkBungeeEvent implements Cancellable {
     @Setter
     private boolean cancelled;
+
+    public BungeeQueuedEvent(BungeeCordProxyInfo proxyInfo) {
+        super(proxyInfo);
+    }
 }

@@ -8,7 +8,8 @@ import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
-@AllArgsConstructor
-public class BungeeStartEvent extends Event {
-    private BungeeCordProxyInfo bungeeCordProxyInfo;
+public class BungeeStartEvent extends NetworkBungeeEvent {
+    public BungeeStartEvent(BungeeCordProxyInfo proxyInfo) {
+        super(proxyInfo);
+    }
 }

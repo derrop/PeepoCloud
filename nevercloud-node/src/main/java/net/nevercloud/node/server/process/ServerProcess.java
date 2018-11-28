@@ -84,12 +84,12 @@ public class ServerProcess implements CloudProcess {
 
     private void loadSpigot() {
         Path path = Paths.get(this.directory.toString(), "server.jar");
-        ServerFilesLoader.copySpigot(this.serverInfo, path);
+        ServerFilesLoader.copySpigot(this, this.serverInfo, path);
     }
 
     private void loadTemplate() {
         Path dir = Paths.get("templates/" + this.serverInfo.getGroupName() + "/" + this.serverInfo.getTemplate().getName());
-        MinecraftServerTemplateCopyEvent copyEvent = new MinecraftServerTemplateCopyEvent(this.serverInfo, null);
+        MinecraftServerTemplateCopyEvent copyEvent = new MinecraftServerTemplateCopyEvent(this, this.serverInfo, null);
         NeverCloudNode.getInstance().getEventManager().callEvent(copyEvent);
         if (copyEvent.getInputStream() != null) {
             ZipUtils.unzipDirectory(copyEvent.getInputStream(), this.directory.toString());

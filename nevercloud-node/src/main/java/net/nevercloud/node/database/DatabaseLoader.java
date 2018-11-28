@@ -24,7 +24,7 @@ public class DatabaseLoader { //TODO implement languagesystem
 
     public DatabaseLoader(String addonsDir) throws IOException {
         this.addonManager = new AddonManager<>();
-        this.addonManager.loadAddons(addonsDir);
+        this.addonManager.loadAddons(addonsDir, databaseAddon -> databaseAddon.databaseLoader = this);
         this.addonManager.enableAddons();
     }
 
