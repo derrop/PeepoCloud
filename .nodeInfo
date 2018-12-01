@@ -1,3 +1,4 @@
 {
-  "nodePath": "nevercloud-node/target/NeverCloud-Node.jar"
+  "nodePath": "nevercloud-node/target/NeverCloud-Node.jar",
+  "nodeDocsPath": "nevercloud-node/target/apidocs"
 }
