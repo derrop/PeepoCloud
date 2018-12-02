@@ -24,10 +24,10 @@ public class NetworkScreenManager {
     private Map<String, NetworkScreen> screens = new HashMap<>();
 
     public UUID enableScreen(BungeeCordProxyInfo proxyInfo, Consumer<String> consumer) {
-        return enableScreen0(consumer, proxyInfo.getComponentName(), proxyInfo.getParentComponentName());
+        return enableScreen(consumer, proxyInfo.getComponentName(), proxyInfo.getParentComponentName());
     }
 
-    public UUID enableScreen0(Consumer<String> consumer, String componentName, String parentComponentName) {
+    public UUID enableScreen(Consumer<String> consumer, String componentName, String parentComponentName) {
         UUID uniqueId = UUID.randomUUID();
         if (this.screens.containsKey(componentName)) {
             this.screens.get(componentName).getConsumers().put(uniqueId, consumer);
@@ -43,7 +43,7 @@ public class NetworkScreenManager {
     }
 
     public UUID enableScreen(MinecraftServerInfo serverInfo, Consumer<String> consumer) {
-        return enableScreen0(consumer, serverInfo.getComponentName(), serverInfo.getParentComponentName());
+        return enableScreen(consumer, serverInfo.getComponentName(), serverInfo.getParentComponentName());
     }
 
     public boolean disableScreen(String componentName, UUID uniqueId) {

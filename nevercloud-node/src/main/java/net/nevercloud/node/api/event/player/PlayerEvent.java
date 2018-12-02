@@ -8,6 +8,6 @@ import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
 @AllArgsConstructor
-public class PlayerEvent extends Event {
+public class PlayerEvent extends OfflinePlayerEvent {
     //TODO add player
 }

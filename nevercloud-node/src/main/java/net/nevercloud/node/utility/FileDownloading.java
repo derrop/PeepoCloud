@@ -24,6 +24,14 @@ import java.nio.file.Path;
 @ToString
 @EqualsAndHashCode
 public class FileDownloading {
+    /**
+     * Copies the content of the {@link InputStream} to the {@link OutputStream} with a {@link ConsoleProgressBarAnimation} in the specified {@link ColoredLogger}
+     * @param logger the logger to print the progress bar to
+     * @param length the full length of the {@link InputStream}
+     * @param inputStream the inputStream to copy from
+     * @param outputStream the outputStream to copy to content of the inputStream to
+     * @throws IOException if an I/O Error occurs
+     */
     public static void copyStreamWithProgessBar(ColoredLogger logger, int length, InputStream inputStream, OutputStream outputStream) throws IOException {
         ConsoleProgressBarAnimation animation = new ConsoleProgressBarAnimation(logger, length, 0, '=', '>', "<!", "!> %value% bytes / %length% bytes | %percent%%, %time% seconds, %bps% KBit/s");
 
@@ -40,6 +48,15 @@ public class FileDownloading {
         SystemUtils.sleepUninterruptedly(50);
     }
 
+    /**
+     * Downloads a file from the specified url to specified {@link Path} with a {@link ConsoleProgressBarAnimation} in the specified {@link ColoredLogger}
+     * @param logger the logger to print the progress bar to
+     * @param url the url to download the file from
+     * @param path the path to which the downloaded file is saved
+     * @param finished called when the file was downloaded successfully
+     * @param error called when the file could not be downloaded successfully
+     * @return {@code true} if it was downloaded successfully or {@code false} if not
+     */
     public static boolean downloadFileWithProgressBar(ColoredLogger logger, String url, Path path, Runnable finished, Runnable error) {
         try (OutputStream outputStream = Files.newOutputStream(path)) {
             return downloadFileWithProgressBar(logger, url, outputStream, finished, () -> {
@@ -56,6 +73,15 @@ public class FileDownloading {
         return false;
     }
 
+    /**
+     * Downloads a file from the specified url to specified {@link OutputStream} with a {@link ConsoleProgressBarAnimation} in the specified {@link ColoredLogger}
+     * @param logger the logger to print the progress bar to
+     * @param url the url to download the file from
+     * @param outputStream the outputStream to which the downloaded file is saved
+     * @param finished called when the file was downloaded successfully
+     * @param error called when the file could not be downloaded successfully
+     * @return {@code true} if it was downloaded successfully or {@code false} if not
+     */
     public static boolean downloadFileWithProgressBar(ColoredLogger logger, String url, OutputStream outputStream, Runnable finished, Runnable error) {
         try {
             URLConnection connection = new URL(url).openConnection();

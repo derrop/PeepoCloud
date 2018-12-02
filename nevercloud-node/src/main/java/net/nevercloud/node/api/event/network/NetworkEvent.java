@@ -5,6 +5,8 @@ package net.nevercloud.node.api.event.network;
 
 import net.nevercloud.node.api.event.internal.Event;
 
+/**
+ * Events that are called when something with the network happens
+ */
 public class NetworkEvent extends Event {
-
 }

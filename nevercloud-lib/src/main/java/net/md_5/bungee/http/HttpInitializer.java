@@ -12,6 +12,10 @@ import net.nevercloud.lib.utility.Callback;
 import javax.net.ssl.SSLEngine;
 import java.util.concurrent.TimeUnit;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 @RequiredArgsConstructor
 public class HttpInitializer extends ChannelInitializer<Channel> {
 

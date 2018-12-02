@@ -9,6 +9,9 @@ import net.nevercloud.node.api.event.network.NetworkEvent;
 
 @Getter
 @AllArgsConstructor
+/**
+ * Events that are called when something with a started/starting bungee happens
+ */
 public class NetworkBungeeEvent extends NetworkEvent {
     private BungeeCordProxyInfo proxyInfo;
 }

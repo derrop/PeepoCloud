@@ -6,6 +6,10 @@ import lombok.Setter;
 import lombok.ToString;
 import net.md_5.bungee.api.ChatColor;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 @Getter
 @Setter
 @ToString

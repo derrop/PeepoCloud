@@ -9,6 +9,9 @@ import net.nevercloud.node.api.event.internal.Event;
 import net.nevercloud.node.network.participant.BungeeCordParticipant;
 
 @Getter
+/**
+ * Called when a bungee on this node instance is stopped
+ */
 public class BungeeStopEvent extends NetworkBungeeEvent {
     public BungeeStopEvent(BungeeCordProxyInfo proxyInfo) {
         super(proxyInfo);

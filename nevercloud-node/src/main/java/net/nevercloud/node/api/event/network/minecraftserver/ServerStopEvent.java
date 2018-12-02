@@ -9,6 +9,9 @@ import net.nevercloud.node.api.event.internal.Event;
 import net.nevercloud.node.network.participant.MinecraftServerParticipant;
 
 @Getter
+/**
+ * Called when a server is stopped on this node instance
+ */
 public class ServerStopEvent extends NetworkServerEvent {
     public ServerStopEvent(MinecraftServerInfo serverInfo) {
         super(serverInfo);

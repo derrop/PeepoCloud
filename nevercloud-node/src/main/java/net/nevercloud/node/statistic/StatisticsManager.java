@@ -22,14 +22,25 @@ public class StatisticsManager {
 
     private Collection<StatisticsUpdateListener> listeners = new ArrayList<>();
 
+    /**
+     * Clears all registered listeners in this instance of {@link StatisticsManager}
+     */
     public void clearListeners() {
         this.listeners.clear();
     }
 
+    /**
+     * Adds a {@link StatisticsUpdateListener} that is called every time an update is made in the statistics of this instance of {@link StatisticsManager}
+     * @param listener the listener to add to this {@link StatisticsManager}
+     */
     public void addListener(StatisticsUpdateListener listener) {
         this.listeners.add(listener);
     }
 
+    /**
+     * Removes a {@link StatisticsUpdateListener} out of this instance of {@link StatisticsManager}
+     * @param listener the listener to to remove out of this {@link StatisticsManager}
+     */
     public void removeListener(StatisticsUpdateListener listener) {
         this.listeners.remove(listener);
     }
@@ -75,7 +86,10 @@ public class StatisticsManager {
         });
     }
 
-
+    /**
+     * A Listener that is called every time an update is made in the statistics of the instance of {@link StatisticsManager} to which it was added
+     * @see StatisticsManager#addListener(StatisticsUpdateListener)
+     */
     public static abstract class StatisticsUpdateListener {
 
         public abstract void call(String key, long oldValue, long newValue);

@@ -41,7 +41,7 @@ public class ScreenManager {
                 return null;
             return this.processScreenManager.loadScreen(process, consumer);
         }
-        return this.networkScreenManager.enableScreen0(consumer, componentName, parentComponentName);
+        return this.networkScreenManager.enableScreen(consumer, componentName, parentComponentName);
     }
 
     public UUID enableScreen(MinecraftServerInfo serverInfo, Consumer<String> consumer) {

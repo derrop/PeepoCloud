@@ -25,16 +25,33 @@ public class Setup {
         this.configurable = configurable;
     }
 
+    /**
+     * Starts a setup asynchronously
+     * @param configurable the configurable to which the user input is saved
+     * @param logger the logger in which the setup is made
+     * @param consumer the consumer which will be accepted with the new setup asynchronously
+     */
     public static void startSetupAsync(Configurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
         NeverCloudNode.getInstance().getExecutorService().execute(() -> {
             consumer.accept(new Setup(configurable, logger));
         });
     }
 
+    /**
+     * Starts a setup synchronously
+     * @param configurable the configurable to which the user input is saved
+     * @param logger the logger in which the setup is made
+     * @param consumer the consumer which will be accepted with the new setup synchronously
+     */
     public static void startSetupSync(Configurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
         consumer.accept(new Setup(configurable, logger));
     }
 
+    /**
+     * Defines if the user can type "cancel" to cancel the setup, default is false
+     * @param cancellable if the user can type "cancel" to cancel the setup {@code true} or {@code false} if not
+     * @return this
+     */
     public Setup setCancellable(boolean cancellable) {
         this.cancellable = cancellable;
         return this;
@@ -96,6 +113,10 @@ public class Setup {
         return this;
     }
 
+    /**
+     * Gets the {@link Configurable} which was specified to this Setup with all the user data
+     * @return the {@link Configurable} of this setup
+     */
     public Configurable getData() {
         return this.configurable;
     }

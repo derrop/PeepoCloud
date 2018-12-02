@@ -9,6 +9,9 @@ import net.nevercloud.node.api.event.internal.Event;
 import net.nevercloud.node.network.participant.BungeeCordParticipant;
 
 @Getter
+/**
+ * Called when a bungee is connected to this node instance
+ */
 public class BungeeConnectEvent extends NetworkBungeeEvent {
     private BungeeCordParticipant participant;
 

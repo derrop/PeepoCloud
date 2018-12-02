@@ -7,6 +7,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import java.lang.reflect.Type;
 import java.util.List;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 public class TextComponentSerializer extends BaseComponentSerializer implements JsonSerializer<TextComponent>, JsonDeserializer<TextComponent>
 {
 

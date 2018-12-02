@@ -14,6 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class YamlConfiguration extends ConfigurationProvider {
 

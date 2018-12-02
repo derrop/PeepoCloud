@@ -4,6 +4,10 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 public abstract class ConfigurationProvider {
 
     private static final Map<Class<? extends ConfigurationProvider>, ConfigurationProvider> providers = new HashMap<>();

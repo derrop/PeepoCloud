@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 /**
  * This component processes a target selector into a pre-formatted set of
  * discovered names.
@@ -14,7 +18,7 @@ import lombok.ToString;
  * This includes all styling from team prefixes, insertions, click event, and
  * hover event.
  * <br>
- * These values are filled in by the server-side implementation.
+ * These values are filled in by the process-side implementation.
  * <br>
  * As of 1.12.2, a bug ( MC-56373 ) prevents full usage within hover event.
  */

@@ -8,6 +8,9 @@ import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
+/**
+ * Called when a server is started on this node instance
+ */
 public class ServerStartEvent extends NetworkServerEvent {
     public ServerStartEvent(MinecraftServerInfo serverInfo) {
         super(serverInfo);

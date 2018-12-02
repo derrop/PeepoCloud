@@ -9,15 +9,13 @@ import net.nevercloud.lib.server.GroupMode;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.lib.utility.ZipUtils;
 import net.nevercloud.node.NeverCloudNode;
-import net.nevercloud.node.api.event.server.BungeeCordTemplateCopyEvent;
-import net.nevercloud.node.api.event.server.MinecraftServerTemplateCopyEvent;
+import net.nevercloud.node.api.event.process.bungee.BungeeCordTemplateCopyEvent;
 import net.nevercloud.node.server.ServerFilesLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 @Getter
 @ToString

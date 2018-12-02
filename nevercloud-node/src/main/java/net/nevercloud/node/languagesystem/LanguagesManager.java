@@ -66,6 +66,10 @@ public class LanguagesManager {
         this.defaultLanguage = Language.load(properties);
     }
 
+    /**
+     * Loads the names of all available languages asynchronously from the server and posts them to the specified {@link Consumer}
+     * @param consumer the consumer to accept the names of all available languages
+     */
     public void getAvailableLanguages(Consumer<Collection<String>> consumer) {
         HttpClient.get(SystemUtils.CENTRAL_SERVER_URL + "languages?all=response", null, (s, throwable) -> {
             if (throwable == null) {
@@ -78,6 +82,10 @@ public class LanguagesManager {
         });
     }
 
+    /**
+     * Loads the names of all available languages synchronously from the server
+     * @return all available languages
+     */
     public Collection<String> getAvailableLanguages() {
         Collection<String> languages = Collections.emptyList();
         try {
@@ -94,6 +102,11 @@ public class LanguagesManager {
         return languages;
     }
 
+    /**
+     * Sets the {@link Language} of this LanguagesManager by the name of the language
+     * @param name the name of the language
+     * @param consumer will be accepted with {@link Language} if the language was found on the server and successfully set or with {@code null} if the the language was not found
+     */
     public void setSelectedLanguage(String name, Consumer<Language> consumer) {
         HttpClient.get(SystemUtils.CENTRAL_SERVER_URL + "languages?name=" + name, null, (s, throwable) -> {
             if (throwable == null) {
@@ -106,6 +119,11 @@ public class LanguagesManager {
         });
     }
 
+    /**
+     * Sets the {@link Language} of this LanguagesManager by the short name of the language
+     * @param shortName the short name of the language
+     * @param consumer will be accepted with {@link Language} if the language was found on the server and successfully set or with {@code null} if the the language was not found
+     */
     public void setSelectedLanguageByShortName(String shortName, Consumer<Language> consumer) {
         HttpClient.get(SystemUtils.CENTRAL_SERVER_URL + "languages?shortName=" + shortName, null, (s, throwable) -> {
             if (throwable == null) {
@@ -128,12 +146,21 @@ public class LanguagesManager {
         return SimpleJsonObject.GSON.fromJson(jsonObject.get("response"), Language.class);
     }
 
+    /**
+     * Gets the selected {@link Language} of this LanguagesManager
+     * @return the {@link Language} of this LanguagesManager or the defaultLanguage if no {@link Language} is set
+     */
     public Language getLanguage() {
         if (selectedLanguage == null)
             return defaultLanguage;
         return selectedLanguage;
     }
 
+    /**
+     * Gets a message out of the {@link Language} selected in this LanguagesManager
+     * @param key the key of the message
+     * @return the message out of the {@link Language} by the specified key
+     */
     public String getMessage(String key) {
         Language language = getLanguage();
         return language.getMessages().getOrDefault(key, "<key \"" + key + "\" was not found in the language \"" + language.getName() + "\">");

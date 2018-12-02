@@ -10,6 +10,9 @@ import net.nevercloud.node.logging.ColoredLogger;
 
 import java.util.function.Consumer;
 
+/**
+ * Represents a progess bar animation in the console that is updated all 10 milliseconds
+ */
 public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
     @Getter
     @Setter
@@ -23,6 +26,16 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
     private char lastProgressChar;
     private long start;
 
+    /**
+     * Creates a new {@link ConsoleProgressBarAnimation}
+     * @param logger the logger in which the animation will be displayed
+     * @param fullLength the maximum of the animation
+     * @param startValue the initial value for this animation
+     * @param progressChar the {@link Character} for each percent in the animation
+     * @param lastProgressChar the {@link Character} which is at the last position of the animation
+     * @param prefix the prefix for this animation
+     * @param suffix the suffix for this animation
+     */
     public ConsoleProgressBarAnimation(ColoredLogger logger, int fullLength, int startValue, char progressChar, char lastProgressChar, String prefix, String suffix) {
         super(logger);
         this.length = fullLength;
@@ -31,14 +44,6 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
         this.lastProgressChar = lastProgressChar;
         this.prefix = prefix;
         this.suffix = suffix;
-    }
-
-    public static Consumer<Integer> startWithConsumer(ColoredLogger logger, int fullLength, int startValue, char progressChar, char lastProgressChar, String prefix, String suffix) {
-        if (logger.isAnimationRunning())
-            return null;
-        ConsoleProgressBarAnimation animation = new ConsoleProgressBarAnimation(logger, fullLength, startValue, progressChar, lastProgressChar, prefix, suffix);
-        logger.startAnimation(animation);
-        return integer -> animation.currentValue = integer;
     }
 
     @Deprecated
@@ -69,7 +74,7 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
         for (int i = (int) percent; i < 100; i++) {
             chars[i] = ' ';
         }
-        if ((int) percent > 0 && lastProgressChar != (char) -1) {
+        if ((int) percent > 0) {
             chars[(int) percent - 1] = lastProgressChar;
         } else {
             chars[0] = lastProgressChar;

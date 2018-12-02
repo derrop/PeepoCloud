@@ -7,6 +7,8 @@ import lombok.*;
 import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
-@AllArgsConstructor
+/**
+ * Called after a player is successfully logged in to the network
+ */
 public class PlayerLoginEvent extends PlayerEvent {
 }

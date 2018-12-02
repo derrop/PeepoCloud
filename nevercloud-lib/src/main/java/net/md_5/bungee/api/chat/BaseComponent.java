@@ -7,6 +7,10 @@ import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 @Setter
 @ToString(exclude = "parent")
 @NoArgsConstructor

@@ -21,7 +21,7 @@ public class SetupMinecraftServerStartupFile { //TODO implement languagesystem
             String versions = MinecraftServerStartupFileVersion.asString(fileVersions);
             setup.request(
                     "type",
-                    "Please specify a minecraft server version [" + versions + "]",
+                    "Please specify a minecraft process version [" + versions + "]",
                     "You have to specify one of the following: " + versions,
                     new ArraySetupAcceptable<>(fileVersions.toArray())
             );
@@ -36,8 +36,8 @@ public class SetupMinecraftServerStartupFile { //TODO implement languagesystem
             }
 
             String finalUrl = url;
-            FileDownloading.downloadFileWithProgressBar(logger, url, path, () -> System.out.println("&aSuccessfully downloaded server"),
-                    () -> System.out.println("&cThere was an error while downloading server.jar from " + finalUrl));
+            FileDownloading.downloadFileWithProgressBar(logger, url, path, () -> System.out.println("&aSuccessfully downloaded process"),
+                    () -> System.out.println("&cThere was an error while downloading process.jar from " + finalUrl));
         });
     }
 

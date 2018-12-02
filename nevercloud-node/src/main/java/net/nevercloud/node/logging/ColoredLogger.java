@@ -54,6 +54,10 @@ public class ColoredLogger extends Logger {
         System.setErr(new PrintStream(new LoggingOutputStream(Level.SEVERE), true));
     }
 
+    /**
+     * Reads a line out of the console and blocks the {@link Thread}, should be only used once for each logger
+     * @return the line
+     */
     public String readLine() {
         String line = this.readLine0();
         if (this.lineAcceptor != null) {
@@ -89,25 +93,45 @@ public class ColoredLogger extends Logger {
         return line.get();
     }
 
+    /**
+     * Reads the lines until the {@link Function#apply(String)} returns {@code true}
+     * @param function the {@link Function} which must return {@code true} to break the loop and let it return the input of the user
+     * @param invalidInputMessage the message which is printed when the {@link Function#apply(String)} returns {@code false}
+     * @param nullOn if the input of the user is equal to nullOn, {@code null} is returned
+     * @return the user input line when the {@link Function#apply(String)} returns {@code true}
+     */
     public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage, String nullOn) {
         String line;
         while (!function.apply(line = this.readLine1()) || (line.equalsIgnoreCase(nullOn))) {
             if (line.equalsIgnoreCase(nullOn)) {
                 return null;
             }
-            System.out.println(invalidInputMessage);
+            this.print(invalidInputMessage);
         }
         return line;
     }
 
+    /**
+     * Reads the lines until the {@link Function#apply(String)} returns {@code true}
+     * @param function the {@link Function} which must return {@code true} to break the loop and let it return the input of the user
+     * @param invalidInputMessage the message which is printed when the {@link Function#apply(String)} returns {@code false}
+     * @return the user input line when the {@link Function#apply(String)} returns {@code true}
+     */
     public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage) {
         return this.readLineUntil(function, invalidInputMessage, null);
     }
 
+    /**
+     * Gets the {@link ConsoleReader} of this {@link ColoredLogger}
+     * @return the {@link ConsoleReader} of this {@link ColoredLogger}
+     */
     public ConsoleReader getConsoleReader() {
         return consoleReader;
     }
 
+    /**
+     * Clears the console screen
+     */
     public void clearScreen() {
         try {
             this.consoleReader.clearScreen();
@@ -118,6 +142,10 @@ public class ColoredLogger extends Logger {
             this.runningAnimation.cursorUp = 1;
     }
 
+    /**
+     * Prints the specified line to this {@link ColoredLogger}
+     * @param line the line to print
+     */
     public void print(String line) {
         line = ConsoleColor.toColouredString(line);
 
@@ -131,6 +159,10 @@ public class ColoredLogger extends Logger {
         this.updateAnimation();
     }
 
+    /**
+     * Prints the specified line without removing the command prompt and reset line to this {@link ColoredLogger}
+     * @param line the line to print
+     */
     public void printRaw(String line) {
         line = ConsoleColor.toColouredString(line);
 
@@ -156,10 +188,19 @@ public class ColoredLogger extends Logger {
         }
     }
 
+    /**
+     * Checks if there is an {@link AbstractConsoleAnimation} running in this {@link ColoredLogger}
+     * @return {@code true} if the running {@link AbstractConsoleAnimation} is not null or {@code false} if it is null
+     */
     public boolean isAnimationRunning() {
         return runningAnimation != null;
     }
 
+    /**
+     * Starts a {@link AbstractConsoleAnimation} to this {@link ColoredLogger} if there is no other animation running
+     * @param animation the animation to start
+     * @throws IllegalArgumentException if there is already an {@link AbstractConsoleAnimation} running in this {@link ColoredLogger}
+     */
     public void startAnimation(AbstractConsoleAnimation animation) {
         Preconditions.checkArgument(this.runningAnimation == null, "there is already another animation running in this logger");
         this.runningAnimation = animation;

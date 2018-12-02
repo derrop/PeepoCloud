@@ -7,6 +7,9 @@ import lombok.*;
 import net.nevercloud.node.NeverCloudNode;
 
 @Data
+/**
+ * Represents a message out of the language system which is addressed to the {@link CommandSender}
+ */
 public class LanguageMessage {
 
     private CommandSender sender;
@@ -21,11 +24,21 @@ public class LanguageMessage {
         this.sender = sender;
     }
 
+    /**
+     * Replaces a string in the message
+     * @param regex The sequence of char values to be replaced
+     * @param replacement The replacement sequence of char values
+     * @see String#replace(CharSequence, CharSequence)
+     * @return
+     */
     public LanguageMessage replace(String regex, String replacement) {
         this.message = this.message.replace(regex, replacement);
         return this;
     }
 
+    /**
+     * Sends the message to the {@link CommandSender}
+     */
     public void send() {
         this.sender.sendMessage(this.message);
     }

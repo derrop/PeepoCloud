@@ -114,6 +114,9 @@ public class SystemUtils {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                             Path target = Paths.get(targetDirectory, directory.relativize(file).toString());
+                            Path parent = target.getParent();
+                            if (parent != null && !Files.exists(parent))
+                                Files.createDirectories(parent);
                             Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
                             return FileVisitResult.CONTINUE;
                         }

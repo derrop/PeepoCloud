@@ -60,7 +60,7 @@ public class NetworkServer implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("&eTrying to bind server @" + this.address);
+        System.out.println("&eTrying to bind process @" + this.address);
         this.serverHost = address;
         this.packetManager.registerPacket(new PacketInfo(-1, PacketInAuth.class, new PacketInAuth.NetworkAuthHandler(this)));
         EventLoopGroup bossGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();

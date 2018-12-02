@@ -18,7 +18,7 @@ import lombok.ToString;
  * <br>
  * <b>Signs cannot use the '*' wildcard</b>
  * <br>
- * These values are filled in by the server-side implementation.
+ * These values are filled in by the process-side implementation.
  * <br>
  * As of 1.12.2, a bug ( MC-56373 ) prevents full usage within hover event.
  */

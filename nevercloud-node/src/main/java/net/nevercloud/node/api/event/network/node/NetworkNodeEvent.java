@@ -9,6 +9,9 @@ import net.nevercloud.node.network.participant.NodeParticipant;
 
 @Getter
 @AllArgsConstructor
+/**
+ * Events that are called when something with a connected node happens
+ */
 public class NetworkNodeEvent extends NetworkEvent {
     private NodeParticipant participant;
 }

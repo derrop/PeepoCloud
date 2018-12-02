@@ -1,4 +1,4 @@
-package net.nevercloud.node.api.event.server;
+package net.nevercloud.node.api.event.process.bungee;
 /*
  * Created by Mc_Ruben on 23.11.2018
  */
@@ -6,11 +6,15 @@ package net.nevercloud.node.api.event.server;
 import lombok.Getter;
 import lombok.Setter;
 import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
+import net.nevercloud.node.api.event.process.ProcessEvent;
 import net.nevercloud.node.server.process.CloudProcess;
 
 import java.io.InputStream;
 
 @Getter
+/**
+ * Called when the bungee.jar is copied into a new proxy, before it's starting up
+ */
 public class BungeeCordStartupFileCopyEvent extends ProcessEvent {
     private BungeeCordProxyInfo proxyInfo;
     @Setter

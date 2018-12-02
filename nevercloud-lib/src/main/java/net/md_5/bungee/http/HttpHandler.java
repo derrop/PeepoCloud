@@ -8,6 +8,10 @@ import net.nevercloud.lib.utility.Callback;
 
 import java.nio.charset.Charset;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 @RequiredArgsConstructor
 public class HttpHandler extends SimpleChannelInboundHandler<HttpObject> {
 

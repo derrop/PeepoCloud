@@ -10,11 +10,11 @@ import java.lang.reflect.Method;
 
 @Getter
 @AllArgsConstructor
-public class ListenerMethod {
+class ListenerMethod {
     private Object listener;
     private Method method;
 
-    public void invoke(Event event) {
+    void invoke(Event event) {
         try {
             this.method.invoke(this.listener, event);
         } catch (IllegalAccessException | InvocationTargetException e) {

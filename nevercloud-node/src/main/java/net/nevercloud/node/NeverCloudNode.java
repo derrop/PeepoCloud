@@ -254,6 +254,8 @@ public class NeverCloudNode {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                this.nodeInfo.setUsedMemory(this.getMemoryUsedOnThisInstance());
+                this.nodeInfo.setCpuUsage(SystemUtils.cpuUsageProcess());
                 this.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
             }
         });
@@ -272,7 +274,7 @@ public class NeverCloudNode {
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown0));
 
-        this.reloadModules();
+        this.reloadAddons();
     }
 
     private void initPacketHandlers() {
@@ -393,10 +395,18 @@ public class NeverCloudNode {
         new Thread(client, "Node client @" + node.toString()).start();
     }
 
+    /**
+     * Checks asynchronous for updates and installs them
+     * @param sender the sender to which the messages should be send
+     */
     public void installUpdates(CommandSender sender) {
         NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdates(updateCheckResponse -> this.installUpdates0(sender, updateCheckResponse));
     }
 
+    /**
+     * Checks synchronous for updates and installs them
+     * @param sender the sender to which the messages should be send
+     */
     public void installUpdatesSync(CommandSender sender) {
         this.installUpdates0(sender, NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdatesSync());
     }
@@ -430,22 +440,34 @@ public class NeverCloudNode {
         }
     }
 
+    /**
+     * Shuts down the system
+     */
     public void shutdown() {
         shutdown0();
         System.exit(0);
     }
 
+    /**
+     * Reloads all the configs, addons, etc. of the system
+     */
     public void reload() {
-        this.reloadModules();
+        this.reloadAddons();
         this.reloadConfigs();
     }
 
+    /**
+     * Reloads all configs of the system
+     */
     public void reloadConfigs() {
         this.loadConfigs();
         this.nodeInfo = this.cloudConfig.loadNodeInfo(this.getMemoryUsedOnThisInstance());
     }
 
-    public void reloadModules() {
+    /**
+     * Reloads all addons of the system
+     */
+    public void reloadAddons() {
         this.nodeAddonManager.disableAndUnloadAddons();
         this.commandManager.getCommands().clear();
         this.eventManager.unregisterAll();
@@ -460,6 +482,10 @@ public class NeverCloudNode {
         this.nodeAddonManager.enableAddons();
     }
 
+    /**
+     * Gets the local address of the server
+     * @return the local address or if it could not be detected "could not detect local address"
+     */
     public String getLocalAddress() {
         try {
             InetAddress inetAddress = InetAddress.getLocalHost();
@@ -469,20 +495,36 @@ public class NeverCloudNode {
         }
     }
 
+    /**
+     * The amount of memory used of all the servers and proxies on this node instance
+     * @return the memory used on this instance in MB
+     */
     public int getMemoryUsedOnThisInstance() {
         return this.memoryUsedOnThisInstanceByBungee + this.memoryUsedOnThisInstanceByServer + this.processManager.getServerQueue().getMemoryNeededForProcessesInQueue();
     }
 
+    /**
+     * Saves the internal config
+     */
     public void saveInternalConfigFile() {
         this.internalConfig.saveAsFile("internal/internalData.json");
     }
 
+    /**
+     * Sets the {@link DatabaseManager} of this node instance
+     * @param databaseManager the database manager
+     * @deprecated should be only used for internal methods of the node
+     */
     @Deprecated
     public void setDatabaseManager(DatabaseManager databaseManager) {
         this.databaseManager = databaseManager;
     }
 
-
+    /**
+     * Gets a node connected to this node as a client
+     * @param name the name of the node
+     * @return the connected node or null, if no node with the given {@code name} is connected
+     */
     public ClientNode getConnectedNode(String name) {
         return this.connectedNodes.get(name);
     }

@@ -25,20 +25,42 @@ public abstract class Command {
     private String permission;
     private String[] aliases;
 
+    /**
+     * Gets the name defined for this Command
+     * @return the name of this Command
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the permission defined in this Command
+     * @return the permission of this Command
+     */
     public String getPermission() {
         return permission;
     }
 
+    /**
+     * Gets the aliases defined in this Command
+     * @return the aliases of this Command
+     */
     public String[] getAliases() {
         return aliases;
     }
 
+    /**
+     * Called when the Command was executed
+     * @param sender the sender which has executed this Command
+     * @param commandLine the command line sent by the sender
+     * @param args the arguments given by the sender (always commandLine splitted by " " and removed the first argument)
+     */
     public abstract void execute(CommandSender sender, String commandLine, String[] args);
 
+    /**
+     * Gets the usage of this Command
+     * @return the usage of this Command
+     */
     public String getUsage() {
         String usage = NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.usage." + this.name);
         if (usage != null)

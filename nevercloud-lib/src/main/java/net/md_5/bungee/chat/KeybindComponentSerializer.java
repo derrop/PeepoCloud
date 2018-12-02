@@ -5,6 +5,10 @@ import net.md_5.bungee.api.chat.KeybindComponent;
 
 import java.lang.reflect.Type;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 public class KeybindComponentSerializer extends BaseComponentSerializer implements JsonSerializer<KeybindComponent>, JsonDeserializer<KeybindComponent>
 {
 

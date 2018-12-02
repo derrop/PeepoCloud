@@ -34,7 +34,7 @@ public class CommandStart extends Command {
                     started++;
                 }
             }
-            sender.sendMessage("&a" + (started == 1 ? "one server" : started + " servers") + " of the group &e" + minecraftGroup.getName() + " &a" + (started == 1 ? "was" : "were") + " started");
+            sender.sendMessage("&a" + (started == 1 ? "one process" : started + " servers") + " of the group &e" + minecraftGroup.getName() + " &a" + (started == 1 ? "was" : "were") + " started");
         } else {
             BungeeGroup bungeeGroup = NeverCloudNode.getInstance().getBungeeGroup(args[0]);
             if (bungeeGroup != null) {

@@ -14,10 +14,24 @@ import java.util.Properties;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Language {
+    /**
+     * The name of this Language
+     */
     private String name;
+    /**
+     * The short name of this Language
+     */
     private String shortName;
+    /**
+     * All the messages in this Language by their key
+     */
     private Map<String, String> messages;
 
+    /**
+     * Loads a language out of the specified {@link Properties}
+     * @param properties the properties to load the language from
+     * @return a new Language with the name, shortName and messages out of the specified {@link Properties}
+     */
     public static Language load(Properties properties) {
         Language language = new Language();
         language.name = properties.getProperty("name");

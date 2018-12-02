@@ -8,7 +8,9 @@ import net.nevercloud.node.api.event.internal.Cancellable;
 import net.nevercloud.node.api.event.internal.Event;
 
 @Getter
-@AllArgsConstructor
+/**
+ * Called when a player logs in to the network
+ */
 public class PlayerPreLoginEvent extends PlayerEvent implements Cancellable {
     //TODO add player
     @Setter

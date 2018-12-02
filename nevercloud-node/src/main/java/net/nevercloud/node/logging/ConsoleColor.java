@@ -42,10 +42,20 @@ public enum ConsoleColor {
         this.ansiCode = ansiCode;
     }
 
+    /**
+     * Removes the colors from the specified input string
+     * @param input the string to remove the colors from
+     * @return the input string without colors
+     */
     public static String stripColor(String input) {
         return STRIP_COLOR_PATTERN.matcher(input.replaceAll("\u001B\\[[;\\d]*m", "")).replaceAll("");
     }
 
+    /**
+     * Replaces all {@code COLOR_CHAR} + {@code index} with their ansi codes
+     * @param text the text to replace the colors in
+     * @return the input text with all colors replaced by their ansi codes
+     */
     public static String toColouredString(String text) {
         if (text == null)
             throw new NullPointerException("text");
@@ -54,22 +64,6 @@ public enum ConsoleColor {
             text = text.replace(COLOR_CHAR + "" + consoleColor.index, consoleColor.ansiCode);
 
         return text;
-    }
-
-    public static String toRandomColourString(String text) {
-        if (text == null) throw new NullPointerException();
-
-        char[] chars = text.toCharArray();
-        StringBuilder builder = new StringBuilder();
-        for (char aChar : chars)
-            builder.append(randomColour().ansiCode).append(aChar);
-
-        return builder.toString();
-    }
-
-    public static ConsoleColor randomColour() {
-        ConsoleColor[] colours = values();
-        return colours[ThreadLocalRandom.current().nextInt(colours.length)];
     }
 
     @Override

@@ -27,6 +27,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.TimeUnit;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HttpClient {
 

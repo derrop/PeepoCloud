@@ -1,5 +1,9 @@
 package net.md_5.bungee.api.chat;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 /**
  * All keybind values supported by vanilla Minecraft.
  * <br>

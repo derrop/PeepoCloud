@@ -93,7 +93,7 @@ public class CloudConfig {
         } else {
             configurable = new YamlConfigurable()
                     .append("bungeeStartCommand", "java -Xmx%memory%M -jar bungee.jar")
-                    .append("serverStartCommand", "java -Dcom.mojang.eula.agree=true -Xmx%memory%M -jar server.jar");
+                    .append("serverStartCommand", "java -Dcom.mojang.eula.agree=true -Xmx%memory%M -jar process.jar");
             configurable.saveAsFile(processPath);
         }
 

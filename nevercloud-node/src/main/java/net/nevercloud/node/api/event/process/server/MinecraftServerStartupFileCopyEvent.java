@@ -1,16 +1,19 @@
-package net.nevercloud.node.api.event.server;
+package net.nevercloud.node.api.event.process.server;
 /*
  * Created by Mc_Ruben on 23.11.2018
  */
 
 import lombok.*;
 import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
-import net.nevercloud.node.api.event.internal.Event;
+import net.nevercloud.node.api.event.process.ProcessEvent;
 import net.nevercloud.node.server.process.CloudProcess;
 
 import java.io.InputStream;
 
 @Getter
+/**
+ * Called when the process.jar is copied into a new process, before it's starting up
+ */
 public class MinecraftServerStartupFileCopyEvent extends ProcessEvent {
     private MinecraftServerInfo serverInfo;
     @Setter

@@ -46,7 +46,7 @@ public class CommandManager {
     }
 
     /**
-     * Registers commands in this {@link CommandManager} by their name and aliases
+     * Registers commands in this CommandManager by their name and aliases
      * @param commands the commands to register
      * @return this
      */
@@ -62,6 +62,11 @@ public class CommandManager {
         return this;
     }
 
+    /**
+     * Unregisters commands in this CommandManager
+     * @param commands the commands to unregister
+     * @return this
+     */
     public CommandManager unregisterCommands(Command... commands) {
         for (Command command : commands) {
             this.commands.values().remove(command);
@@ -69,9 +74,19 @@ public class CommandManager {
         return this;
     }
 
+    /**
+     * Unregisters commands in this CommandManager
+     * @param names the names of the commands to unregister
+     * @return this
+     */
     public CommandManager unregisterCommands(String... names) {
         for (String name : names) {
-            this.commands.remove(name.toLowerCase());
+            Command command = this.commands.remove(name.toLowerCase());
+            if (command != null && command.getAliases() != null && command.getAliases().length != 0) {
+                for (String alias : command.getAliases()) {
+                    this.commands.remove(alias.toLowerCase());
+                }
+            }
         }
         return this;
     }

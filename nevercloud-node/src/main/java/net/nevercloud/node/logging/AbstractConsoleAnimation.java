@@ -16,6 +16,10 @@ public abstract class AbstractConsoleAnimation {
     private ColoredLogger logger;
     int cursorUp = 1;
 
+    /**
+     * Prints the specified input in one line to this logger and removes other lines printed by this method for the animation
+     * @param input the strings to print
+     */
     protected void print(String... input) {
         if (input.length == 0)
             return;

@@ -10,6 +10,9 @@ import net.nevercloud.node.network.NetworkServer;
 import net.nevercloud.node.network.participant.MinecraftServerParticipant;
 
 @Getter
+/**
+ * Called when a server is connected to this node instance
+ */
 public class ServerConnectEvent extends NetworkServerEvent {
     private MinecraftServerParticipant participant;
 

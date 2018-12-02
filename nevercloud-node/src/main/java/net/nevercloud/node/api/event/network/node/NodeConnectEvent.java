@@ -8,6 +8,9 @@ import net.nevercloud.node.api.event.internal.Event;
 import net.nevercloud.node.network.participant.NodeParticipant;
 
 @Getter
+/**
+ * Called when a node is connected successfully
+ */
 public class NodeConnectEvent extends NetworkNodeEvent {
     public NodeConnectEvent(NodeParticipant participant) {
         super(participant);

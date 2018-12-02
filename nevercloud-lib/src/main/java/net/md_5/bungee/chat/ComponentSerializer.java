@@ -6,6 +6,10 @@ import net.md_5.bungee.api.chat.*;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 
+/*
+  This code has been taken from BungeeCord by md_5 (https://github.com/SpigotMC/BungeeCord)
+ */
+
 public class ComponentSerializer implements JsonDeserializer<BaseComponent>
 {
 
