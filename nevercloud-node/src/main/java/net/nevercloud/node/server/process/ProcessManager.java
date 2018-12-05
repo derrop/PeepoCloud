@@ -40,6 +40,8 @@ public class ProcessManager {
     private Map<String, CloudProcess> processes = new HashMap<>();
 
     public void shutdown() {
+        System.out.println("&eStopping server and proxy processes...");
+
         for (CloudProcess value : this.processes.values()) {
             value.shutdown();
         }

@@ -39,7 +39,7 @@ public class ServerFilesLoader {
     }
 
     public static void tryInstallBungee() {
-        Path source = Paths.get("files/bungee.jar");
+        Path source = Paths.get("files/process.jar");
         installBungee(source);
     }
 
@@ -79,7 +79,7 @@ public class ServerFilesLoader {
 
     public static void copyBungee(CloudProcess cloudProcess, BungeeCordProxyInfo proxyInfo, Path path) {
         if (!Files.exists(path)) {
-            Path source = Paths.get("files/bungee.jar");
+            Path source = Paths.get("files/process.jar");
             installBungee(source);
             InputStream inputStream = null;
             try {

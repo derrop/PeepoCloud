@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 @ToString
@@ -26,7 +27,7 @@ public class BungeeProcess implements CloudProcess {
     private ProcessManager processManager;
     private long startup;
     private boolean shuttingDown = false;
-    private boolean wasRunning = false;
+    private volatile boolean wasRunning = false;
 
     BungeeProcess(BungeeCordProxyInfo proxyInfo, ProcessManager processManager) {
         this.proxyInfo = proxyInfo;
@@ -81,7 +82,7 @@ public class BungeeProcess implements CloudProcess {
     }
 
     private void loadBungee() {
-        Path path = Paths.get(this.directory.toString(), "bungee.jar");
+        Path path = Paths.get(this.directory.toString(), "process.jar");
         ServerFilesLoader.copyBungee(this, this.proxyInfo, path);
     }
 
@@ -104,10 +105,12 @@ public class BungeeProcess implements CloudProcess {
 
         NeverCloudNode.getInstance().getExecutorService().execute(() -> {
             this.dispatchCommand("end");
-            SystemUtils.sleepUninterruptedly(1500);
-            if (this.isRunning()) {
-                this.process.destroyForcibly();
-                SystemUtils.sleepUninterruptedly(250);
+            try {
+                if (!this.process.waitFor(8, TimeUnit.SECONDS)) {
+                    this.process.destroyForcibly();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             if (NeverCloudNode.getInstance().getBungeeGroup(this.proxyInfo.getGroupName()).getGroupMode() != GroupMode.SAVE) {
                 SystemUtils.deleteDirectory(this.directory);

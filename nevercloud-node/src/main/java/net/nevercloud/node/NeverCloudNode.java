@@ -36,7 +36,7 @@ import net.nevercloud.node.logging.ColoredLogger;
 import net.nevercloud.node.logging.ConsoleColor;
 import net.nevercloud.node.network.ClientNode;
 import net.nevercloud.node.network.NetworkServer;
-import net.nevercloud.node.network.packet.in.PacketCInUpdateNodeInfo;
+import net.nevercloud.node.network.packet.in.PacketInUpdateNodeInfo;
 import net.nevercloud.node.network.packet.out.PacketOutUpdateNodeInfo;
 import net.nevercloud.node.network.packet.out.group.PacketOutCreateBungeeGroup;
 import net.nevercloud.node.network.packet.out.group.PacketOutCreateMinecraftGroup;
@@ -49,12 +49,15 @@ import net.nevercloud.node.server.process.ProcessManager;
 import net.nevercloud.node.statistic.StatisticsManager;
 import net.nevercloud.node.updater.AutoUpdaterManager;
 import net.nevercloud.node.updater.UpdateCheckResponse;
+import net.nevercloud.node.utility.NodeUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Field;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,6 +72,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 @Getter
 public class NeverCloudNode {
@@ -181,11 +185,20 @@ public class NeverCloudNode {
     private int memoryUsedOnThisInstanceByBungee = 0;
     private int memoryUsedOnThisInstanceByServer = 0;
 
+    private String lastUniqueId;
+
     private boolean running = true;
 
     NeverCloudNode() throws IOException {
         Preconditions.checkArgument(instance == null, "instance is already defined");
         instance = this;
+
+        try {
+            Field field = Charset.class.getDeclaredField("defaultCharset");
+            field.setAccessible(true);
+            field.set(null, StandardCharsets.UTF_8);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+        }
 
         ConsoleReader consoleReader = new ConsoleReader(System.in, System.out);
         this.logger = new ColoredLogger(consoleReader);
@@ -224,9 +237,30 @@ public class NeverCloudNode {
 
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
 
+        if (!this.internalConfig.contains("acceptedInformationsSendingToServer")) {
+            System.out.println("&4Do you accept, that some data of your cloud and server (the ip address hashed, the os, the version of the cloud, the uniqueId of your cloud, the maximum amount of memory of your cloud and the cpu cores) will be send to our server and saved there? We won't share the hashed ip address and the unique id of your cloud, but the other information are important for the support. Please type &eyes&4, if you agree, but please, you won't get any support if you do not agree to this, because we need information about your system to help you.");
+            String s = this.logger.readLine();
+            if (s.equalsIgnoreCase("yes")) {
+                System.out.println("&aYou have accepted that the data named above will be saved on our server.");
+                this.internalConfig.append("acceptedInformationsSendingToServer", true);
+                this.saveInternalConfigFile();
+            } else {
+                System.out.println("&cYou have not accepted that the data named above will be send to our server. You won't get any support for the system.");
+            }
+        } else if (!this.internalConfig.getBoolean("acceptedInformationsSendingToServer")) {
+            System.out.println("&cYou have not accepted that the data named above will be send to our server. You won't get any support for the system.");
+        } else {
+            System.out.println("&aYou have accepted that the ip address of your server hashed, the os, the version of the cloud, the uniqueId of your cloud, the maximum amount of memory of your cloud and the cpu cores will be saved on our server.");
+        }
+
         this.languagesManager = new LanguagesManager();
 
         this.loadConfigs();
+
+        this.databaseLoader = new DatabaseLoader("databaseAddons");
+        this.databaseManager = this.databaseLoader.loadDatabaseManager(this);
+
+        NodeUtils.updateNodeInfoForSupport(null);
 
         this.nodeInfo = this.cloudConfig.loadNodeInfo(0);
 
@@ -240,9 +274,6 @@ public class NeverCloudNode {
         this.eventManager = new EventManager();
 
         this.nodeAddonManager = new AddonManager<>();
-
-        this.databaseLoader = new DatabaseLoader("databaseAddons");
-        this.databaseManager = this.databaseLoader.loadDatabaseManager(this);
 
         this.installUpdatesSync(this.commandManager.getConsole());
 
@@ -278,7 +309,7 @@ public class NeverCloudNode {
     }
 
     private void initPacketHandlers() {
-        this.packetManager.registerPacket(new PacketInfo(14, PacketCInUpdateNodeInfo.class, new PacketCInUpdateNodeInfo()));
+        this.packetManager.registerPacket(new PacketInfo(14, PacketInUpdateNodeInfo.class, new PacketInUpdateNodeInfo()));
     }
 
     private void initCommands(CommandManager commandManager) {
@@ -293,7 +324,9 @@ public class NeverCloudNode {
                 new CommandClear(),
                 new CommandCreate(),
                 new CommandStart(),
-                new CommandScreen()
+                new CommandScreen(),
+                new CommandUnique(),
+                new CommandSupportUpdate()
         );
     }
 
@@ -385,6 +418,42 @@ public class NeverCloudNode {
                 break;
             }
         }
+    }
+
+    /**
+     * Gets the uniqueId of the network (used for example for the support)
+     * @param consumer the consumer to post the uniqueId to
+     */
+    public void getUniqueId(Consumer<String> consumer) {
+        this.databaseManager.getDatabase("internal_configs").get("unique", simpleJsonObject -> {
+            String unique;
+            if (simpleJsonObject == null) {
+                unique = SystemUtils.randomString(128);
+                this.databaseManager.getDatabase("internal_configs").insert("unique", new SimpleJsonObject().append("unique", unique));
+            } else {
+                unique = simpleJsonObject.getString("unique");
+                if (this.lastUniqueId == null)
+                    this.lastUniqueId = unique;
+                if (!this.lastUniqueId.equals(unique)) {
+                    simpleJsonObject.append("unique", this.lastUniqueId);
+                    this.databaseManager.getDatabase("internal_configs").update("unique", simpleJsonObject);
+                }
+            }
+            consumer.accept(unique);
+        });
+    }
+
+    /**
+     * Gets the max memory of all nodes in the network
+     * @return the memory of all nodes in the network
+     */
+    public int getMaxMemory() {
+        int maxMemory = this.cloudConfig.getMaxMemory();
+        for (ClientNode value : this.connectedNodes.values()) {
+            if (value.getNodeInfo() != null)
+                maxMemory += value.getNodeInfo().getMaxMemory();
+        }
+        return maxMemory;
     }
 
     private void connectToNode(NetworkAddress node) {

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 @Getter
 public class ServerProcess implements CloudProcess {
@@ -26,7 +27,7 @@ public class ServerProcess implements CloudProcess {
     private ProcessManager processManager;
     private long startup;
     private boolean shuttingDown = false;
-    private boolean wasRunning = false;
+    private volatile boolean wasRunning = false;
 
     ServerProcess(MinecraftServerInfo serverInfo, ProcessManager processManager) {
         this.serverInfo = serverInfo;
@@ -108,13 +109,15 @@ public class ServerProcess implements CloudProcess {
             if (isRunning()) {
                 if (save) {
                     this.dispatchCommand("save-all");
-                    SystemUtils.sleepUninterruptedly(1500);
+                    SystemUtils.sleepUninterruptedly(750);
                 }
                 this.dispatchCommand("stop");
-                SystemUtils.sleepUninterruptedly(2500);
-                if (this.isRunning()) {
-                    this.process.destroyForcibly();
-                    SystemUtils.sleepUninterruptedly(250);
+                try {
+                    if (!this.process.waitFor(8, TimeUnit.SECONDS)) {
+                        this.process.destroyForcibly();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
             if (!save) {

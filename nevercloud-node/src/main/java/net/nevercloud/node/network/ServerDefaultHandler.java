@@ -9,6 +9,7 @@ import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.api.event.network.node.NodeDisconnectEvent;
 import net.nevercloud.node.network.participant.MinecraftServerParticipant;
 import net.nevercloud.node.network.participant.NodeParticipant;
+import net.nevercloud.node.utility.NodeUtils;
 
 public class ServerDefaultHandler extends ChannelHandlerAdapter {
     @Override
@@ -17,6 +18,7 @@ public class ServerDefaultHandler extends ChannelHandlerAdapter {
             NeverCloudNode.getInstance().getEventManager().callEvent(new NodeDisconnectEvent((NodeParticipant) networkParticipant));
             NeverCloudNode.getInstance().getScreenManager().getNetworkScreenManager().handleNodeDisconnect((NodeParticipant) networkParticipant);
             NeverCloudNode.getInstance().getServerNodes().remove(networkParticipant.getName());
+            NodeUtils.updateNodeInfoForSupport(null);
         } else if (networkParticipant instanceof MinecraftServerParticipant) {
             //NeverCloudNode.getInstance().getEventManager().callEvent()
         }

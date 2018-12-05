@@ -31,6 +31,7 @@ import net.nevercloud.node.api.event.network.minecraftserver.ServerConnectEvent;
 import net.nevercloud.node.api.event.network.node.NodeConnectEvent;
 import net.nevercloud.node.network.packet.auth.PacketInAuth;
 import net.nevercloud.node.network.participant.*;
+import net.nevercloud.node.utility.NodeUtils;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -125,6 +126,7 @@ public class NetworkServer implements Runnable {
                     successful = true;
 
                     NeverCloudNode.getInstance().getEventManager().callEvent(new NodeConnectEvent((NodeParticipant) networkParticipant));
+                    NodeUtils.updateNodeInfoForSupport(null);
                 }
                 break;
 

@@ -24,7 +24,7 @@ public class SystemUtils {
 
     private SystemUtils() { }
 
-    public static final String CENTRAL_SERVER_URL = "http://localhost:1350/";
+    public static final String CENTRAL_SERVER_URL = "http://192.168.56.1:1350/";
 
     private static final char[] values = "abcdefghijklmnopqrstuvwxyzäöüABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890".toCharArray();
 
@@ -138,13 +138,13 @@ public class SystemUtils {
                     new SimpleFileVisitor<Path>() {
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                            Files.delete(file);
+                            Files.deleteIfExists(file);
                             return FileVisitResult.CONTINUE;
                         }
 
                         @Override
                         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                            Files.delete(dir);
+                            Files.deleteIfExists(dir);
                             return FileVisitResult.CONTINUE;
                         }
                     }
@@ -221,6 +221,14 @@ public class SystemUtils {
 
     public static boolean isServerOffline(Exception e) {
         return e instanceof ConnectException && e.getMessage().equalsIgnoreCase("Connection refused: connect");
+    }
+
+    public static String getOperatingSystem() {
+        return System.getProperty("os.name");
+    }
+
+    public static int getAvailableCpuCores() {
+        return Runtime.getRuntime().availableProcessors();
     }
 
 

@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 @Getter
 /**
- * Called when the process.jar is copied into a new process, before it's starting up
+ * Called when the server.jar is copied into a new process, before it's starting up
  */
 public class MinecraftServerStartupFileCopyEvent extends ProcessEvent {
     private MinecraftServerInfo serverInfo;

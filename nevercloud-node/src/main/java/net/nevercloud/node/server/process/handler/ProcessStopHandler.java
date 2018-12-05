@@ -19,7 +19,7 @@ public class ProcessStopHandler implements Runnable {
                     value.shutdown();
                 }
             }
-            SystemUtils.sleepUninterruptedly(400);
+            SystemUtils.sleepUninterruptedly(500);
         }
     }
 }
