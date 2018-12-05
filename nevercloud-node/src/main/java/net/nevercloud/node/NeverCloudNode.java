@@ -469,6 +469,8 @@ public class NeverCloudNode {
      * @param sender the sender to which the messages should be send
      */
     public void installUpdates(CommandSender sender) {
+        if (!this.cloudConfig.isAutoUpdate())
+            return;
         NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdates(updateCheckResponse -> this.installUpdates0(sender, updateCheckResponse));
     }
 
@@ -477,6 +479,8 @@ public class NeverCloudNode {
      * @param sender the sender to which the messages should be send
      */
     public void installUpdatesSync(CommandSender sender) {
+        if (!this.cloudConfig.isAutoUpdate())
+            return;
         this.installUpdates0(sender, NeverCloudNode.getInstance().getAutoUpdaterManager().checkUpdatesSync());
     }
 

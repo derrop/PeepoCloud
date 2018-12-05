@@ -35,6 +35,7 @@ public class CloudConfig {
     private NetworkAddress host;
 
     private int maxMemory;
+    private boolean autoUpdate;
 
     //Process
     private String bungeeStartCmd;
@@ -56,9 +57,12 @@ public class CloudConfig {
             configurable = YamlConfigurable.load(mainPath);
         } else {
             configurable = new YamlConfigurable()
+                    .append("autoUpdate", true)
                     .append("maxMemoryForServers", ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize() / 1024 / 1024 - 2048);
             configurable.saveAsFile(mainPath);
         }
+
+        this.autoUpdate = configurable.getBoolean("autoUpdate");
 
         this.maxMemory = configurable.getInt("maxMemoryForServers");
         this.maxMemory = this.maxMemory >= 64 ? this.maxMemory : this.maxMemory * 1024; //>= 64 = gb; < 64 = mb
@@ -117,6 +121,7 @@ public class CloudConfig {
 
     private void saveMain() {
         new YamlConfigurable()
+                .append("autoUpdate", this.autoUpdate)
                 .append("maxMemoryForServers", this.maxMemory)
                 .saveAsFile(mainPath);
     }
