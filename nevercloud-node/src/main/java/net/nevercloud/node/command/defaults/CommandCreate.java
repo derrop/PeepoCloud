@@ -11,12 +11,16 @@ import net.nevercloud.lib.server.minecraft.MinecraftGroup;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.command.Command;
 import net.nevercloud.node.command.CommandSender;
+import net.nevercloud.node.server.template.TemplateStorage;
 import net.nevercloud.node.setup.Setup;
+import net.nevercloud.node.setup.type.ArraySetupAcceptable;
 import net.nevercloud.node.setup.type.EnumSetupAcceptable;
 import net.nevercloud.node.setup.type.IntegerSetupAcceptable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandCreate extends Command {
     public CommandCreate() {
@@ -34,7 +38,12 @@ public class CommandCreate extends Command {
 
         switch (args[0].toLowerCase()) {
             case "bungeegroup": {
+                if (NeverCloudNode.getInstance().getBungeeGroups().containsKey(name)) {
+                    sender.createLanguageMessage("command.create.bungeegroup.alreadyExists").replace("%name%", name).send();
+                    return;
+                }
                 Setup.startSetupAsync(new YamlConfigurable(), NeverCloudNode.getInstance().getLogger(), setup -> {
+
                     setup.request(
                             "groupMode",
                             NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.groupmode.provide"),
@@ -44,8 +53,24 @@ public class CommandCreate extends Command {
 
                     GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode").toUpperCase());
 
+                    Object[] storages = NeverCloudNode.getInstance().getTemplateStorages().stream().map(TemplateStorage::getName).toArray();
+
+                    String storage = null;
+
+                    if (storages.length <= 1) {
+                        storage = storages.length == 1 ? String.valueOf(storages[0]) : "local";
+                    } else {
+                        setup.request(
+                                "templateStorage",
+                                NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.templatestorage.provide").replace("%storages%", Arrays.toString(storages)),
+                                NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.templatestorage.invalid").replace("%storages%", Arrays.toString(storages)),
+                                new ArraySetupAcceptable<>(storages)
+                        );
+                        storage = setup.getData().getString("templateStorage");
+                    }
+
                     List<Template> templates = new ArrayList<>(); //not Arrays.asList because we cannot use the add method with this (for the create template command)
-                    templates.add(new Template("default"));
+                    templates.add(new Template("default", storage));
 
                     setup.request(
                             "memory",
@@ -72,7 +97,15 @@ public class CommandCreate extends Command {
                     );
                     int maxServers = setup.getData().getInt("maxServers");
 
-                    BungeeGroup group = new BungeeGroup(name, groupMode, templates, memory, minServers, maxServers);
+                    setup.request(
+                            "startPort",
+                            NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.startPort.provide"),
+                            NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.startPort.invalid"),
+                            (IntegerSetupAcceptable) input -> input <= 65535 && input > 0
+                    );
+                    int startPort = setup.getData().getInt("startPort");
+
+                    BungeeGroup group = new BungeeGroup(name, groupMode, templates, memory, minServers, maxServers, startPort);
 
                     NeverCloudNode.getInstance().getGroupsConfig().createGroup(group, success -> {
                         if (success) {
@@ -87,6 +120,10 @@ public class CommandCreate extends Command {
             break;
 
             case "minecraftgroup": {
+                if (NeverCloudNode.getInstance().getMinecraftGroups().containsKey(name)) {
+                    sender.createLanguageMessage("command.create.minecraftgroup.alreadyExists").replace("%name%", name).send();
+                    return;
+                }
                 Setup.startSetupAsync(new YamlConfigurable(), NeverCloudNode.getInstance().getLogger(), setup -> {
                     setup.request(
                             "groupMode",
@@ -97,8 +134,24 @@ public class CommandCreate extends Command {
 
                     GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode").toUpperCase());
 
+                    Object[] storages = NeverCloudNode.getInstance().getTemplateStorages().stream().map(TemplateStorage::getName).toArray();
+
+                    String storage = null;
+
+                    if (storages.length <= 1) {
+                        storage = storages.length == 1 ? String.valueOf(storages[0]) : "local";
+                    } else {
+                        setup.request(
+                                "templateStorage",
+                                NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.templatestorage.provide").replace("%storages%", Arrays.toString(storages)),
+                                NeverCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.templatestorage.invalid").replace("%storages%", Arrays.toString(storages)),
+                                new ArraySetupAcceptable<>(storages)
+                        );
+                        storage = setup.getData().getString("templateStorage");
+                    }
+
                     List<Template> templates = new ArrayList<>(); //not Arrays.asList because we cannot use the add method with this (for the create template command)
-                    templates.add(new Template("default"));
+                    templates.add(new Template("default", storage));
 
                     setup.request(
                             "memory",

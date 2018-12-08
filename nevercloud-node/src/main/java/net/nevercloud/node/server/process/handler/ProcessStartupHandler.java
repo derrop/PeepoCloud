@@ -15,7 +15,7 @@ public class ProcessStartupHandler implements Runnable {
     private ProcessManager processManager;
     @Override
     public void run() {
-        while (!Thread.interrupted()) {
+        while (!Thread.interrupted() && NeverCloudNode.getInstance().isRunning()) {
             for (MinecraftGroup group : NeverCloudNode.getInstance().getMinecraftGroups().values()) {
                 if (
                         NeverCloudNode.getInstance().getNextServerId(group.getName()) - 1 <
@@ -25,10 +25,9 @@ public class ProcessStartupHandler implements Runnable {
             }
             for (BungeeGroup group : NeverCloudNode.getInstance().getBungeeGroups().values()) {
                 if (
-                        NeverCloudNode.getInstance().getBungeeProxies(group.getName()).size() +
-                                this.processManager.getProcessesOfBungeeGroup(group.getName()).size() <
+                        NeverCloudNode.getInstance().getNextProxyId(group.getName()) - 1 <
                                 group.getMinServers()) {
-                    //NeverCloudNode.getInstance().startBungeeProxy(group);
+                    NeverCloudNode.getInstance().startBungeeProxy(group);
                 }
             }
             SystemUtils.sleepUninterruptedly(500);

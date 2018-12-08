@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import net.nevercloud.lib.config.json.SimpleJsonObject;
+import net.nevercloud.lib.network.NetworkParticipant;
 import net.nevercloud.lib.network.auth.Auth;
 import net.nevercloud.lib.network.auth.NetworkComponentType;
 import net.nevercloud.lib.network.packet.Packet;
@@ -40,12 +41,19 @@ import net.nevercloud.node.network.packet.in.PacketInUpdateNodeInfo;
 import net.nevercloud.node.network.packet.out.PacketOutUpdateNodeInfo;
 import net.nevercloud.node.network.packet.out.group.PacketOutCreateBungeeGroup;
 import net.nevercloud.node.network.packet.out.group.PacketOutCreateMinecraftGroup;
+import net.nevercloud.node.network.packet.out.server.PacketOutStartBungee;
+import net.nevercloud.node.network.packet.out.server.PacketOutStartServer;
 import net.nevercloud.node.network.participant.BungeeCordParticipant;
 import net.nevercloud.node.network.participant.MinecraftServerParticipant;
 import net.nevercloud.node.network.participant.NodeParticipant;
 import net.nevercloud.node.screen.ScreenManager;
 import net.nevercloud.node.server.ServerFilesLoader;
+import net.nevercloud.node.server.process.BungeeProcess;
+import net.nevercloud.node.server.process.CloudProcess;
 import net.nevercloud.node.server.process.ProcessManager;
+import net.nevercloud.node.server.process.ServerProcess;
+import net.nevercloud.node.server.template.TemplateLocalStorage;
+import net.nevercloud.node.server.template.TemplateStorage;
 import net.nevercloud.node.statistic.StatisticsManager;
 import net.nevercloud.node.updater.AutoUpdaterManager;
 import net.nevercloud.node.updater.UpdateCheckResponse;
@@ -63,16 +71,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Getter
 public class NeverCloudNode {
@@ -120,6 +126,8 @@ public class NeverCloudNode {
     private Map<String, BungeeGroup> bungeeGroups;
 
     private ProcessManager processManager;
+
+    private Collection<TemplateStorage> templateStorages = new ArrayList<>(Arrays.asList(new TemplateLocalStorage()));
 
     private Map<String, MinecraftServerParticipant> serversOnThisNode = new HashMap<String, MinecraftServerParticipant>() {
         @Override
@@ -185,8 +193,6 @@ public class NeverCloudNode {
     private int memoryUsedOnThisInstanceByBungee = 0;
     private int memoryUsedOnThisInstanceByServer = 0;
 
-    private String lastUniqueId;
-
     private boolean running = true;
 
     NeverCloudNode() throws IOException {
@@ -239,7 +245,7 @@ public class NeverCloudNode {
 
         if (!this.internalConfig.contains("acceptedInformationsSendingToServer")) {
             System.out.println("&4Do you accept, that some data of your cloud and server (the ip address hashed, the os, the version of the cloud, the uniqueId of your cloud, the maximum amount of memory of your cloud and the cpu cores) will be send to our server and saved there? We won't share the hashed ip address and the unique id of your cloud, but the other information are important for the support. Please type &eyes&4, if you agree, but please, you won't get any support if you do not agree to this, because we need information about your system to help you.");
-            String s = this.logger.readLine();
+            String s = this.logger.readLine1();
             if (s.equalsIgnoreCase("yes")) {
                 System.out.println("&aYou have accepted that the data named above will be saved on our server.");
                 this.internalConfig.append("acceptedInformationsSendingToServer", true);
@@ -255,6 +261,8 @@ public class NeverCloudNode {
 
         this.languagesManager = new LanguagesManager();
 
+        this.commandManager = new CommandManager(this.logger);
+
         this.loadConfigs();
 
         this.databaseLoader = new DatabaseLoader("databaseAddons");
@@ -265,8 +273,6 @@ public class NeverCloudNode {
         this.nodeInfo = this.cloudConfig.loadNodeInfo(0);
 
         this.autoUpdaterManager = new AutoUpdaterManager();
-
-        this.commandManager = new CommandManager(this.logger);
 
         this.initCommands(this.commandManager);
         this.initPacketHandlers();
@@ -303,7 +309,11 @@ public class NeverCloudNode {
         ServerFilesLoader.tryInstallSpigot();
         ServerFilesLoader.tryInstallBungee();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown0));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (this.isRunning()) {
+                this.shutdown0();
+            }
+        }));
 
         this.reloadAddons();
     }
@@ -326,7 +336,10 @@ public class NeverCloudNode {
                 new CommandStart(),
                 new CommandScreen(),
                 new CommandUnique(),
-                new CommandSupportUpdate()
+                new CommandSupportUpdate(),
+                new CommandStats(),
+                new CommandGStats(),
+                new CommandConfig()
         );
     }
 
@@ -334,11 +347,12 @@ public class NeverCloudNode {
         running = false;
         if (this.processManager != null)
             this.processManager.shutdown();
+
+        this.nodeAddonManager.disableAndUnloadAddons();
+
         this.commandManager.shutdown();
         this.databaseLoader.shutdown();
         this.databaseManager.shutdown();
-
-        this.nodeAddonManager.disableAndUnloadAddons();
 
         try {
             this.logger.getConsoleReader().print(ConsoleColor.RESET.toString());
@@ -406,6 +420,8 @@ public class NeverCloudNode {
             }
         }
 
+        this.statisticsManager.reload(this.cloudConfig.isUseGlobalStats());
+
     }
 
     public void tryConnectToNode(String host) {
@@ -422,10 +438,11 @@ public class NeverCloudNode {
 
     /**
      * Gets the uniqueId of the network (used for example for the support)
-     * @param consumer the consumer to post the uniqueId to
+     * @return the uniqueId
      */
-    public void getUniqueId(Consumer<String> consumer) {
-        this.databaseManager.getDatabase("internal_configs").get("unique", simpleJsonObject -> {
+    public String getUniqueId() {
+        return this.cloudConfig.getUniqueId();
+        /*this.databaseManager.getDatabase("internal_configs").get("unique", simpleJsonObject -> {
             String unique;
             if (simpleJsonObject == null) {
                 unique = SystemUtils.randomString(128);
@@ -440,7 +457,7 @@ public class NeverCloudNode {
                 }
             }
             consumer.accept(unique);
-        });
+        });*/
     }
 
     /**
@@ -462,6 +479,31 @@ public class NeverCloudNode {
                 null);
         this.connectedNodes.put(node.getHost(), client);
         new Thread(client, "Node client @" + node.toString()).start();
+    }
+
+    /**
+     * Gets the {@link TemplateStorage} registered in this Node by the given {@code name}
+     * @param name the name of the {@link TemplateStorage}
+     * @return the {@link TemplateStorage} or null if not found
+     */
+    public TemplateStorage getTemplateStorage(String name) {
+        for (TemplateStorage storage : this.templateStorages)
+            if (storage.getName() != null && storage.getName().equals(name))
+                return storage;
+        return null;
+    }
+
+    /**
+     * Copies a template by the loaded {@link TemplateStorage} specified in the {@link Template} or if not found the {@link TemplateLocalStorage} to the given {@link Path}
+     * @param group the group of the server/proxy
+     * @param template the {@link Template} to copy
+     * @param target the target where the files are copied in
+     */
+    public void copyTemplate(String group, Template template, Path target) {
+        TemplateStorage storage = this.getTemplateStorage(template.getName());
+        if (storage == null)
+            storage = this.getTemplateStorage("local");
+        storage.copy(group, template, target);
     }
 
     /**
@@ -489,8 +531,8 @@ public class NeverCloudNode {
             if (updateCheckResponse.isUpToDate()) {
                 sender.sendMessageLanguageKey("autoupdate.upToDate");
             } else {
-                sender.createLanguageMessage("autoupdate.versionsBehind").replace("%versionsBehind%", String.valueOf(updateCheckResponse.getVersionsBehind())
-                        .replace("%newestVersion%", updateCheckResponse.getNewestVersion())).send(); //TODO %newestVersion% is not replaced with the version
+                sender.createLanguageMessage("autoupdate.versionsBehind").replace("%versionsBehind%", String.valueOf(updateCheckResponse.getVersionsBehind()))
+                        .replace("%newestVersion%", updateCheckResponse.getNewestVersion()).send();
                 NeverCloudNode.getInstance().getAutoUpdaterManager().update((success, path) -> {
                     if (success) {
                         sender.createLanguageMessage("autoupdate.successfullyUpdated").replace("%newestVersion%", updateCheckResponse.getNewestVersion()).send();
@@ -718,6 +760,12 @@ public class NeverCloudNode {
         return i.get() + this.processManager.getProcessesOfMinecraftGroup(group).size() + this.processManager.getProcessesOfMinecraftGroupQueued(group).size() + 1;
     }
 
+    public int getNextProxyId(String group) {
+        AtomicInteger i = new AtomicInteger();
+        this.networkServer.getConnectedNodes().values().forEach(participant -> i.addAndGet(participant.getProxies().size() + participant.getStartingProxies().size() + participant.getWaitingProxies().size()));
+        return i.get() + this.processManager.getProcessesOfBungeeGroup(group).size() + this.processManager.getProcessesOfBungeeGroupQueued(group).size() + 1;
+    }
+
     public boolean isServerStarted(String name) {
         if (this.getMinecraftServers().stream().anyMatch(serverInfo -> serverInfo.getComponentName().equals(name)))
             return true;
@@ -731,6 +779,44 @@ public class NeverCloudNode {
         return false;
     }
 
+    public MinecraftServerInfo getMinecraftServerInfo(String name) {
+        if (this.serversOnThisNode.containsKey(name))
+            return this.serversOnThisNode.get(name).getServerInfo();
+        if (this.processManager.getProcesses().containsKey(name)) {
+            CloudProcess process = this.processManager.getProcesses().get(name);
+            if (process instanceof ServerProcess)
+                return ((ServerProcess) process).getServerInfo();
+        }
+        for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
+            if (value.getServers().containsKey(name))
+                return value.getServers().get(name);
+            if (value.getWaitingServers().containsKey(name))
+                return value.getWaitingServers().get(name);
+            if (value.getStartingServers().containsKey(name))
+                return value.getStartingServers().get(name);
+        }
+        return null;
+    }
+
+    public BungeeCordProxyInfo getBungeeProxyInfo(String name) {
+        if (this.proxiesOnThisNode.containsKey(name))
+            return this.proxiesOnThisNode.get(name).getProxyInfo();
+        if (this.processManager.getProcesses().containsKey(name)) {
+            CloudProcess process = this.processManager.getProcesses().get(name);
+            if (process instanceof BungeeProcess)
+                return ((BungeeProcess) process).getProxyInfo();
+        }
+        for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
+            if (value.getProxies().containsKey(name))
+                return value.getProxies().get(name);
+            if (value.getWaitingProxies().containsKey(name))
+                return value.getWaitingProxies().get(name);
+            if (value.getStartingProxies().containsKey(name))
+                return value.getStartingProxies().get(name);
+        }
+        return null;
+    }
+
     public MinecraftServerInfo startMinecraftServer(MinecraftGroup group) {
         return this.startMinecraftServer(group, group.getMemory());
     }
@@ -741,7 +827,7 @@ public class NeverCloudNode {
     }
 
     public MinecraftServerInfo startMinecraftServer(MinecraftGroup group, String name) {
-        return this.startMinecraftServer(group, group.getName() + "-" + this.getNextServerId(group.getName()), group.getMemory());
+        return this.startMinecraftServer(group, name, group.getMemory());
     }
 
     public MinecraftServerInfo startMinecraftServer(MinecraftGroup group, String name, int id, int memory) {
@@ -782,6 +868,8 @@ public class NeverCloudNode {
                     id,
                     this.nodeInfo.getName(),
                     memory,
+                    this.cloudConfig.getHost().getHost(),
+                    this.findServerPort(),
                     new HashMap<>(),
                     this.findTemplate(group),
                     -1L
@@ -789,13 +877,148 @@ public class NeverCloudNode {
             this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(serverInfo), false);
             return serverInfo;
         } else {
+            NetworkParticipant channel = this.getServerNodes().get(nodeInfo.getName());
+            if (channel == null)
+                channel = this.getConnectedNode(nodeInfo.getName());
+            if (channel == null)
+                return null;
 
+            MinecraftServerInfo serverInfo = new MinecraftServerInfo(
+                    name,
+                    group.getName(),
+                    id,
+                    this.nodeInfo.getName(),
+                    memory,
+                    channel.getAddress(),
+                    this.findServerPort(),
+                    new HashMap<>(),
+                    this.findTemplate(group),
+                    -1L
+            );
+            channel.sendPacket(new PacketOutStartServer(serverInfo));
+
+            if (channel instanceof NodeParticipant)
+                ((NodeParticipant) channel).getWaitingServers().put(serverInfo.getComponentName(), serverInfo);
+
+            return serverInfo;
         }
-        return null;
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group) {
+        return this.startBungeeProxy(group, group.getMemory());
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group, int memory) {
+        int id = this.getNextProxyId(group.getName());
+        return this.startBungeeProxy(group, group.getName() + "-" + id, id, memory);
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group, String name) {
+        return this.startBungeeProxy(group, name, group.getMemory());
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group, String name, int id, int memory) {
+        return this.startBungeeProxy(this.getBestNodeInfo(memory), group, name, id, memory);
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group, String name, int memory) {
+        return startBungeeProxy(this.getBestNodeInfo(memory), group, name, memory);
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(NodeInfo nodeInfo, BungeeGroup group) {
+        return this.startBungeeProxy(nodeInfo, group, group.getMemory());
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(NodeInfo nodeInfo, BungeeGroup group, int memory) {
+        int id = this.getNextProxyId(group.getName());
+        return this.startBungeeProxy(nodeInfo, group, group.getName() + "-" + id, id, memory);
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(NodeInfo nodeInfo, BungeeGroup group, String name) {
+        return this.startBungeeProxy(nodeInfo, group, name, this.getNextProxyId(group.getName()), group.getMemory());
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(NodeInfo nodeInfo, BungeeGroup group, String name, int memory) {
+        return this.startBungeeProxy(nodeInfo, group, name, this.getNextServerId(group.getName()), memory);
+    }
+
+    public BungeeCordProxyInfo startBungeeProxy(NodeInfo nodeInfo, BungeeGroup group, String name, int id, int memory) {
+        int nextId = this.getNextProxyId(group.getName()) - 1;
+        if (nextId >= group.getMaxServers() || this.isServerStarted(name))
+            return null;
+        if (nodeInfo == null)
+            nodeInfo = this.nodeInfo;
+
+        if (this.nodeInfo.getName().equals(nodeInfo.getName())) {
+            BungeeCordProxyInfo serverInfo = new BungeeCordProxyInfo(
+                    name,
+                    group.getName(),
+                    id,
+                    this.nodeInfo.getName(),
+                    memory,
+                    this.cloudConfig.getHost().getHost(),
+                    group.getStartPort() + nextId,
+                    new HashMap<>(),
+                    this.findTemplate(group),
+                    -1L
+            );
+            this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(serverInfo), false);
+            return serverInfo;
+        } else {
+            NetworkParticipant channel = this.getServerNodes().get(nodeInfo.getName());
+            if (channel == null)
+                channel = this.getConnectedNode(nodeInfo.getName());
+            if (channel == null)
+                return null;
+
+            BungeeCordProxyInfo serverInfo = new BungeeCordProxyInfo(
+                    name,
+                    group.getName(),
+                    id,
+                    this.nodeInfo.getName(),
+                    memory,
+                    channel.getAddress(),
+                    group.getStartPort() + nextId,
+                    new HashMap<>(),
+                    this.findTemplate(group),
+                    -1L
+            );
+            channel.sendPacket(new PacketOutStartBungee(serverInfo));
+
+            if (channel instanceof NodeParticipant)
+                ((NodeParticipant) channel).getWaitingProxies().put(serverInfo.getComponentName(), serverInfo);
+
+            return serverInfo;
+        }
     }
 
     public Template findTemplate(MinecraftGroup group) {
         return group.getTemplates().get(ThreadLocalRandom.current().nextInt(group.getTemplates().size()));
+    }
+
+    public Template findTemplate(BungeeGroup group) {
+        return group.getTemplates().get(ThreadLocalRandom.current().nextInt(group.getTemplates().size()));
+    }
+
+    /**
+     * Gets all ports binded by the servers/proxies of this Node
+     * @return a collection with all binded ports
+     */
+    public Collection<Integer> getBindedPorts() {
+        Collection<Integer> a = this.processManager.getProcesses().values().stream().map(CloudProcess::getPort).collect(Collectors.toList());
+        for (CloudProcess serverProcess : this.processManager.getServerQueue().getServerProcesses()) {
+            a.add(serverProcess.getPort());
+        }
+        return a;
+    }
+
+    private int findServerPort() {
+        Collection<Integer> bindedPorts = this.getBindedPorts();
+        int port = this.cloudConfig.getStartPort();
+        while (bindedPorts.contains(port)) {
+            port += ThreadLocalRandom.current().nextInt(15);
+        }
+        return port;
     }
 
 }

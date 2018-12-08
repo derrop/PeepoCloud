@@ -55,16 +55,35 @@ public class ColoredLogger extends Logger {
     }
 
     /**
-     * Reads a line out of the console and blocks the {@link Thread}, should be only used once for each logger
-     * @return the line
+     * @deprecated don't use after {@link net.nevercloud.node.command.CommandManager} has been started
+     * @return the line read from the console
      */
-    public String readLine() {
+    @Deprecated
+    public String readLine1() {
         String line = this.readLine0();
         if (this.lineAcceptor != null) {
             this.lineAcceptor.accept(line);
             return "";
         }
         return line;
+    }
+
+    /**
+     * Reads a line out of the console and blocks the {@link Thread}, should be only used once for each logger
+     * @return the line
+     */
+    public String readLine() {
+        AtomicReference<String> line = new AtomicReference<>();
+        this.lineAcceptor = line::set;
+        while (line.get() == null) {
+            try {
+                Thread.sleep(0, 500000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        this.lineAcceptor = null;
+        return line.get();
     }
 
     private String readLine0() {
@@ -79,20 +98,6 @@ public class ColoredLogger extends Logger {
         return line;
     }
 
-    private String readLine1() {
-        AtomicReference<String> line = new AtomicReference<>();
-        this.lineAcceptor = line::set;
-        while (line.get() == null) {
-            try {
-                Thread.sleep(0, 500000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        this.lineAcceptor = null;
-        return line.get();
-    }
-
     /**
      * Reads the lines until the {@link Function#apply(String)} returns {@code true}
      * @param function the {@link Function} which must return {@code true} to break the loop and let it return the input of the user
@@ -102,7 +107,7 @@ public class ColoredLogger extends Logger {
      */
     public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage, String nullOn) {
         String line;
-        while (!function.apply(line = this.readLine1()) || (line.equalsIgnoreCase(nullOn))) {
+        while (!function.apply(line = this.readLine()) || (line.equalsIgnoreCase(nullOn))) {
             if (line.equalsIgnoreCase(nullOn)) {
                 return null;
             }
@@ -218,7 +223,7 @@ public class ColoredLogger extends Logger {
     }
 
     private class LogFileFormatter extends Formatter {
-        private final DateFormat format = new SimpleDateFormat("dd:MM:yyyy kk:mm:ss");
+        private final DateFormat format = new SimpleDateFormat("dd.MM.yyyy kk:mm:ss");
 
         @Override
         public String format(LogRecord record) {
@@ -241,7 +246,7 @@ public class ColoredLogger extends Logger {
     }
 
     private class LogFormatter extends Formatter {
-        private final DateFormat format = new SimpleDateFormat("dd:MM:yyyy kk:mm:ss");
+        private final DateFormat format = new SimpleDateFormat("dd.MM.yyyy kk:mm:ss");
 
         @Override
         public String format(LogRecord record) {

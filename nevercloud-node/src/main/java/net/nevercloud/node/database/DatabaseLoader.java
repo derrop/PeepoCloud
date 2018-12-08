@@ -6,9 +6,9 @@ package net.nevercloud.node.database;
 import net.nevercloud.lib.config.yaml.YamlConfigurable;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.addon.AddonManager;
-import net.nevercloud.node.database.defaults.ArangoDatabaseManager;
-import net.nevercloud.node.database.defaults.MongoDatabaseManager;
-import net.nevercloud.node.database.defaults.MySQLDatabaseManager;
+import net.nevercloud.node.database.defaults.arango.ArangoDatabaseManager;
+import net.nevercloud.node.database.defaults.mongo.MongoDatabaseManager;
+import net.nevercloud.node.database.defaults.mysql.MySQLDatabaseManager;
 import net.nevercloud.node.setup.type.ArraySetupAcceptable;
 import net.nevercloud.node.setup.Setup;
 

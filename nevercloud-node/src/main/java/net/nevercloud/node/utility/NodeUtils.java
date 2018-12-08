@@ -18,52 +18,60 @@ public class NodeUtils {
     private NodeUtils() { }
 
     public static void updateNodeInfoForSupport(Consumer<Boolean> consumer) {
-        if (!NeverCloudNode.getInstance().getInternalConfig().getBoolean("acceptedInformationsSendingToServer")) {
-            consumer.accept(null);
+        if (!NeverCloudNode.getInstance().getInternalConfig().getBoolean("acceptedInformationsSendingToServer") ||
+                NeverCloudNode.getInstance().getCloudConfig().getUsername() == null ||
+                NeverCloudNode.getInstance().getCloudConfig().getApiToken() == null ||
+                NeverCloudNode.getInstance().getCloudConfig().getUniqueId() == null) {
+            if (consumer != null)
+                consumer.accept(null);
             return;
         }
-        NeverCloudNode.getInstance().getUniqueId(uniqueId -> {
-            try {
-                URLConnection connection = new URL(SystemUtils.CENTRAL_SERVER_URL + "cloudInfoUpdate").openConnection();
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-                connection.setUseCaches(false);
-                connection.setConnectTimeout(15000);
-                connection.connect();
+        String uniqueId = NeverCloudNode.getInstance().getUniqueId();
+        try {
+            URLConnection connection = new URL(SystemUtils.CENTRAL_SERVER_URL + "cloudInfoUpdate").openConnection();
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setUseCaches(false);
+            connection.setConnectTimeout(15000);
+            connection.connect();
 
-                try (OutputStream outputStream = connection.getOutputStream();
-                     Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
-                    SimpleJsonObject.GSON.toJson(
-                            new CloudInfo(
-                                    uniqueId,
-                                    SystemUtils.getOperatingSystem(),
-                                    SystemUtils.getCurrentVersion(),
-                                    NeverCloudNode.getInstance().getMaxMemory(),
-                                    SystemUtils.getAvailableCpuCores()
-                            ),
-                            writer
-                    );
-                }
-
-                try (InputStream inputStream = connection.getInputStream();
-                     Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                    SimpleJsonObject simpleJsonObject = new SimpleJsonObject(reader);
-                    if (!simpleJsonObject.getBoolean("success")) {
-                        System.out.println("&cCould not update the node info to the server: " + simpleJsonObject);
-                        if (consumer != null)
-                            consumer.accept(false);
-                    } else {
-                        if (consumer != null)
-                            consumer.accept(true);
-                    }
-                }
-            } catch (IOException e) {
-                if (consumer != null)
-                    consumer.accept(false);
-                if (!SystemUtils.isServerOffline(e))
-                    e.printStackTrace();
+            try (OutputStream outputStream = connection.getOutputStream();
+                 Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+                SimpleJsonObject.GSON.toJson(
+                        new SimpleJsonObject()
+                                .append("username", NeverCloudNode.getInstance().getCloudConfig().getUsername())
+                                .append("apiToken", NeverCloudNode.getInstance().getCloudConfig().getApiToken())
+                                .append("cloudInfo", new CloudInfo(
+                                                uniqueId,
+                                                SystemUtils.getOperatingSystem(),
+                                                SystemUtils.getCurrentVersion(),
+                                                NeverCloudNode.getInstance().getMaxMemory(),
+                                                SystemUtils.getAvailableCpuCores()
+                                        )
+                                )
+                                .asJsonObject(),
+                        writer
+                );
             }
-        });
+
+            try (InputStream inputStream = connection.getInputStream();
+                 Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+                SimpleJsonObject simpleJsonObject = new SimpleJsonObject(reader);
+                if (!simpleJsonObject.getBoolean("success")) {
+                    System.out.println("&cCould not update the node info to the server: " + simpleJsonObject);
+                    if (consumer != null)
+                        consumer.accept(false);
+                } else {
+                    if (consumer != null)
+                        consumer.accept(true);
+                }
+            }
+        } catch (IOException e) {
+            if (consumer != null)
+                consumer.accept(false);
+            if (!SystemUtils.isServerOffline(e))
+                e.printStackTrace();
+        }
     }
 
 

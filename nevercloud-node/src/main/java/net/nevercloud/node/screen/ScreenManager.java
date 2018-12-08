@@ -29,11 +29,11 @@ public class ScreenManager {
     private ProcessScreenManager processScreenManager;
     private NetworkScreenManager networkScreenManager;
 
-    public UUID enableScreen(BungeeCordProxyInfo proxyInfo, Consumer<String> consumer) {
+    public EnabledScreen enableScreen(BungeeCordProxyInfo proxyInfo, Consumer<String> consumer) {
         return enableScreen0(consumer, proxyInfo.getComponentName(), proxyInfo.getParentComponentName());
     }
 
-    private UUID enableScreen0(Consumer<String> consumer, String componentName, String parentComponentName) {
+    private EnabledScreen enableScreen0(Consumer<String> consumer, String componentName, String parentComponentName) {
         NodeParticipant nodeParticipant = NeverCloudNode.getInstance().getServerNodes().get(parentComponentName);
         if (nodeParticipant == null) {
             CloudProcess process = NeverCloudNode.getInstance().getProcessManager().getProcesses().get(componentName);
@@ -44,7 +44,7 @@ public class ScreenManager {
         return this.networkScreenManager.enableScreen(consumer, componentName, parentComponentName);
     }
 
-    public UUID enableScreen(MinecraftServerInfo serverInfo, Consumer<String> consumer) {
+    public EnabledScreen enableScreen(MinecraftServerInfo serverInfo, Consumer<String> consumer) {
         return enableScreen0(consumer, serverInfo.getComponentName(), serverInfo.getParentComponentName());
     }
 
@@ -54,6 +54,10 @@ public class ScreenManager {
             return this.networkScreenManager.disableScreen(componentName, uniqueId);
         }
         return this.processScreenManager.disableScreen(process, uniqueId);
+    }
+
+    public boolean disableScreen(EnabledScreen enabledScreen) {
+        return this.disableScreen(enabledScreen.getComponentName(), enabledScreen.getUniqueId());
     }
 
 }

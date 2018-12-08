@@ -88,7 +88,6 @@ public class FilePacket extends Packet {
     @Override
     public void write(DataOutput dataOutput) throws IOException {
         dataOutput.writeBoolean(this.directory);
-        dataOutput.writeInt(this.bytes.length);
         PacketUtils.writeBytes(dataOutput, this.bytes);
     }
 

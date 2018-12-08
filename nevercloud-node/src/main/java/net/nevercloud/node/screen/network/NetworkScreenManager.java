@@ -3,35 +3,36 @@ package net.nevercloud.node.screen.network;
  * Created by Mc_Ruben on 26.11.2018
  */
 
-import lombok.*;
-import net.nevercloud.lib.network.NetworkParticipant;
+import lombok.Getter;
 import net.nevercloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.nevercloud.lib.server.minecraft.MinecraftServerInfo;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.network.packet.out.screen.NetworkScreen;
+import net.nevercloud.node.network.packet.out.screen.PacketOutDispatchProxyCommand;
+import net.nevercloud.node.network.packet.out.screen.PacketOutDispatchServerCommand;
 import net.nevercloud.node.network.packet.out.screen.PacketOutToggleScreen;
 import net.nevercloud.node.network.participant.NodeParticipant;
+import net.nevercloud.node.screen.EnabledScreen;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Getter
 public class NetworkScreenManager {
 
     private Map<String, NetworkScreen> screens = new HashMap<>();
 
-    public UUID enableScreen(BungeeCordProxyInfo proxyInfo, Consumer<String> consumer) {
+    public EnabledScreen enableScreen(BungeeCordProxyInfo proxyInfo, Consumer<String> consumer) {
         return enableScreen(consumer, proxyInfo.getComponentName(), proxyInfo.getParentComponentName());
     }
 
-    public UUID enableScreen(Consumer<String> consumer, String componentName, String parentComponentName) {
+    public EnabledScreen enableScreen(Consumer<String> consumer, String componentName, String parentComponentName) {
         UUID uniqueId = UUID.randomUUID();
         if (this.screens.containsKey(componentName)) {
             this.screens.get(componentName).getConsumers().put(uniqueId, consumer);
-            return uniqueId;
+            return createScreen(componentName, parentComponentName, uniqueId);
         }
         NodeParticipant nodeParticipant = NeverCloudNode.getInstance().getServerNodes().get(parentComponentName);
         if (nodeParticipant == null)
@@ -39,10 +40,26 @@ public class NetworkScreenManager {
         nodeParticipant.sendPacket(new PacketOutToggleScreen(componentName, true));
         this.screens.put(componentName, new NetworkScreen(nodeParticipant));
         this.screens.get(componentName).getConsumers().put(uniqueId, consumer);
-        return uniqueId;
+        return createScreen(componentName, parentComponentName, uniqueId);
     }
 
-    public UUID enableScreen(MinecraftServerInfo serverInfo, Consumer<String> consumer) {
+    private EnabledScreen createScreen(String componentName, String parentComponentName, UUID uniqueId) {
+        return new EnabledScreen(componentName, uniqueId) {
+            @Override
+            public void write(String line) {
+                NodeParticipant participant = NeverCloudNode.getInstance().getServerNodes().get(parentComponentName);
+                if (participant == null)
+                    return;
+                if (participant.getServers().containsKey(componentName) || participant.getWaitingServers().containsKey(componentName) || participant.getStartingServers().containsKey(componentName)) {
+                    participant.sendPacket(new PacketOutDispatchServerCommand(componentName, line));
+                } else if (participant.getProxies().containsKey(componentName) || participant.getWaitingProxies().containsKey(componentName) || participant.getStartingProxies().containsKey(componentName)) {
+                    participant.sendPacket(new PacketOutDispatchProxyCommand(componentName, line));
+                }
+            }
+        };
+    }
+
+    public EnabledScreen enableScreen(MinecraftServerInfo serverInfo, Consumer<String> consumer) {
         return enableScreen(consumer, serverInfo.getComponentName(), serverInfo.getParentComponentName());
     }
 
@@ -58,6 +75,10 @@ public class NetworkScreenManager {
             this.screens.remove(componentName);
         }
         return true;
+    }
+
+    public boolean disableScreen(EnabledScreen enabledScreen) {
+        return this.disableScreen(enabledScreen.getComponentName(), enabledScreen.getUniqueId());
     }
 
     public void handleNodeDisconnect(NodeParticipant participant) {

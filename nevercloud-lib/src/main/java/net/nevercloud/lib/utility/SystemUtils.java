@@ -25,6 +25,7 @@ public class SystemUtils {
     private SystemUtils() { }
 
     public static final String CENTRAL_SERVER_URL = "http://192.168.56.1:1350/";
+    public static final String CENTRAL_SERVER_URL_WS_GSTATS = "ws://localhost:1351";
 
     private static final char[] values = "abcdefghijklmnopqrstuvwxyzäöüABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890".toCharArray();
 

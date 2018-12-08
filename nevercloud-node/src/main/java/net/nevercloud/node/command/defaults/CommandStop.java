@@ -9,7 +9,7 @@ import net.nevercloud.node.command.CommandSender;
 
 public class CommandStop extends Command {
     public CommandStop() {
-        super("stop");
+        super("stop", null, "exit", "end");
     }
 
     @Override

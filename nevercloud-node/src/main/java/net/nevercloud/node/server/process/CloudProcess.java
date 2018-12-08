@@ -7,14 +7,26 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface CloudProcess {
 
     Process getProcess();
 
+    Collection<String> getCachedLog();
+
+    Map<UUID, Consumer<String>> getScreenHandlers();
+
     String getName();
 
+    String getGroupName();
+
     int getMemory();
+
+    int getPort();
 
     default void dispatchCommand(String command) {
         if (isRunning()) {

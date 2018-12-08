@@ -14,6 +14,8 @@ public class CommandUnique extends Command {
 
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
-        NeverCloudNode.getInstance().getUniqueId(s -> sender.sendMessage("&aThe unique id of your cloud is: &e" + s));
+        if (NeverCloudNode.getInstance().getUniqueId() == null)
+            NeverCloudNode.getInstance().getCloudConfig().loadCredentials();
+        sender.sendMessage("&aThe unique id of your cloud is: &e" + (NeverCloudNode.getInstance().getUniqueId() == null ? "not available" : NeverCloudNode.getInstance().getUniqueId()));
     }
 }

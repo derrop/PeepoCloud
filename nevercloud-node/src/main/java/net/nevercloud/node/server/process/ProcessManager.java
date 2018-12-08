@@ -7,6 +7,7 @@ import lombok.*;
 import net.nevercloud.lib.utility.SystemUtils;
 import net.nevercloud.node.CloudConfig;
 import net.nevercloud.node.NeverCloudNode;
+import net.nevercloud.node.server.process.handler.ProcessLogHandler;
 import net.nevercloud.node.server.process.handler.ProcessStartupHandler;
 import net.nevercloud.node.server.process.handler.ProcessStopHandler;
 
@@ -27,7 +28,7 @@ public class ProcessManager {
         this.bungeeMemoryAdd = bungeeMemoryAdd;
         this.serverMemoryAdd = serverMemoryAdd;
 
-        Arrays.asList(new ProcessStartupHandler(this), new ProcessStopHandler(this))
+        Arrays.asList(new ProcessStartupHandler(this), new ProcessStopHandler(this), new ProcessLogHandler(this))
                 .forEach(runnable -> new Thread(runnable, runnable.getClass().getSimpleName()).start());
     }
 
@@ -49,6 +50,7 @@ public class ProcessManager {
         while (isAnyProcessRunning()) {
             SystemUtils.sleepUninterruptedly(50);
         }
+        SystemUtils.sleepUninterruptedly(200);
 
         SystemUtils.deleteDirectory(Paths.get("internal/deletingServers"));
 
@@ -75,8 +77,8 @@ public class ProcessManager {
     }
 
     public Collection<CloudProcess> getProcessesOfBungeeGroupQueued(String group) {
-        return this.serverQueue.getServerProcesses().stream().filter(process -> process instanceof ServerProcess && ((ServerProcess) process).getServerInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
-    }
+        return this.serverQueue.getServerProcesses().stream().filter(process -> process instanceof BungeeProcess && ((BungeeProcess) process).getProxyInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
+}
 
     void handleProcessStop(CloudProcess process) {
         this.processes.remove(process.getName());

@@ -5,8 +5,10 @@ package net.nevercloud.node.screen.process;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.nevercloud.node.screen.EnabledScreen;
 import net.nevercloud.node.server.process.CloudProcess;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -17,13 +19,21 @@ import java.util.function.Consumer;
 @Getter
 public class ProcessScreenManager {
 
-    private ExecutorService executorService = Executors.newCachedThreadPool();
-    private Map<String, LoadingScreen> screens = new HashMap<>();
+    //private ExecutorService executorService = Executors.newCachedThreadPool();
+    //private Map<String, LoadingScreen> screens = new HashMap<>();
 
-    public UUID loadScreen(CloudProcess process, Consumer<String> consumer) {
+    public EnabledScreen loadScreen(CloudProcess process, Consumer<String> consumer) {
         Preconditions.checkArgument(process.isRunning(), "process must be active to start a screen");
         UUID uniqueId = UUID.randomUUID();
-        LoadingScreen screen;
+        new ArrayList<>(process.getCachedLog()).forEach(consumer);
+        process.getScreenHandlers().put(uniqueId, consumer);
+        return new EnabledScreen(process.getName(), uniqueId) {
+            @Override
+            public void write(String line) {
+                process.dispatchCommand(line);
+            }
+        };
+        /*LoadingScreen screen;
         if (this.screens.containsKey(process.getName())) {
             screen = this.screens.get(process.getName());
         } else {
@@ -31,11 +41,15 @@ public class ProcessScreenManager {
             this.executorService.execute(screen);
         }
         screen.getConsumers().put(uniqueId, consumer);
-        return uniqueId;
+        return uniqueId;*/
     }
 
     public boolean disableScreen(CloudProcess process, UUID uniqueId) {
-        if (!this.screens.containsKey(process.getName()))
+        if (!process.getScreenHandlers().containsKey(uniqueId))
+            return false;
+        process.getScreenHandlers().remove(uniqueId);
+        return true;
+        /*if (!this.screens.containsKey(process.getName()))
             return false;
         LoadingScreen screen = this.screens.get(process.getName());
         if (!screen.getConsumers().containsKey(uniqueId))
@@ -45,14 +59,16 @@ public class ProcessScreenManager {
             screen.stop();
             this.screens.remove(process.getName());
         }
-        return true;
+        return true;*/
     }
 
     public boolean disableScreen(CloudProcess process) {
-        if (!this.screens.containsKey(process.getName()))
+        process.getScreenHandlers().clear();
+        return true;
+        /*if (!this.screens.containsKey(process.getName()))
             return false;
         this.screens.remove(process.getName());
-        return true;
+        return true;*/
     }
 
 }

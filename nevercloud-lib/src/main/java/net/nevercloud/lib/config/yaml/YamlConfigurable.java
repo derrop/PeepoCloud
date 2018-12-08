@@ -17,6 +17,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Collection;
+import java.util.Map;
 
 public class YamlConfigurable implements Configurable<YamlConfigurable> {
 
@@ -26,6 +28,10 @@ public class YamlConfigurable implements Configurable<YamlConfigurable> {
     
     public YamlConfigurable() {
         this.configuration = new Configuration();
+    }
+
+    public YamlConfigurable(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     public YamlConfigurable(Reader reader) {
@@ -140,13 +146,33 @@ public class YamlConfigurable implements Configurable<YamlConfigurable> {
         return this.configuration.get(key);
     }
 
+    public Configuration getConfiguration(String key) {
+        Object object = this.get(key);
+        if (object instanceof Map) {
+            Configuration configuration = new Configuration();
+            configuration.self = (Map<String, Object>) object;
+            return configuration;
+        }
+        if (object instanceof Configuration)
+            return (Configuration) object;
+        return null;
+    }
+
+    public YamlConfigurable getYamlConfigurable(String key) {
+        Configuration configuration = this.getConfiguration(key);
+        if (configuration != null) {
+            return new YamlConfigurable(configuration);
+        }
+        return null;
+    }
+
     public Configuration asConfiguration() {
         return this.configuration;
     }
 
     @Override
     public void saveAsFile(Path path) {
-        try (OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW);
+        try (OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE);
              Writer writer = new OutputStreamWriter(outputStream)) {
             configurationProvider.save(this.configuration, writer);
         } catch (IOException e) {

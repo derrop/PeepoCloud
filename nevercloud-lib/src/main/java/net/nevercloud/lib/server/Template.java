@@ -5,10 +5,11 @@ package net.nevercloud.lib.server;
 
 import lombok.*;
 
-@Data
+@Getter
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
 public class Template {
     private String name;
+    private String storage;
 }

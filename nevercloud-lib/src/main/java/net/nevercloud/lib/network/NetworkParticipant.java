@@ -2,9 +2,11 @@ package net.nevercloud.lib.network;
 
 import io.netty.channel.Channel;
 import net.nevercloud.lib.network.packet.Packet;
+import net.nevercloud.lib.utility.SystemUtils;
+
 import java.net.InetSocketAddress;
 
-public class NetworkParticipant {
+public class NetworkParticipant implements INetworkPacketSender {
     private String name;
     protected Channel channel;
     protected long connectedAt;
@@ -23,9 +25,16 @@ public class NetworkParticipant {
         return name;
     }
 
+    @Override
     public void sendPacket(Packet packet) {
         if (this.isConnected())
             this.channel.writeAndFlush(packet);
+    }
+
+    @Override
+    public void sendPacketSync(Packet packet) {
+        if (this.isConnected())
+            this.channel.writeAndFlush(packet).syncUninterruptibly();
     }
 
     public boolean isConnected() {

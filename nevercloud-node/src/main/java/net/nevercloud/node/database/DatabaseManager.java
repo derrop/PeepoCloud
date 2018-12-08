@@ -14,7 +14,9 @@ public interface DatabaseManager {
 
     void deleteDatabase(String name);
 
-    void deleteDatabase(Database database);
+    default void deleteDatabase(Database database) {
+        this.deleteDatabase(database.getName());
+    }
 
     int getDefaultPort();
 

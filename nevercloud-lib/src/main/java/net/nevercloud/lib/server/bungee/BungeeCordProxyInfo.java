@@ -21,6 +21,8 @@ public class BungeeCordProxyInfo {
     private int componentId;
     private String parentComponentName;
     private int memory;
+    private String host;
+    private int port;
 
     private Map<UUID, String> players;
 

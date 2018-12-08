@@ -1,4 +1,4 @@
-package net.nevercloud.node.database.defaults;
+package net.nevercloud.node.database.defaults.mongo;
 /*
  * Created by Mc_Ruben on 05.11.2018
  */
@@ -33,7 +33,7 @@ public class MongoDatabaseManager implements DatabaseManager {
         if (databases.containsKey(name))
             return databases.get(name);
         this.mongoDatabase.createCollection(name);
-        Database database = new net.nevercloud.node.database.defaults.MongoDatabase(name, this.mongoDatabase.getCollection(name));
+        Database database = new net.nevercloud.node.database.defaults.mongo.MongoDatabase(name, this.mongoDatabase.getCollection(name));
         databases.put(name, database);
         return database;
     }
@@ -50,11 +50,6 @@ public class MongoDatabaseManager implements DatabaseManager {
     @Override
     public void deleteDatabase(String name) {
         NeverCloudNode.getInstance().getExecutorService().execute(() -> this.mongoDatabase.getCollection(name).drop());
-    }
-
-    @Override
-    public void deleteDatabase(Database database) {
-        this.deleteDatabase(database.getName());
     }
 
     @Override

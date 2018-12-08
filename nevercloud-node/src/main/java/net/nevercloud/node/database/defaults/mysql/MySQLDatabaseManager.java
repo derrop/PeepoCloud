@@ -1,4 +1,4 @@
-package net.nevercloud.node.database.defaults;
+package net.nevercloud.node.database.defaults.mysql;
 /*
  * Created by Mc_Ruben on 05.11.2018
  */
@@ -68,11 +68,6 @@ public class MySQLDatabaseManager implements DatabaseManager {
                 e.printStackTrace();
             }
         });
-    }
-
-    @Override
-    public void deleteDatabase(Database database) {
-        this.deleteDatabase(database.getName());
     }
 
     @Override

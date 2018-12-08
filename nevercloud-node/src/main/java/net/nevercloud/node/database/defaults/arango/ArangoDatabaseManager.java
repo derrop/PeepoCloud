@@ -1,40 +1,56 @@
-package net.nevercloud.node.database.defaults;
+package net.nevercloud.node.database.defaults.arango;
 /*
  * Created by Mc_Ruben on 05.11.2018
  */
 
+import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDatabase;
+import com.arangodb.entity.CollectionEntity;
 import net.nevercloud.node.NeverCloudNode;
 import net.nevercloud.node.database.Database;
 import net.nevercloud.node.database.DatabaseConfig;
 import net.nevercloud.node.database.DatabaseManager;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ArangoDatabaseManager implements DatabaseManager {
     private ArangoDB arangoDB;
     private ArangoDatabase arangoDatabase;
+    private Map<String, Database> databases = new HashMap<>();
 
     @Override
     public Database getDatabase(String name) {
-        return null;
+        if (this.databases.containsKey(name))
+            return this.databases.get(name);
+        ArangoCollection collection = this.arangoDatabase.collection(name);
+        if (!collection.exists()) {
+            this.arangoDatabase.createCollection(name);
+        }
+        Database database = new net.nevercloud.node.database.defaults.arango.ArangoDatabase(name, collection);
+        this.databases.put(name, database);
+        return database;
     }
 
     @Override
     public void getDatabases(Consumer<Collection<String>> consumer) {
-
+        NeverCloudNode.getInstance().getExecutorService().execute(() -> {
+            consumer.accept(this.arangoDatabase.getCollections().stream().map(CollectionEntity::getName).collect(Collectors.toList()));
+        });
     }
 
     @Override
     public void deleteDatabase(String name) {
-
-    }
-
-    @Override
-    public void deleteDatabase(Database database) {
-
+        NeverCloudNode.getInstance().getExecutorService().execute(() -> {
+            ArangoCollection collection = this.arangoDatabase.collection(name);
+            if (collection != null) {
+                collection.drop();
+            }
+        });
     }
 
     @Override
