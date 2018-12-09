@@ -54,11 +54,15 @@ public class PacketManager {
 
         this.packetQueryAsync(networkParticipant, packet, result -> {
             reference.set(result);
-            lock.notify();
+            synchronized (lock) {
+                lock.notify();
+            }
         });
 
         try {
-            lock.wait(TimeUnit.SECONDS.toMillis(6));
+            synchronized (lock) {
+                lock.wait(TimeUnit.SECONDS.toMillis(6));
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

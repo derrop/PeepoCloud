@@ -1,7 +1,15 @@
 package net.nevercloud.lib.scheduler;
 
 
+import java.util.concurrent.ExecutorService;
+
 public class SchedulerTask implements Runnable {
+
+    /**
+     * ThreadPool where the runner will be executed on in case of an async task
+     */
+
+    private ExecutorService threadPool;
 
     /**
      * The Runnable of this task which will be executed
@@ -34,7 +42,8 @@ public class SchedulerTask implements Runnable {
 
     private long runCounter = 0;
 
-    public SchedulerTask(Runnable runner, long startDelay, long repeatDelay, boolean async) {
+    public SchedulerTask(ExecutorService threadPool, Runnable runner, long startDelay, long repeatDelay, boolean async) {
+        this.threadPool = threadPool;
         this.runner = runner;
         this.startDelay = startDelay;
         this.repeatDelay = repeatDelay;
@@ -46,16 +55,23 @@ public class SchedulerTask implements Runnable {
         this.runCounter++;
         if(this.hasBeenExecuted() && this.isRepeating()) {
             if(this.runCounter == this.repeatDelay) { // runCounter reached the number of the repeatDelay
-                this.runner.run();
+                this.executeRunner();
                 this.runCounter = 0;
             } else if(this.runCounter > this.repeatDelay) // to be secure
                 this.runCounter = 0;
         } else {
             if(this.runCounter == this.startDelay) { // runCounter reached the number of the startDelay
-                this.runner.run();
+                this.executeRunner();
                 this.startDelay = -1; // symbolises that the task has been executed
             }
         }
+    }
+
+    private void executeRunner() {
+        if(this.isAsync())
+            this.threadPool.execute(this.runner);
+        else
+            this.runner.run();
     }
 
     /**

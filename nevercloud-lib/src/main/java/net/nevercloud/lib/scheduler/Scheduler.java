@@ -1,5 +1,7 @@
 package net.nevercloud.lib.scheduler;
 
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -12,7 +14,7 @@ public class Scheduler implements Runnable {
      * ThreadPool where the async tasks are being executed on
      */
 
-    public static final ExecutorService POOL = Executors.newCachedThreadPool();
+    private ExecutorService threadPool;
 
     /**
      * Describes if this scheduler runs
@@ -36,10 +38,24 @@ public class Scheduler implements Runnable {
      * Object where will be waited on
      */
 
-    private Object lock = new Object();
+    private final Object lock = new Object();
+
+
+    public Scheduler() {
+        this(20);
+    }
 
     public Scheduler(int ticksPerSecond) {
+        this(ticksPerSecond,  Executors.newCachedThreadPool());
+    }
+
+    public Scheduler(ExecutorService threadPool) {
+        this(20, threadPool);
+    }
+
+    public Scheduler(int ticksPerSecond, ExecutorService threadPool) {
         this.ticksPerSecond = ticksPerSecond;
+        this.threadPool = threadPool;
     }
 
     /**
@@ -52,8 +68,9 @@ public class Scheduler implements Runnable {
      * @return the new task
      */
 
-    private SchedulerTask repeat(Runnable runner, long startDelay, long repeatDelay, boolean async) {
-        SchedulerTask task = new SchedulerTask(runner, startDelay, repeatDelay, async);
+    public SchedulerTask repeat(Runnable runner, long startDelay, long repeatDelay, boolean async) {
+        Preconditions.checkArgument(startDelay > 0 && repeatDelay > 0, "startDelay and repeatDelay have to be at least 1");
+        SchedulerTask task = new SchedulerTask(this.threadPool, runner, startDelay, repeatDelay, async);
         this.tasks.add(task);
         return task;
     }
@@ -67,8 +84,9 @@ public class Scheduler implements Runnable {
      * @return the new task
      */
 
-    private SchedulerTask delay(Runnable runner, long startDelay, boolean async) {
-        SchedulerTask task = new SchedulerTask(runner, startDelay, -1, async);
+    public SchedulerTask delay(Runnable runner, long startDelay, boolean async) {
+        Preconditions.checkArgument(startDelay > 0, "startDelay has to be at least 1");
+        SchedulerTask task = new SchedulerTask(this.threadPool, runner, startDelay, -1, async);
         this.tasks.add(task);
         return task;
     }
@@ -81,8 +99,8 @@ public class Scheduler implements Runnable {
      * @return the new task
      */
 
-    private SchedulerTask execute(Runnable runner, boolean async) {
-        SchedulerTask task = new SchedulerTask(runner, 1, -1, async);
+    public SchedulerTask execute(Runnable runner, boolean async) {
+        SchedulerTask task = new SchedulerTask(this.threadPool, runner, 1, -1, async);
         this.tasks.add(task);
         return task;
     }
@@ -93,8 +111,16 @@ public class Scheduler implements Runnable {
      * @param task the task
      */
 
-    private void cancelTask(SchedulerTask task) {
+    public void cancelTask(SchedulerTask task) {
         this.tasks.remove(task);
+    }
+
+    /**
+     * Removes all tasks from the list so they won't be executed anymore
+     */
+
+    public void cancelAllTasks() {
+        this.tasks.clear();
     }
 
     /**
@@ -106,18 +132,20 @@ public class Scheduler implements Runnable {
         this.enabled = true;
         while (this.enabled) {
             try {
-                this.lock.wait(TimeUnit.SECONDS.toMillis(1) / this.ticksPerSecond);
+                synchronized (this.lock) {
+                    this.lock.wait(TimeUnit.SECONDS.toMillis(1) / this.ticksPerSecond);
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            for(SchedulerTask schedulerTask : new ArrayList<>(this.tasks)) { // new list, because of concurrent modification
-                if(schedulerTask.isAsync())
-                    POOL.execute(schedulerTask);
-                else
-                    schedulerTask.run();
+            if(this.tasks.isEmpty())
+                continue;
 
-                if(!schedulerTask.isRepeating())
+            for(SchedulerTask schedulerTask : new ArrayList<>(this.tasks)) { // new list because of concurrent modification
+                schedulerTask.run();
+
+                if(!schedulerTask.isRepeating() && schedulerTask.hasBeenExecuted())
                     this.cancelTask(schedulerTask);
             }
 
@@ -125,13 +153,20 @@ public class Scheduler implements Runnable {
     }
 
     /**
-     * Disables this scheduler and unlocks the {@link Scheduler#lock} if i'ts waiting
+     * Disables this scheduler and unlocks the {@link Scheduler#lock} if it's waiting
      */
 
     public void disable() {
         this.tasks.clear();
         this.enabled = false;
-        this.lock.notify();
+        this.threadPool.shutdown();
+        synchronized (this.lock) {
+            this.lock.notify();
+        }
+    }
+
+    public ExecutorService getThreadPool() {
+        return threadPool;
     }
 
     public boolean isEnabled() {
@@ -145,4 +180,5 @@ public class Scheduler implements Runnable {
     public List<SchedulerTask> getTasks() {
         return tasks;
     }
+
 }
