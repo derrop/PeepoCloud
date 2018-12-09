@@ -1,1 +1,1 @@
-java -Xmx256M -jar NeverCloud-Node.jar
+java -Xmx256M -jar PeepoCloud-Node.jar

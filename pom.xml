@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.nevercloud</groupId>
-    <artifactId>nevercloud</artifactId>
+    <groupId>net.peepocloud</groupId>
+    <artifactId>peepocloud</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>nevercloud-lib</module>
-        <module>nevercloud-api</module>
-        <module>nevercloud-node</module>
-        <module>nevercloud-addons</module>
+        <module>peepocloud-lib</module>
+        <module>peepocloud-api</module>
+        <module>peepocloud-node</module>
+        <module>peepocloud-addons</module>
     </modules>
 
     <properties>

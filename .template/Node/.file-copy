@@ -1,4 +1,4 @@
 {
-  "sourcePath": "nevercloud-node/target/NeverCloud-Node.jar",
-  "targetName": "NeverCloud-Node.jar"
+  "sourcePath": "peepocloud-node/target/PeepoCloud-Node.jar",
+  "targetName": "PeepoCloud-Node.jar"
 }
