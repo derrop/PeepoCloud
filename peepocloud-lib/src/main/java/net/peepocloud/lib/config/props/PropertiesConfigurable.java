@@ -179,17 +179,34 @@ public class PropertiesConfigurable implements Configurable<PropertiesConfigurab
         return null;
     }
 
-    public static PropertiesConfigurable load(Path path) {
-        if (!Files.exists(path))
-            return new PropertiesConfigurable();
+    public static PropertiesConfigurable load(Reader reader) {
         Properties properties = new Properties();
-        try (InputStream inputStream = Files.newInputStream(path);
-             Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+        try {
             properties.load(reader);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return new PropertiesConfigurable(properties);
+    }
+
+    public static PropertiesConfigurable load(InputStream inputStream) {
+        try (Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+            return load(reader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new PropertiesConfigurable();
+    }
+
+    public static PropertiesConfigurable load(Path path) {
+        if (!Files.exists(path))
+            return new PropertiesConfigurable();
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            return load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new PropertiesConfigurable();
     }
 
     public static PropertiesConfigurable load(String path) {

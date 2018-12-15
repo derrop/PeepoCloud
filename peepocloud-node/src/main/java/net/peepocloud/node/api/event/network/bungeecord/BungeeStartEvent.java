@@ -8,7 +8,7 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 
 @Getter
 /**
- * Called when a bungee was started on this node instance
+ * Called when a bungee was started on one node in the network
  */
 public class BungeeStartEvent extends NetworkBungeeEvent {
     public BungeeStartEvent(BungeeCordProxyInfo proxyInfo) {

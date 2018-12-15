@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
+    @Setter
     private NetworkParticipant participant;
     private PacketManager packetManager;
     @Setter

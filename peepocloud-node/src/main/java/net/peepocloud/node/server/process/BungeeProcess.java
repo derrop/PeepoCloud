@@ -5,6 +5,7 @@ package net.peepocloud.node.server.process;
 
 import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import net.md_5.bungee.config.Configuration;
 import net.peepocloud.lib.config.UnmodifiableConfigurable;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 public class BungeeProcess implements CloudProcess {
     private Path directory;
     private Process process;
+    @Setter
     private BungeeCordProxyInfo proxyInfo;
     private ProcessManager processManager;
     private long startup;
@@ -43,12 +45,14 @@ public class BungeeProcess implements CloudProcess {
     private volatile boolean wasRunning = false;
     private List<String> cachedLog = new ArrayList<>();
     private Map<UUID, Consumer<String>> screenHandlers = new ConcurrentHashMap<>();
+    @Setter
+    private Consumer<String> networkScreenHandler;
 
     BungeeProcess(BungeeCordProxyInfo proxyInfo, ProcessManager processManager) {
         this.proxyInfo = proxyInfo;
         this.directory = PeepoCloudNode.getInstance().getBungeeGroup(proxyInfo.getGroupName()).getGroupMode() == GroupMode.SAVE ?
-                Paths.get("internal/savedProxies/" + proxyInfo.getGroupName() + "/" + proxyInfo.getComponentName()) :
-                Paths.get("internal/deletingProxies/" + proxyInfo.getGroupName() + "/" + proxyInfo.getComponentName());
+                Paths.get("internal/savedProxies/" + proxyInfo.getGroupName() + "/" + proxyInfo.getComponentId()) :
+                Paths.get("internal/tempProxies/" + proxyInfo.getGroupName() + "/" + proxyInfo.getComponentId());
         this.processManager = processManager;
 
         if (!Files.exists(this.directory)) {
@@ -204,8 +208,10 @@ public class BungeeProcess implements CloudProcess {
                 e.printStackTrace();
             }
             this.screenHandlers.clear();
+            this.networkScreenHandler = null;
             this.cachedLog.clear();
             if (PeepoCloudNode.getInstance().getBungeeGroup(this.proxyInfo.getGroupName()).getGroupMode() != GroupMode.SAVE) {
+                SystemUtils.sleepUninterruptedly(500);
                 SystemUtils.deleteDirectory(this.directory);
             }
             this.processManager.handleProcessStop(this);

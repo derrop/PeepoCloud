@@ -6,6 +6,7 @@ package net.peepocloud.lib.config.json;
 import com.google.common.base.Preconditions;
 import com.google.gson.*;
 import net.peepocloud.lib.config.Configurable;
+import net.peepocloud.lib.utility.SystemUtils;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -146,22 +147,17 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
         return GSON.fromJson(this.get(key), type);
     }
 
+    public SimpleJsonObject getJsonObject(String key) {
+        JsonElement jsonElement = this.jsonObject.get(key);
+        return jsonElement != null && jsonElement.isJsonObject() ? new SimpleJsonObject(jsonElement.getAsJsonObject()) : null;
+    }
+
     public JsonObject asJsonObject() {
         return jsonObject;
     }
 
     public void saveAsFile(Path path) {
-        if (!Files.exists(path)) {
-            Path parent = path.getParent();
-            if (parent != null && !Files.exists(parent)) {
-                try {
-                    Files.createDirectories(parent);
-                    Files.createFile(path);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        SystemUtils.createFile(path);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
             GSON.toJson(this.jsonObject, writer);
@@ -187,6 +183,11 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
 
     public String toJson() {
         return this.jsonObject.toString();
+    }
+
+    @Override
+    public String toString() {
+        return this.toJson();
     }
 
     public String toPrettyJson() {

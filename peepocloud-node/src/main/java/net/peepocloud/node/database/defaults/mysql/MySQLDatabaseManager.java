@@ -9,10 +9,7 @@ import net.peepocloud.node.database.DatabaseConfig;
 import net.peepocloud.node.database.DatabaseManager;
 
 import java.sql.*;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class MySQLDatabaseManager implements DatabaseManager {
@@ -53,7 +50,18 @@ public class MySQLDatabaseManager implements DatabaseManager {
     @Override
     public void getDatabases(Consumer<Collection<String>> consumer) {
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            consumer.accept(Collections.emptyList());//TODO
+            try {
+                PreparedStatement statement = getConnection().prepareStatement("SHOW TABLES");
+                ResultSet resultSet = statement.executeQuery();
+                Collection<String> tables = new ArrayList<>();
+                while (resultSet.next()) {
+                    tables.add(resultSet.getString(1));
+                }
+                statement.close();
+                consumer.accept(tables);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -107,6 +115,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
                 config.getUsername(),
                 config.getPassword());
         System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.mysqldb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
+        getDatabases(strings -> {});
     }
 
     @Override

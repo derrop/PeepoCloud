@@ -25,6 +25,16 @@ public class PacketInAuth extends JsonPacket {
         private NetworkServer networkServer;
 
         @Override
+        public int getId() {
+            return -1;
+        }
+
+        @Override
+        public Class<? extends Packet> getPacketClass() {
+            return PacketInAuth.class;
+        }
+
+        @Override
         public void handlePacket(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> queryResponse) {
             if (!(packet instanceof PacketInAuth)) {
                 networkParticipant.getChannel().close();

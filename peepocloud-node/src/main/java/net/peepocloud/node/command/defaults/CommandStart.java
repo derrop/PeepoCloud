@@ -37,7 +37,7 @@ public class CommandStart extends Command {
             if (started == 1) {
                 sender.createLanguageMessage("command.start.server.successful.one").replace("%group%", minecraftGroup.getName()).send();
             } else {
-                sender.createLanguageMessage("command.start.server.successful.more").replace("%amount%", String.valueOf(started)).send();
+                sender.createLanguageMessage("command.start.server.successful.more").replace("%group%", minecraftGroup.getName()).replace("%amount%", String.valueOf(started)).send();
             }
         } else {
             BungeeGroup bungeeGroup = PeepoCloudNode.getInstance().getBungeeGroup(args[0]);
@@ -51,7 +51,7 @@ public class CommandStart extends Command {
                 if (started == 1) {
                     sender.createLanguageMessage("command.start.proxy.successful.one").replace("%group%", bungeeGroup.getName()).send();
                 } else {
-                    sender.createLanguageMessage("command.start.proxy.successful.more").replace("%amount%", String.valueOf(started)).send();
+                    sender.createLanguageMessage("command.start.proxy.successful.more").replace("%group%", bungeeGroup.getName()).replace("%amount%", String.valueOf(started)).send();
                 }
             } else {
                 sender.createLanguageMessage("command.start.groupNotFound").replace("%group%", args[0]).send();

@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.peepocloud.node.command.CommandManager;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
@@ -31,10 +32,15 @@ public class ColoredLogger extends Logger {
     @Getter
     private AbstractConsoleAnimation runningAnimation;
     private Consumer<String> lineAcceptor;
+    @Getter
+    @Setter
+    private boolean debugging;
 
     public ColoredLogger(ConsoleReader consoleReader) throws IOException {
         super("PeepoCloud Logger", null);
         this.consoleReader = consoleReader;
+
+        this.debugging = Boolean.getBoolean("peepocloud.debug");
 
         AnsiConsole.systemInstall();
 
@@ -191,6 +197,16 @@ public class ColoredLogger extends Logger {
             consoleReader.flush();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Prints the given {@code line} to this {@link ColoredLogger} if {@code debugging} is enabled
+     * @param line the line to print
+     */
+    public void debug(String line) {
+        if (this.debugging) {
+            this.print("&5[DEBUG] " + line);
         }
     }
 

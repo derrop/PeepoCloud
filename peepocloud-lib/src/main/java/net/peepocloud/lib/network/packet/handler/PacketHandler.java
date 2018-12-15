@@ -7,6 +7,10 @@ import java.util.function.Consumer;
 
 public interface PacketHandler {
 
+    int getId();
+
+    Class<? extends Packet> getPacketClass();
+
     void handlePacket(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> queryResponse);
 
 }

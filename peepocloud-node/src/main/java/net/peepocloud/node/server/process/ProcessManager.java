@@ -7,6 +7,8 @@ import lombok.*;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.CloudConfig;
 import net.peepocloud.node.PeepoCloudNode;
+import net.peepocloud.node.network.packet.out.server.PacketOutBungeeProcessStarted;
+import net.peepocloud.node.network.packet.out.server.PacketOutServerProcessStarted;
 import net.peepocloud.node.server.process.handler.ProcessLogHandler;
 import net.peepocloud.node.server.process.handler.ProcessStartupHandler;
 import net.peepocloud.node.server.process.handler.ProcessStopHandler;
@@ -28,8 +30,11 @@ public class ProcessManager {
         this.bungeeMemoryAdd = bungeeMemoryAdd;
         this.serverMemoryAdd = serverMemoryAdd;
 
-        Arrays.asList(new ProcessStartupHandler(this), new ProcessStopHandler(this), new ProcessLogHandler(this))
-                .forEach(runnable -> new Thread(runnable, runnable.getClass().getSimpleName()).start());
+        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
+            SystemUtils.sleepUninterruptedly(1000);
+            Arrays.asList(new ProcessStartupHandler(), new ProcessStopHandler(this), new ProcessLogHandler(this))
+                    .forEach(runnable -> new Thread(runnable, runnable.getClass().getSimpleName()).start());
+        });
     }
 
     private CloudConfig config;
@@ -50,9 +55,10 @@ public class ProcessManager {
         while (isAnyProcessRunning()) {
             SystemUtils.sleepUninterruptedly(50);
         }
-        SystemUtils.sleepUninterruptedly(200);
+        SystemUtils.sleepUninterruptedly(100);
 
-        SystemUtils.deleteDirectory(Paths.get("internal/deletingServers"));
+        SystemUtils.deleteDirectory(Paths.get("internal/tempServers"));
+        SystemUtils.deleteDirectory(Paths.get("internal/tempProxies"));
 
     }
 
@@ -89,15 +95,17 @@ public class ProcessManager {
             this.serverMemoryAdd.accept(-process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.server.stopped").replace("%name%", process.toString()));
         }
-        PeepoCloudNode.getInstance().getScreenManager().getProcessScreenManager().disableScreen(process);
+        PeepoCloudNode.getInstance().getScreenManager().handleProcessStop(process);
     }
 
     void handleProcessStart(CloudProcess process) {
         this.processes.put(process.getName(), process);
         if (process instanceof BungeeProcess) {
+            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeProcessStarted(((BungeeProcess) process).getProxyInfo()));
             this.bungeeMemoryAdd.accept(process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.bungee.started").replace("%name%", process.toString()));
         } else if (process instanceof ServerProcess) {
+            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerProcessStarted(((ServerProcess) process).getServerInfo()));
             this.serverMemoryAdd.accept(process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.server.started").replace("%name%", process.toString()));
         }

@@ -5,6 +5,7 @@ package net.peepocloud.node.network.participant;
 
 import io.netty.channel.Channel;
 import lombok.Getter;
+import lombok.Setter;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
@@ -12,6 +13,7 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 @Getter
 public class BungeeCordParticipant extends NetworkParticipant {
     private Auth auth;
+    @Setter
     private BungeeCordProxyInfo proxyInfo;
 
     public BungeeCordParticipant(Channel channel, Auth auth) {

@@ -45,6 +45,8 @@ public class NetworkParticipant implements INetworkPacketSender {
     }
 
     public String getAddress() {
+        if (this.channel == null)
+            return null;
         return ((InetSocketAddress) channel.remoteAddress()).getAddress().getHostAddress();
     }
 

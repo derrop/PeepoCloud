@@ -79,7 +79,7 @@ public class EventManager {
      * @param event the Event to call in each Listener in this EventManager
      * @return this
      */
-    public Event callEvent(Event event) {
+    public <T extends Event> T callEvent(T event) {
         if (this.eventMethods.containsKey(event.getClass())) {
             this.eventMethods.get(event.getClass()).forEach(listenerMethod -> listenerMethod.invoke(event));
         }

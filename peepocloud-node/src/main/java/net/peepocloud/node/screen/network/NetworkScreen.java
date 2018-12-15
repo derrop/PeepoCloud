@@ -1,4 +1,4 @@
-package net.peepocloud.node.network.packet.out.screen;
+package net.peepocloud.node.screen.network;
 /*
  * Created by Mc_Ruben on 26.11.2018
  */

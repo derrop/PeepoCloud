@@ -62,7 +62,7 @@ class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
         TextWebSocketFrame webSocketFrame = (TextWebSocketFrame) o;
 
         for (WebSocketHandler handler : this.webSocketClient.getHandlers()) {
-            handler.handleRequest(channelHandlerContext, webSocketFrame);
+            handler.handleRequest(channelHandlerContext, webSocketFrame, response -> channelHandlerContext.channel().writeAndFlush(response));
         }
     }
 }

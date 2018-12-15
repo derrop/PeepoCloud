@@ -23,4 +23,7 @@ public class MinecraftGroup {
     private int memory;
     private int minServers;
     private int maxServers;
+    private int maxPlayers;
+    private String motd;
+    private int startPort;
 }

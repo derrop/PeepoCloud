@@ -45,6 +45,9 @@ public class ProcessLogHandler implements Runnable {
                     continue;
                 process.getCachedLog().add(line);
                 process.getScreenHandlers().values().forEach(consumer -> consumer.accept(line));
+                if (process.getNetworkScreenHandler() != null) {
+                    process.getNetworkScreenHandler().accept(line);
+                }
             }
             stringBuffer.setLength(0);
         } catch (Exception e) {

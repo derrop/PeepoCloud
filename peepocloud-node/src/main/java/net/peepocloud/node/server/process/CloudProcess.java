@@ -20,6 +20,10 @@ public interface CloudProcess {
 
     Map<UUID, Consumer<String>> getScreenHandlers();
 
+    Consumer<String> getNetworkScreenHandler();
+
+    void setNetworkScreenHandler(Consumer<String> consumer);
+
     String getName();
 
     String getGroupName();

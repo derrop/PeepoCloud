@@ -10,22 +10,24 @@ import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.command.Command;
 import net.peepocloud.node.command.CommandSender;
+import net.peepocloud.node.command.TabCompletable;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
-public class CommandConfig extends Command {
+public class CommandConfig extends Command implements TabCompletable {
     public CommandConfig() {
         super("config", null, "conf");
     }
 
     private Collection<Field> bungeeGroupFields = Arrays.stream(BungeeGroup.class.getDeclaredFields())
-            .filter(field -> field.getType().equals(String.class) || field.getType().equals(int.class) || field.getType().equals(GroupMode.class))
+            .filter(field -> !field.getName().equals("name") && field.getType().equals(String.class) || field.getType().equals(int.class) || field.getType().equals(GroupMode.class))
             .collect(Collectors.toList());
     private Collection<Field> minecraftGroupFields = Arrays.stream(MinecraftGroup.class.getDeclaredFields())
-            .filter(field -> field.getType().equals(String.class) || field.getType().equals(int.class) || field.getType().equals(GroupMode.class))
+            .filter(field -> !field.getName().equals("name") && field.getType().equals(String.class) || field.getType().equals(int.class) || field.getType().equals(GroupMode.class))
             .collect(Collectors.toList());
 
     {
@@ -121,7 +123,7 @@ public class CommandConfig extends Command {
             } else if (field.getType().equals(GroupMode.class)) {
                 GroupMode groupMode;
                 try {
-                    groupMode = GroupMode.valueOf(val);
+                    groupMode = GroupMode.valueOf(val.toUpperCase());
                 } catch (Exception e) {
                     sender.createLanguageMessage("command.config.edit." + a + ".groupModeInvalid").replace("%val%", val).send();
                     return false;
@@ -134,5 +136,28 @@ public class CommandConfig extends Command {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Collection<String> tabComplete(CommandSender sender, String commandLine, String[] args) {
+        if (args.length == 1)
+            return Collections.singletonList("edit");
+        if (args.length == 2)
+            return Arrays.asList("minecraftGroup", "bungeeGroup");
+        if (args.length == 3) {
+            if (args[1].equalsIgnoreCase("minecraftgroup")) {
+                return PeepoCloudNode.getInstance().getMinecraftGroups().keySet();
+            } else if (args[1].equalsIgnoreCase("bungeegroup")) {
+                return PeepoCloudNode.getInstance().getBungeeGroups().keySet();
+            }
+        }
+        if (args.length == 4) {
+            if (args[1].equalsIgnoreCase("minecraftgroup")) {
+                return this.minecraftGroupFields.stream().map(Field::getName).collect(Collectors.toList());
+            } else if (args[1].equalsIgnoreCase("bungeegroup")) {
+                return this.bungeeGroupFields.stream().map(Field::getName).collect(Collectors.toList());
+            }
+        }
+        return null;
     }
 }

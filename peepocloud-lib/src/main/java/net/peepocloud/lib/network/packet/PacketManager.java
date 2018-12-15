@@ -2,6 +2,7 @@ package net.peepocloud.lib.network.packet;
 
 
 import net.peepocloud.lib.network.NetworkParticipant;
+import net.peepocloud.lib.network.packet.handler.PacketHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,18 @@ public class PacketManager {
 
     public void registerPacket(PacketInfo packetInfo) {
         this.registeredPackets.put(packetInfo.getId(), packetInfo);
+    }
+
+    public void registerPacket(PacketHandler handler) {
+        this.registerPacket(new PacketInfo(handler.getId(), handler.getPacketClass(), handler));
+    }
+
+    public void clearPacketHandlers() {
+        this.registeredPackets.clear();
+    }
+
+    public Map<Integer, PacketInfo> getRegisteredPackets() {
+        return registeredPackets;
     }
 
     public PacketInfo getPacketInfo(int id) {

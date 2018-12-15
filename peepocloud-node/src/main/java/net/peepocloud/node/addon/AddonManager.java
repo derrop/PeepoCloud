@@ -97,6 +97,7 @@ public class AddonManager<Addon extends net.peepocloud.node.addon.Addon> {
                 long start = System.nanoTime();
                 Addon addon = (Addon) addonLoader.loadAddon(config);
                 if (addon != null) {
+                    addon.setConfigFile(Paths.get(path.getParent().toString(), config.getName() + "/config.yml"));
                     this.loadedAddons.put(config.getName(), addon);
                     if (preLoadAddon != null)
                         preLoadAddon.accept(addon);

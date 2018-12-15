@@ -24,6 +24,7 @@ import lombok.Getter;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
+import net.peepocloud.node.websocket.server.WebSocket;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class WebSocketClient {
     private int maxReconnectTries;
     private boolean connected;
     private ExecutorService executorService = Executors.newCachedThreadPool();
+
+    WebSocket webSocket;
 
     public void registerHandler(WebSocketHandler handler) {
         this.handlers.add(handler);

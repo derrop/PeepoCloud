@@ -8,7 +8,7 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 
 @Getter
 /**
- * Called when a server is started on this node instance
+ * Called when a server is started on one node in the network
  */
 public class ServerStartEvent extends NetworkServerEvent {
     public ServerStartEvent(MinecraftServerInfo serverInfo) {

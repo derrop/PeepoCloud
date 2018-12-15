@@ -32,6 +32,7 @@ public class ServerProcess implements CloudProcess {
 
     private Process process;
     private Path directory;
+    @Setter
     private MinecraftServerInfo serverInfo;
     private ProcessManager processManager;
     private long startup;
@@ -39,12 +40,14 @@ public class ServerProcess implements CloudProcess {
     private volatile boolean wasRunning = false;
     private List<String> cachedLog = new ArrayList<>();
     private Map<UUID, Consumer<String>> screenHandlers = new ConcurrentHashMap<>();
+    @Setter
+    private Consumer<String> networkScreenHandler;
 
     ServerProcess(MinecraftServerInfo serverInfo, ProcessManager processManager) {
         this.serverInfo = serverInfo;
         this.directory = PeepoCloudNode.getInstance().getMinecraftGroup(serverInfo.getGroupName()).getGroupMode() == GroupMode.SAVE ?
-                Paths.get("internal/savedServers/" + serverInfo.getGroupName() + "/" + serverInfo.getComponentName()) :
-                Paths.get("internal/deletingServers/" + serverInfo.getGroupName() + "/" + serverInfo.getComponentName());
+                Paths.get("internal/savedServers/" + serverInfo.getGroupName() + "/" + serverInfo.getComponentId()) :
+                Paths.get("internal/tempServers/" + serverInfo.getGroupName() + "/" + serverInfo.getComponentId());
         this.processManager = processManager;
 
         if (!Files.exists(this.directory)) {
@@ -124,9 +127,29 @@ public class ServerProcess implements CloudProcess {
 
     private void loadServerConfig() {
         Path path = Paths.get(this.directory.toString(), "server.properties");
-        PropertiesConfigurable configurable = PropertiesConfigurable.load(path) //TODO check if exists and if not load default
-                .append("server-ip", this.serverInfo.getHost())
+        PropertiesConfigurable configurable;
+        if (Files.exists(path)) {
+            configurable = PropertiesConfigurable.load(path);
+        } else {
+            configurable = PropertiesConfigurable.load(PeepoCloudNode.class.getClassLoader().getResourceAsStream("files/server.properties"));
+        }
+        configurable.append("server-ip", this.serverInfo.getHost())
                 .append("server-port", this.serverInfo.getPort());
+        if (this.serverInfo.getMotd() != null) {
+            configurable.append("motd", this.serverInfo.getMotd());
+        } else {
+            this.serverInfo.setMotd(configurable.getString("motd"));
+        }
+        if (this.serverInfo.getMaxPlayers() != -1) {
+            configurable.append("max-players", this.serverInfo.getMaxPlayers());
+        } else {
+            int maxPlayers = -1;
+            try {
+                maxPlayers = Integer.parseInt(configurable.getString("max-players"));
+            } catch (NumberFormatException e) {
+            }
+            this.serverInfo.setMaxPlayers(maxPlayers);
+        }
         MinecraftServerConfigFillEvent configFillEvent = new MinecraftServerConfigFillEvent(this, path, configurable);
         PeepoCloudNode.getInstance().getEventManager().callEvent(configFillEvent);
         configFillEvent.getConfigurable().saveAsFile(configFillEvent.getConfigPath());
@@ -155,9 +178,11 @@ public class ServerProcess implements CloudProcess {
                     e.printStackTrace();
                 }
                 this.screenHandlers.clear();
+                this.networkScreenHandler = null;
                 this.cachedLog.clear();
             }
             if (!save) {
+                SystemUtils.sleepUninterruptedly(500);
                 SystemUtils.deleteDirectory(this.directory);
             }
             this.processManager.handleProcessStop(this);

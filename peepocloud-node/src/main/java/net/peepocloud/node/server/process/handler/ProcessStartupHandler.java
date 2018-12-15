@@ -3,19 +3,21 @@ package net.peepocloud.node.server.process.handler;
  * Created by Mc_Ruben on 27.11.2018
  */
 
-import lombok.AllArgsConstructor;
+import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.server.process.ProcessManager;
 
-@AllArgsConstructor
 public class ProcessStartupHandler implements Runnable {
-    private ProcessManager processManager;
     @Override
     public void run() {
         while (!Thread.interrupted() && PeepoCloudNode.getInstance().isRunning()) {
+            if (!PeepoCloudNode.getInstance().getNetworkServer().isSelfNodeCore()) {
+                SystemUtils.sleepUninterruptedly(2000);
+                continue;
+            }
+
             for (MinecraftGroup group : PeepoCloudNode.getInstance().getMinecraftGroups().values()) {
                 if (
                         PeepoCloudNode.getInstance().getNextServerId(group.getName()) - 1 <

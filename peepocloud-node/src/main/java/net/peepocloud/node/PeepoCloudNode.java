@@ -12,17 +12,17 @@ import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.network.packet.Packet;
-import net.peepocloud.lib.network.packet.PacketInfo;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
+import net.peepocloud.lib.network.packet.handler.PacketHandler;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.server.Template;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.server.minecraft.MinecraftState;
 import net.peepocloud.lib.utility.SystemUtils;
-import net.peepocloud.lib.utility.network.NetworkAddress;
 import net.peepocloud.node.addon.AddonManager;
 import net.peepocloud.node.addon.defaults.DefaultAddonManager;
 import net.peepocloud.node.addon.node.NodeAddon;
@@ -36,13 +36,13 @@ import net.peepocloud.node.languagesystem.LanguagesManager;
 import net.peepocloud.node.logging.ColoredLogger;
 import net.peepocloud.node.logging.ConsoleColor;
 import net.peepocloud.node.network.ClientNode;
+import net.peepocloud.node.network.ConnectableNode;
 import net.peepocloud.node.network.NetworkServer;
-import net.peepocloud.node.network.packet.in.PacketInUpdateNodeInfo;
 import net.peepocloud.node.network.packet.out.PacketOutUpdateNodeInfo;
 import net.peepocloud.node.network.packet.out.group.PacketOutCreateBungeeGroup;
 import net.peepocloud.node.network.packet.out.group.PacketOutCreateMinecraftGroup;
-import net.peepocloud.node.network.packet.out.server.PacketOutStartBungee;
-import net.peepocloud.node.network.packet.out.server.PacketOutStartServer;
+import net.peepocloud.node.network.packet.out.server.PacketOutUpdateBungee;
+import net.peepocloud.node.network.packet.out.server.PacketOutUpdateServer;
 import net.peepocloud.node.network.participant.BungeeCordParticipant;
 import net.peepocloud.node.network.participant.MinecraftServerParticipant;
 import net.peepocloud.node.network.participant.NodeParticipant;
@@ -58,6 +58,8 @@ import net.peepocloud.node.statistic.StatisticsManager;
 import net.peepocloud.node.updater.AutoUpdaterManager;
 import net.peepocloud.node.updater.UpdateCheckResponse;
 import net.peepocloud.node.utility.NodeUtils;
+import net.peepocloud.node.utility.users.UserManager;
+import org.reflections.Reflections;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -106,7 +108,6 @@ public class PeepoCloudNode {
     private String networkAuthKey;
     private NetworkServer networkServer;
     private Map<String, ClientNode> connectedNodes = new HashMap<>();
-    private Map<String, NodeParticipant> serverNodes = new HashMap<>();
 
     private PacketManager packetManager = new PacketManager();
 
@@ -125,6 +126,8 @@ public class PeepoCloudNode {
     private Map<String, BungeeGroup> bungeeGroups;
 
     private ProcessManager processManager;
+
+    private UserManager userManager = new UserManager();
 
     private Collection<TemplateStorage> templateStorages = new ArrayList<>(Arrays.asList(new TemplateLocalStorage()));
 
@@ -192,6 +195,8 @@ public class PeepoCloudNode {
     private int memoryUsedOnThisInstanceByBungee = 0;
     private int memoryUsedOnThisInstanceByServer = 0;
 
+    private long startupTime;
+
     private boolean running = true;
 
     PeepoCloudNode() throws IOException {
@@ -243,7 +248,7 @@ public class PeepoCloudNode {
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
 
         if (!this.internalConfig.contains("acceptedInformationsSendingToServer")) {
-            System.out.println("&4Do you accept, that some data of your cloud and server (the ip address hashed, the os, the version of the cloud, the uniqueId of your cloud, the maximum amount of memory of your cloud and the cpu cores) will be send to our server and saved there? We won't share the hashed ip address and the unique id of your cloud, but the other information are important for the support. Please type &eyes&4, if you agree, but please, you won't get any support if you do not agree to this, because we need information about your system to help you.");
+            System.out.println("&4Do you accept, that some data of your cloud and server (the ip address hashed, the os, the version of the cloud, the uniqueId of your cloud, the maximum amount of memory of your cloud and the cpu cores) will be send to our server and saved there? We won't share the hashed ip address and the unique id of your cloud, but the other information are important for the support. Please type &eyes&4, if you agree, but please, you won't get any support if you do not agree to this, because we need information about your system to help you.)");
             String s = this.logger.readLine1();
             if (s.equalsIgnoreCase("yes")) {
                 System.out.println("&aYou have accepted that the data named above will be saved on our server.");
@@ -262,6 +267,8 @@ public class PeepoCloudNode {
 
         this.commandManager = new CommandManager(this.logger);
 
+        this.eventManager = new EventManager();
+
         this.loadConfigs();
 
         this.databaseLoader = new DatabaseLoader("databaseAddons");
@@ -269,14 +276,10 @@ public class PeepoCloudNode {
 
         NodeUtils.updateNodeInfoForSupport(null);
 
-        this.nodeInfo = this.cloudConfig.loadNodeInfo(0);
-
         this.autoUpdaterManager = new AutoUpdaterManager();
 
         this.initCommands(this.commandManager);
         this.initPacketHandlers();
-
-        this.eventManager = new EventManager();
 
         this.nodeAddonManager = new AddonManager<>();
 
@@ -305,6 +308,8 @@ public class PeepoCloudNode {
                 this.cloudConfig
         );
 
+        this.startupTime = System.currentTimeMillis();
+
         ServerFilesLoader.tryInstallSpigot();
         ServerFilesLoader.tryInstallBungee();
 
@@ -318,7 +323,14 @@ public class PeepoCloudNode {
     }
 
     private void initPacketHandlers() {
-        this.packetManager.registerPacket(new PacketInfo(14, PacketInUpdateNodeInfo.class, new PacketInUpdateNodeInfo()));
+        new Reflections("net.peepocloud.node.network.packet.in").getSubTypesOf(PacketHandler.class)
+                .forEach(aClass -> {
+                    try {
+                        this.packetManager.registerPacket(aClass.newInstance());
+                    } catch (InstantiationException | IllegalAccessException e) {
+                    }
+                });
+        this.logger.debug("Registered " + this.packetManager.getRegisteredPackets().size() + " packet handlers");
     }
 
     private void initCommands(CommandManager commandManager) {
@@ -338,8 +350,11 @@ public class PeepoCloudNode {
                 new CommandSupportUpdate(),
                 new CommandStats(),
                 new CommandGStats(),
-                new CommandConfig()
+                new CommandConfig(),
+                new CommandList()
         );
+
+        this.logger.debug("Registered " + this.commandManager.getCommands().size() + " commands");
     }
 
     private void shutdown0() {
@@ -380,12 +395,14 @@ public class PeepoCloudNode {
             }
         }
 
-        Collection<NetworkAddress> oldNodes = this.cloudConfig == null ? null : this.cloudConfig.getConnectableNodes();
+        Collection<ConnectableNode> oldNodes = this.cloudConfig == null ? null : this.cloudConfig.getConnectableNodes();
         if (this.cloudConfig == null) {
             this.cloudConfig = new CloudConfig();
         }
         this.cloudConfig.load();
-        Collection<NetworkAddress> newNodes = this.cloudConfig.getConnectableNodes();
+        Collection<ConnectableNode> newNodes = this.cloudConfig.getConnectableNodes();
+
+        this.nodeInfo = this.cloudConfig.loadNodeInfo(this.processManager == null ? 0 : this.getMemoryUsedOnThisInstance());
 
         if (this.networkServer == null) {
             this.networkServer = new NetworkServer(this.cloudConfig.getHost().getHost().equals("*") ? new InetSocketAddress(this.cloudConfig.getHost().getPort())
@@ -396,20 +413,20 @@ public class PeepoCloudNode {
         if (oldNodes == null || !oldNodes.equals(newNodes)) {
             if (oldNodes == null) {
                 oldNodes = newNodes;
-                for (NetworkAddress node : oldNodes) {
-                    if (node.getHost() == null || node.getHost().equalsIgnoreCase("host"))
+                for (ConnectableNode node : oldNodes) {
+                    if (node.getAddress().getHost() == null || node.getAddress().getHost().equalsIgnoreCase("host"))
                         continue;
                     this.connectToNode(node);
                 }
             } else {
-                for (NetworkAddress connectableNode : new ArrayList<>(oldNodes)) {
+                for (ConnectableNode connectableNode : new ArrayList<>(oldNodes)) {
                     if (!newNodes.contains(connectableNode)) {
                         oldNodes.remove(connectableNode);
-                        this.networkServer.closeNodeConnection(connectableNode.getHost());
+                        this.networkServer.closeNodeConnection(connectableNode.getAddress().getHost());
                     }
                 }
-                for (NetworkAddress node : new ArrayList<>(newNodes)) {
-                    if (node.getHost() == null || node.getHost().equalsIgnoreCase("host"))
+                for (ConnectableNode node : new ArrayList<>(newNodes)) {
+                    if (node.getAddress().getHost() == null || node.getAddress().getHost().equalsIgnoreCase("host"))
                         continue;
                     if (!oldNodes.contains(node)) {
                         oldNodes.add(node);
@@ -424,11 +441,13 @@ public class PeepoCloudNode {
     }
 
     public void tryConnectToNode(String host) {
-        if (this.connectedNodes.containsKey(host))
-            return;
+        for (ClientNode value : this.connectedNodes.values()) {
+            if (value.isConnected() && value.getAddress().equals(host))
+                return;
+        }
 
-        for (NetworkAddress node : this.cloudConfig.getConnectableNodes()) {
-            if (node.getHost().equals(host)) {
+        for (ConnectableNode node : this.cloudConfig.getConnectableNodes()) {
+            if (node.getAddress().getHost().equals(host)) {
                 this.connectToNode(node);
                 break;
             }
@@ -441,22 +460,6 @@ public class PeepoCloudNode {
      */
     public String getUniqueId() {
         return this.cloudConfig.getUniqueId();
-        /*this.databaseManager.getDatabase("internal_configs").get("unique", simpleJsonObject -> {
-            String unique;
-            if (simpleJsonObject == null) {
-                unique = SystemUtils.randomString(128);
-                this.databaseManager.getDatabase("internal_configs").insert("unique", new SimpleJsonObject().append("unique", unique));
-            } else {
-                unique = simpleJsonObject.getString("unique");
-                if (this.lastUniqueId == null)
-                    this.lastUniqueId = unique;
-                if (!this.lastUniqueId.equals(unique)) {
-                    simpleJsonObject.append("unique", this.lastUniqueId);
-                    this.databaseManager.getDatabase("internal_configs").update("unique", simpleJsonObject);
-                }
-            }
-            consumer.accept(unique);
-        });*/
     }
 
     /**
@@ -472,11 +475,52 @@ public class PeepoCloudNode {
         return maxMemory;
     }
 
-    private void connectToNode(NetworkAddress node) {
-        ClientNode client = new ClientNode(new InetSocketAddress(node.getHost(), node.getPort()), this.packetManager, new ChannelHandlerAdapter(),
-                new Auth(this.networkAuthKey, this.cloudConfig.getNodeName(), NetworkComponentType.NODE, null, new SimpleJsonObject().append("nodeInfo", this.nodeInfo)),
+    /**
+     * Gets the memory used by all servers/proxies in the network
+     * @return the memory of all servers/proxies in the network
+     */
+    public int getMemoryUsed() {
+        int used = this.getMemoryUsedOnThisInstance();
+        for (ClientNode value : this.connectedNodes.values()) {
+            if (value.getNodeInfo() != null)
+                used += value.getNodeInfo().getUsedMemory();
+        }
+        return used;
+    }
+
+    private void connectToNode(ConnectableNode node) {
+        SimpleJsonObject authData = new SimpleJsonObject().append("nodeInfo", this.nodeInfo);
+        if (this.processManager != null && !this.processManager.getProcesses().isEmpty()) {
+            authData.append("startingProxies", this.processManager.getProcesses().values().stream()
+                    .filter(process -> process instanceof BungeeProcess && !this.proxiesOnThisNode.containsKey(process.getName())).map(process -> ((BungeeProcess) process).getProxyInfo()).collect(Collectors.toList()));
+            authData.append("startingServers", this.processManager.getProcesses().values().stream()
+                    .filter(process -> process instanceof ServerProcess && ((ServerProcess) process).getServerInfo().getState() == MinecraftState.OFFLINE)
+                    .map(process -> ((ServerProcess) process).getServerInfo()).collect(Collectors.toList()));
+        }
+        if (!this.proxiesOnThisNode.isEmpty()) {
+            authData.append("proxies", this.proxiesOnThisNode.values().stream().map(BungeeCordParticipant::getProxyInfo).collect(Collectors.toList()));
+        }
+        if (!this.serversOnThisNode.isEmpty()) {
+            authData.append("servers", this.serversOnThisNode.values().stream().map(MinecraftServerParticipant::getServerInfo).collect(Collectors.toList()));
+        }
+        if (this.processManager != null && !this.processManager.getServerQueue().getServerProcesses().isEmpty()) {
+            authData.append("queuedProxies", this.processManager.getServerQueue().getServerProcesses().stream()
+                    .filter(process -> process instanceof BungeeProcess).map(process -> ((BungeeProcess) process).getProxyInfo()).collect(Collectors.toList()));
+            authData.append("queuedServers", this.processManager.getServerQueue().getServerProcesses().stream()
+                    .filter(process -> process instanceof ServerProcess).map(process -> ((ServerProcess) process).getServerInfo()).collect(Collectors.toList()));
+        }
+        ClientNode client = new ClientNode(
+                new InetSocketAddress(node.getAddress().getHost(), node.getAddress().getPort()),
+                this.packetManager,
+                new ChannelHandlerAdapter() {
+                    @Override
+                    public void disconnected(NetworkParticipant networkParticipant) {
+                        connectedNodes.remove(node.getName());
+                    }
+                },
+                new Auth(this.networkAuthKey, this.cloudConfig.getNodeName(), NetworkComponentType.NODE, null, authData),
                 null);
-        this.connectedNodes.put(node.getHost(), client);
+        this.connectedNodes.put(node.getName(), client);
         new Thread(client, "Node client @" + node.toString()).start();
     }
 
@@ -635,6 +679,14 @@ public class PeepoCloudNode {
     }
 
     /**
+     * Gets the nodes connected as a client to this node as a server
+     * @return the nodes connected to this node
+     */
+    public Map<String, NodeParticipant> getServerNodes() {
+        return this.networkServer.getConnectedNodes();
+    }
+
+    /**
      * Gets a node connected to this node as a client
      * @param name the name of the node
      * @return the connected node or null, if no node with the given {@code name} is connected
@@ -658,20 +710,62 @@ public class PeepoCloudNode {
 
     public void updateMinecraftGroup(MinecraftGroup group) {
         this.minecraftGroups.put(group.getName(), group);
+        this.groupsConfig.update(group);
         this.sendPacketToNodes(new PacketOutCreateMinecraftGroup(group));
     }
 
     public void updateBungeeGroup(BungeeGroup group) {
         this.bungeeGroups.put(group.getName(), group);
+        this.groupsConfig.update(group);
         this.sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
     }
 
     public void updateServerInfo(MinecraftServerInfo serverInfo) {
-        //TODO
+        boolean a = false;
+        if (this.processManager.getProcesses().containsKey(serverInfo.getComponentName())) {
+            CloudProcess process = this.processManager.getProcesses().get(serverInfo.getComponentName());
+            if (process instanceof ServerProcess) {
+                ((ServerProcess) process).setServerInfo(serverInfo);
+                a = true;
+            }
+        }
+        if (this.serversOnThisNode.containsKey(serverInfo.getComponentName())) {
+            this.serversOnThisNode.get(serverInfo.getComponentName()).setServerInfo(serverInfo);
+            a = true;
+        }
+
+        if (!a) {
+            NodeParticipant participant = this.getServerNodes().get(serverInfo.getParentComponentName());
+            if (participant != null) {
+                participant.sendPacket(new PacketOutUpdateServer(serverInfo));
+            }
+        } else {
+            //TODO send api update packet to all components
+        }
     }
 
     public void updateProxyInfo(BungeeCordProxyInfo proxyInfo) {
-        //TODO
+        boolean a = false;
+        if (this.processManager.getProcesses().containsKey(proxyInfo.getComponentName())) {
+            CloudProcess process = this.processManager.getProcesses().get(proxyInfo.getComponentName());
+            if (process instanceof BungeeProcess) {
+                ((BungeeProcess) process).setProxyInfo(proxyInfo);
+                a = true;
+            }
+        }
+        if (this.proxiesOnThisNode.containsKey(proxyInfo.getComponentName())) {
+            this.proxiesOnThisNode.get(proxyInfo.getComponentName()).setProxyInfo(proxyInfo);
+            a = true;
+        }
+
+        if (!a) {
+            NodeParticipant participant = this.getServerNodes().get(proxyInfo.getParentComponentName());
+            if (participant != null) {
+                participant.sendPacket(new PacketOutUpdateBungee(proxyInfo));
+            }
+        } else {
+            //TODO send api update packet to all components
+        }
     }
 
     public NodeInfo getBestNodeInfo(int memoryNeeded) {
@@ -697,7 +791,56 @@ public class PeepoCloudNode {
         return best;
     }
 
+    /**
+     * Gets all {@link MinecraftServerInfo}'s of the running and starting servers in the network (on all nodes)
+     * @return an {@link ArrayList} with all infos of the servers in the network
+     */
     public Collection<MinecraftServerInfo> getMinecraftServers() {
+        Collection<MinecraftServerInfo> serverInfos = new ArrayList<>();
+        this.processManager.getProcesses().values().forEach(process -> {
+            if (process instanceof ServerProcess) {
+                serverInfos.add(((ServerProcess) process).getServerInfo());
+            }
+        });
+        for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
+            serverInfos.addAll(value.getServers().values());
+            serverInfos.addAll(value.getStartingServers().values());
+        }
+        return serverInfos;
+    }
+
+    /**
+     * Gets all {@link MinecraftServerInfo}'s which are from the group specified in the parameters of the running and starting servers in the network (on all nodes)
+     * @param group the name of the group
+     * @return an {@link ArrayList} with all infos of the servers in the network from the group {@code group}
+     */
+    public Collection<MinecraftServerInfo> getMinecraftServers(String group) {
+        Collection<MinecraftServerInfo> serverInfos = new ArrayList<>();
+        this.processManager.getProcesses().values().forEach(process -> {
+            if (process instanceof ServerProcess && ((ServerProcess) process).getServerInfo().getGroupName().equalsIgnoreCase(group)) {
+                serverInfos.add(((ServerProcess) process).getServerInfo());
+            }
+        });
+        for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
+            for (MinecraftServerInfo serverInfo : value.getServers().values()) {
+                if (serverInfo.getGroupName().equalsIgnoreCase(group)) {
+                    serverInfos.add(serverInfo);
+                }
+            }
+            for (MinecraftServerInfo serverInfo : value.getStartingServers().values()) {
+                if (serverInfo.getGroupName().equalsIgnoreCase(group)) {
+                    serverInfos.add(serverInfo);
+                }
+            }
+        }
+        return serverInfos;
+    }
+
+    /**
+     * Gets all {@link MinecraftServerInfo}'s of the starting servers in the network (on all nodes)
+     * @return an {@link ArrayList} with all infos of the starting servers in the network
+     */
+    public Collection<MinecraftServerInfo> getStartedMinecraftServers() {
         Collection<MinecraftServerInfo> participants = new ArrayList<>();
         for (MinecraftServerParticipant value : this.serversOnThisNode.values()) {
             participants.add(value.getServerInfo());
@@ -708,7 +851,12 @@ public class PeepoCloudNode {
         return participants;
     }
 
-    public Collection<MinecraftServerInfo> getMinecraftServers(String group) {
+    /**
+     * Gets all {@link MinecraftServerInfo}'s which are from the group specified in the parameters of the starting servers in the network (on all nodes)
+     * @param group the name of the group
+     * @return an {@link ArrayList} with all infos of the starting servers in the network from the group {@code group}
+     */
+    public Collection<MinecraftServerInfo> getStartedMinecraftServers(String group) {
         Collection<MinecraftServerInfo> participants = new ArrayList<>();
         for (MinecraftServerParticipant value : this.serversOnThisNode.values()) {
             if (value.getServerInfo().getGroupName().equalsIgnoreCase(group)) {
@@ -725,7 +873,56 @@ public class PeepoCloudNode {
         return participants;
     }
 
+    /**
+     * Gets all {@link BungeeCordProxyInfo}'s of the running and starting proxies in the network (on all nodes)
+     * @return an {@link ArrayList} with all infos of the proxies in the network
+     */
     public Collection<BungeeCordProxyInfo> getBungeeProxies() {
+        Collection<BungeeCordProxyInfo> serverInfos = new ArrayList<>();
+        this.processManager.getProcesses().values().forEach(process -> {
+            if (process instanceof BungeeProcess) {
+                serverInfos.add(((BungeeProcess) process).getProxyInfo());
+            }
+        });
+        for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
+            serverInfos.addAll(value.getProxies().values());
+            serverInfos.addAll(value.getStartingProxies().values());
+        }
+        return serverInfos;
+    }
+
+    /**
+     * Gets all {@link BungeeCordProxyInfo}'s which are from the group specified in the parameters of the running and starting proxies in the network (on all nodes)
+     * @param group the name of the group
+     * @return an {@link ArrayList} with all infos of the servers in the network from the group {@code group}
+     */
+    public Collection<BungeeCordProxyInfo> getBungeeProxies(String group) {
+        Collection<BungeeCordProxyInfo> serverInfos = new ArrayList<>();
+        this.processManager.getProcesses().values().forEach(process -> {
+            if (process instanceof BungeeProcess && ((BungeeProcess) process).getProxyInfo().getGroupName().equalsIgnoreCase(group)) {
+                serverInfos.add(((BungeeProcess) process).getProxyInfo());
+            }
+        });
+        for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
+            for (BungeeCordProxyInfo serverInfo : value.getProxies().values()) {
+                if (serverInfo.getGroupName().equalsIgnoreCase(group)) {
+                    serverInfos.add(serverInfo);
+                }
+            }
+            for (BungeeCordProxyInfo serverInfo : value.getStartingProxies().values()) {
+                if (serverInfo.getGroupName().equalsIgnoreCase(group)) {
+                    serverInfos.add(serverInfo);
+                }
+            }
+        }
+        return serverInfos;
+    }
+
+    /**
+     * Gets all {@link BungeeCordProxyInfo}'s of the starting proxies in the network (on all nodes)
+     * @return an {@link ArrayList} with all infos of the starting proxies in the network
+     */
+    public Collection<BungeeCordProxyInfo> getStartedBungeeProxies() {
         Collection<BungeeCordProxyInfo> participants = new ArrayList<>();
         for (BungeeCordParticipant value : this.proxiesOnThisNode.values()) {
             participants.add(value.getProxyInfo());
@@ -736,7 +933,12 @@ public class PeepoCloudNode {
         return participants;
     }
 
-    public Collection<BungeeCordProxyInfo> getBungeeProxies(String group) {
+    /**
+     * Gets all {@link BungeeCordProxyInfo}'s which are from the group specified in the parameters of the starting proxies in the network (on all nodes)
+     * @param group the name of the group
+     * @return an {@link ArrayList} with all infos of the starting proxies in the network from the group {@code group}
+     */
+    public Collection<BungeeCordProxyInfo> getStartedBungeeProxies(String group) {
         Collection<BungeeCordProxyInfo> participants = new ArrayList<>();
         for (BungeeCordParticipant value : this.proxiesOnThisNode.values()) {
             if (value.getProxyInfo().getGroupName().equalsIgnoreCase(group)) {
@@ -795,8 +997,6 @@ public class PeepoCloudNode {
     }
 
     public MinecraftServerInfo getMinecraftServerInfo(String name) {
-        if (this.serversOnThisNode.containsKey(name))
-            return this.serversOnThisNode.get(name).getServerInfo();
         if (this.processManager.getProcesses().containsKey(name)) {
             CloudProcess process = this.processManager.getProcesses().get(name);
             if (process instanceof ServerProcess)
@@ -814,8 +1014,6 @@ public class PeepoCloudNode {
     }
 
     public BungeeCordProxyInfo getBungeeProxyInfo(String name) {
-        if (this.proxiesOnThisNode.containsKey(name))
-            return this.proxiesOnThisNode.get(name).getProxyInfo();
         if (this.processManager.getProcesses().containsKey(name)) {
             CloudProcess process = this.processManager.getProcesses().get(name);
             if (process instanceof BungeeProcess)
@@ -873,8 +1071,8 @@ public class PeepoCloudNode {
     public MinecraftServerInfo startMinecraftServer(NodeInfo nodeInfo, MinecraftGroup group, String name, int id, int memory) {
         if (this.getNextServerId(group.getName()) - 1 >= group.getMaxServers() || this.isServerStarted(name))
             return null;
-        if (nodeInfo == null)
-            nodeInfo = this.nodeInfo;
+        if (nodeInfo == null) //not enough ram on any node free
+            return null;
 
         if (this.nodeInfo.getName().equals(nodeInfo.getName())) {
             MinecraftServerInfo serverInfo = new MinecraftServerInfo(
@@ -884,7 +1082,10 @@ public class PeepoCloudNode {
                     this.nodeInfo.getName(),
                     memory,
                     this.cloudConfig.getHost().getHost(),
-                    this.findServerPort(),
+                    this.findServerPort(group),
+                    group.getMaxPlayers(),
+                    group.getMotd(),
+                    MinecraftState.OFFLINE,
                     new HashMap<>(),
                     this.findTemplate(group),
                     -1L
@@ -892,9 +1093,7 @@ public class PeepoCloudNode {
             this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(serverInfo), false);
             return serverInfo;
         } else {
-            NetworkParticipant channel = this.getServerNodes().get(nodeInfo.getName());
-            if (channel == null)
-                channel = this.getConnectedNode(nodeInfo.getName());
+            NodeParticipant channel = this.getServerNodes().get(nodeInfo.getName());
             if (channel == null)
                 return null;
 
@@ -902,20 +1101,38 @@ public class PeepoCloudNode {
                     name,
                     group.getName(),
                     id,
-                    this.nodeInfo.getName(),
+                    nodeInfo.getName(),
                     memory,
                     channel.getAddress(),
-                    this.findServerPort(),
+                    this.findServerPort(group),
+                    group.getMaxPlayers(),
+                    group.getMotd(),
+                    MinecraftState.OFFLINE,
                     new HashMap<>(),
                     this.findTemplate(group),
                     -1L
             );
-            channel.sendPacket(new PacketOutStartServer(serverInfo));
-
-            if (channel instanceof NodeParticipant)
-                ((NodeParticipant) channel).getWaitingServers().put(serverInfo.getComponentName(), serverInfo);
+            channel.startMinecraftServer(serverInfo);
 
             return serverInfo;
+        }
+    }
+
+    public void startMinecraftServer(MinecraftServerInfo serverInfo) {
+        MinecraftGroup group = this.getMinecraftGroup(serverInfo.getGroupName());
+        if (group == null)
+            return;
+        if (this.getNextServerId(serverInfo.getGroupName()) - 1 >= group.getMaxServers() || this.isServerStarted(serverInfo.getComponentName()))
+            return;
+
+        if (this.nodeInfo.getName().equals(serverInfo.getParentComponentName())) {
+            this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(serverInfo), false);
+        } else {
+            NodeParticipant channel = this.getServerNodes().get(serverInfo.getParentComponentName());
+            if (channel == null)
+                return;
+
+            channel.startMinecraftServer(serverInfo);
         }
     }
 
@@ -961,8 +1178,8 @@ public class PeepoCloudNode {
         int nextId = this.getNextProxyId(group.getName()) - 1;
         if (nextId >= group.getMaxServers() || this.isProxyStarted(name))
             return null;
-        if (nodeInfo == null)
-            nodeInfo = this.nodeInfo;
+        if (nodeInfo == null) //not enough ram on any node free
+            return null;
 
         if (this.nodeInfo.getName().equals(nodeInfo.getName())) {
             BungeeCordProxyInfo serverInfo = new BungeeCordProxyInfo(
@@ -980,9 +1197,7 @@ public class PeepoCloudNode {
             this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(serverInfo), false);
             return serverInfo;
         } else {
-            NetworkParticipant channel = this.getServerNodes().get(nodeInfo.getName());
-            if (channel == null)
-                channel = this.getConnectedNode(nodeInfo.getName());
+            NodeParticipant channel = this.getServerNodes().get(nodeInfo.getName());
             if (channel == null)
                 return null;
 
@@ -990,7 +1205,7 @@ public class PeepoCloudNode {
                     name,
                     group.getName(),
                     id,
-                    this.nodeInfo.getName(),
+                    nodeInfo.getName(),
                     memory,
                     channel.getAddress(),
                     group.getStartPort() + nextId,
@@ -998,12 +1213,22 @@ public class PeepoCloudNode {
                     this.findTemplate(group),
                     -1L
             );
-            channel.sendPacket(new PacketOutStartBungee(serverInfo));
 
-            if (channel instanceof NodeParticipant)
-                ((NodeParticipant) channel).getWaitingProxies().put(serverInfo.getComponentName(), serverInfo);
+            channel.startBungeeCordProxy(serverInfo);
 
             return serverInfo;
+        }
+    }
+
+    public void startBungeeProxy(BungeeCordProxyInfo proxyInfo) {
+        if (this.nodeInfo.getName().equals(proxyInfo.getParentComponentName())) {
+            this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(proxyInfo), false);
+        } else {
+            NodeParticipant channel = this.getServerNodes().get(proxyInfo.getParentComponentName());
+            if (channel == null)
+                return;
+
+            channel.startBungeeCordProxy(proxyInfo);
         }
     }
 
@@ -1027,9 +1252,9 @@ public class PeepoCloudNode {
         return a;
     }
 
-    private int findServerPort() {
+    private int findServerPort(MinecraftGroup group) {
         Collection<Integer> bindedPorts = this.getBindedPorts();
-        int port = this.cloudConfig.getStartPort();
+        int port = group.getStartPort();
         while (bindedPorts.contains(port)) {
             port += ThreadLocalRandom.current().nextInt(15);
         }

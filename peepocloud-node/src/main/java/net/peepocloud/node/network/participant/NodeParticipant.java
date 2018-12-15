@@ -6,8 +6,10 @@ package net.peepocloud.node.network.participant;
 import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 import lombok.Getter;
+import lombok.Setter;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
+import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.network.packet.out.server.PacketOutStartBungee;
@@ -25,6 +27,9 @@ public class NodeParticipant extends NetworkParticipant {
     }
 
     private Auth auth;
+
+    @Setter
+    private NodeInfo nodeInfo;
 
     private Map<String, MinecraftServerInfo> servers = new HashMap<>();
     private Map<String, BungeeCordProxyInfo> proxies = new HashMap<>();

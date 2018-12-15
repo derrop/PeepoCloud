@@ -13,8 +13,12 @@ import java.lang.management.ManagementFactory;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.EnumSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
@@ -24,7 +28,7 @@ public class SystemUtils {
     private SystemUtils() { }
 
     public static final String CENTRAL_SERVER_URL = "http://192.168.56.1:1350/";
-    public static final String CENTRAL_SERVER_URL_WS_GSTATS = "ws://localhost:1351";
+    public static final String CENTRAL_SERVER_URL_WS_GSTATS = "ws://192.168.56.1:1351";
 
     private static final char[] values = "abcdefghijklmnopqrstuvwxyzäöüABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890".toCharArray();
 
@@ -231,5 +235,34 @@ public class SystemUtils {
         return Runtime.getRuntime().availableProcessors();
     }
 
+    /**
+     * Hashes the specified {@link String}
+     * @param input the {@link String} to hash
+     * @return the hashed {@link String} or if an error occurs the input {@link String}
+     */
+    public static String hashString(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(input.getBytes(StandardCharsets.UTF_8));
+            return new String(Base64.getMimeEncoder().encode(digest.digest()), StandardCharsets.UTF_8);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return input;
+    }
+
+    public static void createFile(Path path) {
+        if (!Files.exists(path)) {
+            Path parent = path.getParent();
+            if (parent != null && !Files.exists(parent)) {
+                try {
+                    Files.createDirectories(parent);
+                    Files.createFile(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 }

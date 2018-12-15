@@ -8,6 +8,7 @@ import net.peepocloud.lib.server.GroupMode;
 import net.peepocloud.lib.server.Template;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
+import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.command.Command;
 import net.peepocloud.node.command.CommandSender;
@@ -16,6 +17,8 @@ import net.peepocloud.node.setup.Setup;
 import net.peepocloud.node.setup.type.ArraySetupAcceptable;
 import net.peepocloud.node.setup.type.EnumSetupAcceptable;
 import net.peepocloud.node.setup.type.IntegerSetupAcceptable;
+import net.peepocloud.node.setup.type.StringSetupAcceptable;
+import net.peepocloud.node.utility.users.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +31,7 @@ public class CommandCreate extends Command {
 
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
-        if (args.length != 2) {
+        if (args.length != 2 && args.length != 3) {
             sendHelp(sender);
             return;
         }
@@ -37,6 +40,11 @@ public class CommandCreate extends Command {
 
         switch (args[0].toLowerCase()) {
             case "bungeegroup": {
+                if (args.length != 2) {
+                    sendHelp(sender);
+                    return;
+                }
+
                 if (PeepoCloudNode.getInstance().getBungeeGroups().containsKey(name)) {
                     sender.createLanguageMessage("command.create.bungeegroup.alreadyExists").replace("%name%", name).send();
                     return;
@@ -119,6 +127,11 @@ public class CommandCreate extends Command {
             break;
 
             case "minecraftgroup": {
+                if (args.length != 2) {
+                    sendHelp(sender);
+                    return;
+                }
+
                 if (PeepoCloudNode.getInstance().getMinecraftGroups().containsKey(name)) {
                     sender.createLanguageMessage("command.create.minecraftgroup.alreadyExists").replace("%name%", name).send();
                     return;
@@ -177,7 +190,31 @@ public class CommandCreate extends Command {
                     );
                     int maxServers = setup.getData().getInt("maxServers");
 
-                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers);
+                    setup.request(
+                            "startPort",
+                            PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.startPort.provide"),
+                            PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.startPort.invalid"),
+                            (IntegerSetupAcceptable) input -> input > 0 && input <= 65535
+                    );
+                    int startPort = setup.getData().getInt("startPort");
+
+                    setup.request(
+                            "maxPlayers",
+                            PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.maxPlayers.provide"),
+                            PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.maxPlayers.invalid"),
+                            (IntegerSetupAcceptable) input -> true
+                    );
+                    int maxPlayers = setup.getData().getInt("maxPlayers");
+
+                    setup.request(
+                            "motd",
+                            PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.motd.provide"),
+                            PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.motd.invalid"),
+                            (StringSetupAcceptable) input -> true
+                    );
+                    String motd = setup.getData().getString("motd");
+
+                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort);
 
                     PeepoCloudNode.getInstance().getGroupsConfig().createGroup(group, success -> {
                         if (success) {
@@ -202,7 +239,14 @@ public class CommandCreate extends Command {
             break;
 
             case "user": {
+                if (args.length != 3) {
+                    sendHelp(sender);
+                    return;
+                }
 
+                User user = new User(args[1], args[2], SystemUtils.randomString(32));
+                PeepoCloudNode.getInstance().getUserManager().addUser(user);
+                sender.sendMessage("&aUser successfully created, the API Token is: &e" + user.getApiToken());
             }
             break;
 
@@ -218,7 +262,7 @@ public class CommandCreate extends Command {
                 "create minecraftgroup <name>",
                 "create template <name>",
                 "create node <name>",
-                "create user <name>"
+                "create user <name> <password>"
         );
     }
 }

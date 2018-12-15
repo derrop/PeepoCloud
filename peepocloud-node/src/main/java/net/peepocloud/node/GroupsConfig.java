@@ -60,6 +60,16 @@ public class GroupsConfig {
         }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
     }
 
+    public void update(MinecraftGroup group) {
+        Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups");
+        database.update(group.getName(), new SimpleJsonObject(group));
+    }
+
+    public void update(BungeeGroup group) {
+        Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("bungeeGroups");
+        database.update(group.getName(), new SimpleJsonObject(group));
+    }
+
     private void doCreate(Consumer<Boolean> success, Database database, String name, JsonElement jsonElement) {
         database.contains(name, aBoolean -> {
             if (aBoolean) {

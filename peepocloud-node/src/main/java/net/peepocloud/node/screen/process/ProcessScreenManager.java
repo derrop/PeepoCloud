@@ -5,18 +5,45 @@ package net.peepocloud.node.screen.process;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.peepocloud.lib.network.NetworkParticipant;
+import net.peepocloud.node.network.packet.out.screen.PacketOutScreenLine;
 import net.peepocloud.node.screen.EnabledScreen;
 import net.peepocloud.node.server.process.CloudProcess;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 @Getter
 public class ProcessScreenManager {
 
-    //private ExecutorService executorService = Executors.newCachedThreadPool();
-    //private Map<String, LoadingScreen> screens = new HashMap<>();
+    private Map<CloudProcess, Collection<NetworkParticipant>> networkScreens = new ConcurrentHashMap<>();
+
+    public void enableNetworkScreen(CloudProcess process, NetworkParticipant node) {
+        if (!this.networkScreens.containsKey(process))
+            this.networkScreens.put(process, new ArrayList<>());
+        this.networkScreens.get(process).add(node);
+        Collection<NetworkParticipant> nodes = this.networkScreens.get(process);
+        process.getCachedLog().forEach(s -> node.sendPacket(new PacketOutScreenLine(process.getName(), s)));
+        if (process.getNetworkScreenHandler() == null) {
+            process.setNetworkScreenHandler(s -> nodes.forEach(networkParticipant -> networkParticipant.sendPacket(new PacketOutScreenLine(process.getName(), s))));
+        }
+    }
+
+    public void disableNetworkScreen(CloudProcess process, NetworkParticipant node) {
+        if (!this.networkScreens.containsKey(process)) {
+            process.setNetworkScreenHandler(null);
+            return;
+        }
+        this.networkScreens.get(process).remove(node);
+        if (this.networkScreens.get(process).isEmpty()) {
+            this.networkScreens.remove(process);
+            process.setNetworkScreenHandler(null);
+        }
+    }
 
     public EnabledScreen loadScreen(CloudProcess process, Consumer<String> consumer) {
         Preconditions.checkArgument(process.isRunning(), "process must be active to start a screen");
@@ -29,15 +56,6 @@ public class ProcessScreenManager {
                 process.dispatchCommand(line);
             }
         };
-        /*LoadingScreen screen;
-        if (this.screens.containsKey(process.getName())) {
-            screen = this.screens.get(process.getName());
-        } else {
-            screen = new LoadingScreen(process);
-            this.executorService.execute(screen);
-        }
-        screen.getConsumers().put(uniqueId, consumer);
-        return uniqueId;*/
     }
 
     public boolean disableScreen(CloudProcess process, UUID uniqueId) {
@@ -45,26 +63,11 @@ public class ProcessScreenManager {
             return false;
         process.getScreenHandlers().remove(uniqueId);
         return true;
-        /*if (!this.screens.containsKey(process.getName()))
-            return false;
-        LoadingScreen screen = this.screens.get(process.getName());
-        if (!screen.getConsumers().containsKey(uniqueId))
-            return false;
-        screen.getConsumers().remove(uniqueId);
-        if (screen.getConsumers().isEmpty()) {
-            screen.stop();
-            this.screens.remove(process.getName());
-        }
-        return true;*/
     }
 
     public boolean disableScreen(CloudProcess process) {
         process.getScreenHandlers().clear();
         return true;
-        /*if (!this.screens.containsKey(process.getName()))
-            return false;
-        this.screens.remove(process.getName());
-        return true;*/
     }
 
 }

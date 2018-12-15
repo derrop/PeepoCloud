@@ -14,6 +14,6 @@ public class CommandReload extends Command {
 
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
-        PeepoCloudNode.getInstance().reload();
+        PeepoCloudNode.getInstance().getExecutorService().execute(() -> PeepoCloudNode.getInstance().reload());
     }
 }

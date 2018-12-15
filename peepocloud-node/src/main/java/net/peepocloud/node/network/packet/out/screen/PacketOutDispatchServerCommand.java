@@ -8,7 +8,7 @@ import net.peepocloud.lib.network.packet.JsonPacket;
 
 public class PacketOutDispatchServerCommand extends JsonPacket {
     public PacketOutDispatchServerCommand(String componentName, String command) {
-        super(30);
+        super(31);
         this.setSimpleJsonObject(new SimpleJsonObject().append("componentName", componentName).append("command", command));
     }
 }

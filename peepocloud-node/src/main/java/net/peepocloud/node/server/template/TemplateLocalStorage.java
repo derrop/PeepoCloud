@@ -21,7 +21,11 @@ public class TemplateLocalStorage extends TemplateStorage {
     @Override
     public void copy(String group, Template template, Path target) {
         Path dir = Paths.get("templates/" + group + "/" + template.getName());
-        SystemUtils.copyDirectory(dir, target.toString());
+        if (!Files.exists(dir)) {
+            this.create(group, template);
+        } else {
+            SystemUtils.copyDirectory(dir, target.toString());
+        }
     }
 
     @Override

@@ -7,11 +7,13 @@ import com.sun.management.OperatingSystemMXBean;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import net.md_5.bungee.config.Configuration;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.config.yaml.YamlConfigurable;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.lib.utility.network.NetworkAddress;
+import net.peepocloud.node.network.ConnectableNode;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,8 +25,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 @Getter
 @ToString
@@ -37,7 +41,7 @@ public class CloudConfig {
     private final Path credentialsPath = Paths.get("credentials.yml");
 
     //Network
-    private Collection<NetworkAddress> connectableNodes;
+    private Collection<ConnectableNode> connectableNodes;
     private String nodeName;
     private NetworkAddress host;
 
@@ -47,8 +51,6 @@ public class CloudConfig {
     //Process
     private String bungeeStartCmd;
     private String serverStartCmd;
-
-    private int startPort;
 
     //Credentials
     private String username;
@@ -130,14 +132,12 @@ public class CloudConfig {
             configurable = new YamlConfigurable()
                     .append("autoUpdate", true)
                     .append("maxMemoryForServers", ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize() / 1024 / 1024 - 2048)
-                    .append("disableGlobalStats", !gStats)
-                    .append("startPort", 41352);
+                    .append("disableGlobalStats", !gStats);
             configurable.saveAsFile(mainPath);
         }
 
         this.autoUpdate = configurable.getBoolean("autoUpdate");
         this.useGlobalStats = !configurable.getBoolean("disableGlobalStats");
-        this.startPort = configurable.getInt("startPort");
 
         this.maxMemory = configurable.getInt("maxMemoryForServers");
         this.maxMemory = this.maxMemory >= 64 ? this.maxMemory : this.maxMemory * 1024; //>= 64 = gb; < 64 = mb
@@ -153,7 +153,7 @@ public class CloudConfig {
             configurable = YamlConfigurable.load(networkPath);
         } else {
             configurable = new YamlConfigurable()
-                    .append("nodes", Arrays.asList(new NetworkAddress("host", 1234)))
+                    .append("nodes", Arrays.asList(new YamlConfigurable().append("name", "Node-2").append("host", "host").append("port", 1234).asConfiguration()))
                     .append("host", new NetworkAddress(PeepoCloudNode.getInstance().getLocalAddress(), 2580))
                     .append("nodeName", "Node-1");
             configurable.saveAsFile(networkPath);
@@ -161,7 +161,29 @@ public class CloudConfig {
 
         this.nodeName = configurable.getString("nodeName");
 
-        this.connectableNodes = (Collection<NetworkAddress>) configurable.get("nodes");
+        this.connectableNodes = new ArrayList<>();
+        for (Object object : (Collection) configurable.get("nodes")) {
+            YamlConfigurable yamlConfigurable;
+            if (object instanceof Configuration) {
+                yamlConfigurable = new YamlConfigurable((Configuration) object);
+            } else if (object instanceof Map) {
+                Configuration configuration = new Configuration();
+                configuration.self = (Map<String, Object>) object;
+                yamlConfigurable = new YamlConfigurable(configuration);
+            } else {
+                continue;
+            }
+
+            this.connectableNodes.add(
+                    new ConnectableNode(
+                            yamlConfigurable.getString("name"),
+                            new NetworkAddress(
+                                    yamlConfigurable.getString("host"),
+                                    yamlConfigurable.getInt("port")
+                            )
+                    )
+            );
+        }
         this.host = (NetworkAddress) configurable.get("host");
     }
 

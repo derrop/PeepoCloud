@@ -4,10 +4,10 @@ package net.peepocloud.node.screen.network;
  */
 
 import lombok.Getter;
+import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.network.packet.out.screen.NetworkScreen;
 import net.peepocloud.node.network.packet.out.screen.PacketOutDispatchProxyCommand;
 import net.peepocloud.node.network.packet.out.screen.PacketOutDispatchServerCommand;
 import net.peepocloud.node.network.packet.out.screen.PacketOutToggleScreen;
@@ -81,6 +81,15 @@ public class NetworkScreenManager {
         return this.disableScreen(enabledScreen.getComponentName(), enabledScreen.getUniqueId());
     }
 
+    public boolean disableScreen(String componentName) {
+        NetworkScreen screen = this.screens.get(componentName);
+        if (screen == null)
+            return false;
+        screen.getParticipant().sendPacket(new PacketOutToggleScreen(componentName, false));
+        this.screens.remove(componentName);
+        return true;
+    }
+
     public void handleNodeDisconnect(NodeParticipant participant) {
         new HashMap<>(this.screens).forEach((s, networkScreen) -> { //prevent ConcurrentModificationException
             if (networkScreen.getParticipant().equals(participant)) {
@@ -89,11 +98,11 @@ public class NetworkScreenManager {
         });
     }
 
-    public void dispatchScreenInput(NodeParticipant participant, String name, String line) {
+    public void dispatchScreenInput(NetworkParticipant node, String name, String line) {
         if (line == null)
             return;
         if (!this.screens.containsKey(name)) {
-            participant.sendPacket(new PacketOutToggleScreen(name, false));
+            node.sendPacket(new PacketOutToggleScreen(name, false));
             return;
         }
 

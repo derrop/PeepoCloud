@@ -43,12 +43,6 @@ public class ServerQueue implements Runnable {
     }
 
     public void queueProcess(CloudProcess process, boolean priorityHigh) {
-        if (process instanceof BungeeProcess) {
-            PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeQueuedEvent((BungeeProcess) process, ((BungeeProcess) process).getProxyInfo()));
-        } else if (process instanceof ServerProcess){
-            PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerQueuedEvent((ServerProcess) process, ((ServerProcess) process).getServerInfo()));
-        }
-
         if (priorityHigh) {
             this.serverProcesses.offerFirst(process);
         } else {
@@ -56,6 +50,12 @@ public class ServerQueue implements Runnable {
         }
 
         System.out.println("&aServer process queued [" + process + "]");
+
+        if (process instanceof BungeeProcess) {
+            PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeQueuedEvent((BungeeProcess) process, ((BungeeProcess) process).getProxyInfo()));
+        } else if (process instanceof ServerProcess){
+            PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerQueuedEvent((ServerProcess) process, ((ServerProcess) process).getServerInfo()));
+        }
     }
 
     public int getMemoryNeededForProcessesInQueue() {

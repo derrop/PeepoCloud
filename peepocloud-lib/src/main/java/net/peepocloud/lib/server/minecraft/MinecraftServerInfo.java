@@ -23,6 +23,13 @@ public class MinecraftServerInfo {
     private String host;
     private int port;
 
+    @Setter
+    private int maxPlayers;
+    @Setter
+    private String motd;
+    @Setter
+    private MinecraftState state;
+
     private Map<UUID, String> players;
 
     private Template template;
