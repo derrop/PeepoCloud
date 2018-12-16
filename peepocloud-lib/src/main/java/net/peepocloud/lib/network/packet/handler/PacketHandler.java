@@ -5,12 +5,18 @@ import net.peepocloud.lib.network.packet.Packet;
 
 import java.util.function.Consumer;
 
-public interface PacketHandler {
+public interface PacketHandler<P extends Packet> {
 
     int getId();
 
-    Class<? extends Packet> getPacketClass();
+    Class<P> getPacketClass();
 
-    void handlePacket(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> queryResponse);
+    default void handleInternal(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> queryResponse) {
+        if(packet.getClass().equals(this.getPacketClass()))
+            this.handlePacket(networkParticipant, (P) packet, queryResponse);
+    }
+
+    void handlePacket(NetworkParticipant networkParticipant, P packet, Consumer<Packet> queryResponse);
+
 
 }

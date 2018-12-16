@@ -1,7 +1,5 @@
 package net.peepocloud.lib.network.packet;
 
-import com.google.common.io.ByteArrayDataOutput;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.util.UUID;

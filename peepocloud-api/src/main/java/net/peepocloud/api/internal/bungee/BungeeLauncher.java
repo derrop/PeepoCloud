@@ -13,6 +13,5 @@ public class BungeeLauncher extends Plugin  {
 
     @Override
     public void onDisable() {
-        this.bungeeAPI.shutdown();
     }
 }

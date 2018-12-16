@@ -9,18 +9,14 @@ import net.peepocloud.lib.network.packet.Packet;
 
 import java.util.function.Consumer;
 
-public abstract class JsonPacketHandler implements PacketHandler {
-    @Override
-    public final void handlePacket(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> queryResponse) {
-        if (!(packet instanceof JsonPacket))
-            return;
-        handlePacket(networkParticipant, (JsonPacket) packet, queryResponse);
-    }
+public abstract class JsonPacketHandler implements PacketHandler<JsonPacket> {
 
     @Override
-    public Class<? extends Packet> getPacketClass() {
+    public abstract void handlePacket(NetworkParticipant networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse);
+
+    @Override
+    public Class<JsonPacket> getPacketClass() {
         return JsonPacket.class;
     }
 
-    public abstract void handlePacket(NetworkParticipant networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse);
 }

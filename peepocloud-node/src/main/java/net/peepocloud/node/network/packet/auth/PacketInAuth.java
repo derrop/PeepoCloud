@@ -20,7 +20,7 @@ public class PacketInAuth extends JsonPacket {
     }
 
     @AllArgsConstructor
-    public static class NetworkAuthHandler implements PacketHandler {
+    public static class NetworkAuthHandler implements PacketHandler<PacketInAuth> {
 
         private NetworkServer networkServer;
 
@@ -30,17 +30,13 @@ public class PacketInAuth extends JsonPacket {
         }
 
         @Override
-        public Class<? extends Packet> getPacketClass() {
+        public Class<PacketInAuth> getPacketClass() {
             return PacketInAuth.class;
         }
 
         @Override
-        public void handlePacket(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> queryResponse) {
-            if (!(packet instanceof PacketInAuth)) {
-                networkParticipant.getChannel().close();
-                return;
-            }
-            SimpleJsonObject jsonObject = ((PacketInAuth) packet).getSimpleJsonObject();
+        public void handlePacket(NetworkParticipant networkParticipant, PacketInAuth packet, Consumer<Packet> queryResponse) {
+            SimpleJsonObject jsonObject = packet.getSimpleJsonObject();
             if (jsonObject == null)
                 return;
             Auth auth = SimpleJsonObject.GSON.fromJson(jsonObject.asJsonObject(), Auth.class);

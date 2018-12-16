@@ -13,6 +13,6 @@ public class BukkitLauncher extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        this.bukkitAPI.shutdown();
+
     }
 }
