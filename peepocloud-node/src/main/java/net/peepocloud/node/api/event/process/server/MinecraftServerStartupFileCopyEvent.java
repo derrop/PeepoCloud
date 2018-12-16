@@ -4,7 +4,7 @@ package net.peepocloud.node.api.event.process.server;
  */
 
 import lombok.*;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.api.event.process.ProcessEvent;
 import net.peepocloud.node.server.process.CloudProcess;
 

@@ -5,7 +5,7 @@ package net.peepocloud.node.api.event.process.bungee;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.node.api.event.process.ProcessEvent;
 import net.peepocloud.node.server.process.CloudProcess;
 

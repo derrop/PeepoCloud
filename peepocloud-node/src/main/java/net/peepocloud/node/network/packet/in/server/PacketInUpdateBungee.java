@@ -7,12 +7,10 @@ import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
-import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.server.process.BungeeProcess;
 import net.peepocloud.node.server.process.CloudProcess;
-import net.peepocloud.node.server.process.ServerProcess;
 
 import java.util.function.Consumer;
 

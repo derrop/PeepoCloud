@@ -3,9 +3,8 @@ package net.peepocloud.node.server.process.handler;
  * Created by Mc_Ruben on 27.11.2018
  */
 
-import net.peepocloud.lib.network.NetworkParticipant;
-import net.peepocloud.lib.server.bungee.BungeeGroup;
-import net.peepocloud.lib.server.minecraft.MinecraftGroup;
+import net.peepocloud.api.server.bungee.BungeeGroup;
+import net.peepocloud.api.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 

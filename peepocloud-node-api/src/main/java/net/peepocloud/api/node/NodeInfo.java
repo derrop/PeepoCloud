@@ -1,4 +1,4 @@
-package net.peepocloud.lib.node;
+package net.peepocloud.api.node;
 /*
  * Created by Mc_Ruben on 14.11.2018
  */

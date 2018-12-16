@@ -7,6 +7,8 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import jline.console.ConsoleReader;
 import lombok.Getter;
+import net.peepocloud.api.PeepoAPI;
+import net.peepocloud.api.server.Template;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
@@ -15,13 +17,12 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
-import net.peepocloud.lib.node.NodeInfo;
-import net.peepocloud.lib.server.Template;
-import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.lib.server.bungee.BungeeGroup;
-import net.peepocloud.lib.server.minecraft.MinecraftGroup;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.lib.server.minecraft.MinecraftState;
+import net.peepocloud.api.node.NodeInfo;
+import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.api.server.bungee.BungeeGroup;
+import net.peepocloud.api.server.minecraft.MinecraftGroup;
+import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.server.minecraft.MinecraftState;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.addon.AddonManager;
 import net.peepocloud.node.addon.defaults.DefaultAddonManager;
@@ -82,7 +83,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Getter
-public class PeepoCloudNode {
+public class PeepoCloudNode extends PeepoAPI {
 
     @Getter
     private static PeepoCloudNode instance;
@@ -202,6 +203,8 @@ public class PeepoCloudNode {
     PeepoCloudNode() throws IOException {
         Preconditions.checkArgument(instance == null, "instance is already defined");
         instance = this;
+
+        PeepoAPI.setInstance(this);
 
         try {
             Field field = Charset.class.getDeclaredField("defaultCharset");
@@ -333,6 +336,11 @@ public class PeepoCloudNode {
         this.logger.debug("Registered " + this.packetManager.getRegisteredPackets().size() + " packet handlers");
     }
 
+    @Override
+    public boolean isNode() {
+        return true;
+    }
+
     private void initCommands(CommandManager commandManager) {
         commandManager.registerCommands(
                 new CommandHelp(),
@@ -462,10 +470,6 @@ public class PeepoCloudNode {
         return this.cloudConfig.getUniqueId();
     }
 
-    /**
-     * Gets the max memory of all nodes in the network
-     * @return the memory of all nodes in the network
-     */
     public int getMaxMemory() {
         int maxMemory = this.cloudConfig.getMaxMemory();
         for (ClientNode value : this.connectedNodes.values()) {
@@ -475,10 +479,6 @@ public class PeepoCloudNode {
         return maxMemory;
     }
 
-    /**
-     * Gets the memory used by all servers/proxies in the network
-     * @return the memory of all servers/proxies in the network
-     */
     public int getMemoryUsed() {
         int used = this.getMemoryUsedOnThisInstance();
         for (ClientNode value : this.connectedNodes.values()) {
@@ -791,10 +791,6 @@ public class PeepoCloudNode {
         return best;
     }
 
-    /**
-     * Gets all {@link MinecraftServerInfo}'s of the running and starting servers in the network (on all nodes)
-     * @return an {@link ArrayList} with all infos of the servers in the network
-     */
     public Collection<MinecraftServerInfo> getMinecraftServers() {
         Collection<MinecraftServerInfo> serverInfos = new ArrayList<>();
         this.processManager.getProcesses().values().forEach(process -> {
@@ -809,11 +805,6 @@ public class PeepoCloudNode {
         return serverInfos;
     }
 
-    /**
-     * Gets all {@link MinecraftServerInfo}'s which are from the group specified in the parameters of the running and starting servers in the network (on all nodes)
-     * @param group the name of the group
-     * @return an {@link ArrayList} with all infos of the servers in the network from the group {@code group}
-     */
     public Collection<MinecraftServerInfo> getMinecraftServers(String group) {
         Collection<MinecraftServerInfo> serverInfos = new ArrayList<>();
         this.processManager.getProcesses().values().forEach(process -> {
@@ -836,10 +827,6 @@ public class PeepoCloudNode {
         return serverInfos;
     }
 
-    /**
-     * Gets all {@link MinecraftServerInfo}'s of the starting servers in the network (on all nodes)
-     * @return an {@link ArrayList} with all infos of the starting servers in the network
-     */
     public Collection<MinecraftServerInfo> getStartedMinecraftServers() {
         Collection<MinecraftServerInfo> participants = new ArrayList<>();
         for (MinecraftServerParticipant value : this.serversOnThisNode.values()) {
@@ -851,11 +838,6 @@ public class PeepoCloudNode {
         return participants;
     }
 
-    /**
-     * Gets all {@link MinecraftServerInfo}'s which are from the group specified in the parameters of the starting servers in the network (on all nodes)
-     * @param group the name of the group
-     * @return an {@link ArrayList} with all infos of the starting servers in the network from the group {@code group}
-     */
     public Collection<MinecraftServerInfo> getStartedMinecraftServers(String group) {
         Collection<MinecraftServerInfo> participants = new ArrayList<>();
         for (MinecraftServerParticipant value : this.serversOnThisNode.values()) {
@@ -873,10 +855,6 @@ public class PeepoCloudNode {
         return participants;
     }
 
-    /**
-     * Gets all {@link BungeeCordProxyInfo}'s of the running and starting proxies in the network (on all nodes)
-     * @return an {@link ArrayList} with all infos of the proxies in the network
-     */
     public Collection<BungeeCordProxyInfo> getBungeeProxies() {
         Collection<BungeeCordProxyInfo> serverInfos = new ArrayList<>();
         this.processManager.getProcesses().values().forEach(process -> {
@@ -891,11 +869,6 @@ public class PeepoCloudNode {
         return serverInfos;
     }
 
-    /**
-     * Gets all {@link BungeeCordProxyInfo}'s which are from the group specified in the parameters of the running and starting proxies in the network (on all nodes)
-     * @param group the name of the group
-     * @return an {@link ArrayList} with all infos of the servers in the network from the group {@code group}
-     */
     public Collection<BungeeCordProxyInfo> getBungeeProxies(String group) {
         Collection<BungeeCordProxyInfo> serverInfos = new ArrayList<>();
         this.processManager.getProcesses().values().forEach(process -> {
@@ -918,10 +891,6 @@ public class PeepoCloudNode {
         return serverInfos;
     }
 
-    /**
-     * Gets all {@link BungeeCordProxyInfo}'s of the starting proxies in the network (on all nodes)
-     * @return an {@link ArrayList} with all infos of the starting proxies in the network
-     */
     public Collection<BungeeCordProxyInfo> getStartedBungeeProxies() {
         Collection<BungeeCordProxyInfo> participants = new ArrayList<>();
         for (BungeeCordParticipant value : this.proxiesOnThisNode.values()) {
@@ -933,11 +902,6 @@ public class PeepoCloudNode {
         return participants;
     }
 
-    /**
-     * Gets all {@link BungeeCordProxyInfo}'s which are from the group specified in the parameters of the starting proxies in the network (on all nodes)
-     * @param group the name of the group
-     * @return an {@link ArrayList} with all infos of the starting proxies in the network from the group {@code group}
-     */
     public Collection<BungeeCordProxyInfo> getStartedBungeeProxies(String group) {
         Collection<BungeeCordProxyInfo> participants = new ArrayList<>();
         for (BungeeCordParticipant value : this.proxiesOnThisNode.values()) {
@@ -1134,6 +1098,26 @@ public class PeepoCloudNode {
 
             channel.startMinecraftServer(serverInfo);
         }
+    }
+
+    @Override
+    public void stopBungeeProxy(String name) {
+        //TODO
+    }
+
+    @Override
+    public void stopBungeeProxy(BungeeCordProxyInfo proxyInfo) {
+//TODO
+    }
+
+    @Override
+    public void stopMinecraftServer(String name) {
+//TODO
+    }
+
+    @Override
+    public void stopMinecraftServer(MinecraftServerInfo serverInfo) {
+//TODO
     }
 
     public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group) {

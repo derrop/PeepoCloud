@@ -3,8 +3,8 @@ package net.peepocloud.node.command.defaults;
  * Created by Mc_Ruben on 27.11.2018
  */
 
-import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.command.Command;
 import net.peepocloud.node.command.CommandSender;

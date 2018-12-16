@@ -7,7 +7,7 @@ import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
-import net.peepocloud.lib.server.bungee.BungeeGroup;
+import net.peepocloud.api.server.bungee.BungeeGroup;
 import net.peepocloud.node.PeepoCloudNode;
 
 import java.util.function.Consumer;

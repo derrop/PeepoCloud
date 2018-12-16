@@ -9,9 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
-import net.peepocloud.lib.node.NodeInfo;
-import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.node.NodeInfo;
+import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.network.packet.out.server.PacketOutStartBungee;
 import net.peepocloud.node.network.packet.out.server.PacketOutStartServer;
 

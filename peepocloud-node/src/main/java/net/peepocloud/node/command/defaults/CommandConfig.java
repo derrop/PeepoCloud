@@ -3,9 +3,9 @@ package net.peepocloud.node.command.defaults;
  * Created by Mc_Ruben on 08.12.2018
  */
 
-import net.peepocloud.lib.server.GroupMode;
-import net.peepocloud.lib.server.bungee.BungeeGroup;
-import net.peepocloud.lib.server.minecraft.MinecraftGroup;
+import net.peepocloud.api.server.GroupMode;
+import net.peepocloud.api.server.bungee.BungeeGroup;
+import net.peepocloud.api.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.command.Command;

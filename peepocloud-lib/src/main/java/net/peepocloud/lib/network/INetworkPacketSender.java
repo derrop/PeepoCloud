@@ -11,6 +11,8 @@ import java.nio.file.Path;
 
 public interface INetworkPacketSender {
 
+    String getName();
+
     void sendPacket(Packet packet);
 
     default void sendFile(int packetId, File file) {

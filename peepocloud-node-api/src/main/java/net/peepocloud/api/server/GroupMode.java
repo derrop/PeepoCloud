@@ -1,4 +1,4 @@
-package net.peepocloud.lib.server;
+package net.peepocloud.api.server;
 /*
  * Created by Mc_Ruben on 23.11.2018
  */
