@@ -13,6 +13,7 @@ import net.peepocloud.node.PeepoCloudNode;
 import java.util.function.Consumer;
 
 public class PacketInCreateBungeeGroup extends JsonPacketHandler {
+
     @Override
     public void handlePacket(NetworkParticipant networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
         BungeeGroup group = packet.getSimpleJsonObject().getObject("group", BungeeGroup.class);

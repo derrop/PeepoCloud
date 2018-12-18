@@ -126,7 +126,7 @@ public class DatabaseLoader { //TODO implement languagesystem
     }
 
     public DatabaseConfig loadConfig(DatabaseManager databaseManager) {
-        DatabaseConfig config = null;
+        DatabaseConfig config;
 
         Path path = Paths.get("database.yml");
         if (Files.exists(path)) {

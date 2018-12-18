@@ -9,7 +9,7 @@ import net.peepocloud.lib.network.packet.Packet;
 import java.io.File;
 import java.nio.file.Path;
 
-public interface INetworkPacketSender {
+public interface NetworkPacketSender {
 
     String getName();
 

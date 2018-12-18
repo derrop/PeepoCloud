@@ -7,19 +7,24 @@ import net.peepocloud.lib.network.packet.handler.PacketHandler;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 public class PacketManager {
     private Map<Integer, PacketInfo> registeredPackets = new HashMap<>();
-    private Map<UUID, Consumer<Packet>> pendingQueries = new HashMap<>();
+    private Map<UUID, CompletableFuture<Packet>> pendingQueries = new HashMap<>();
 
     public void registerPacket(PacketInfo packetInfo) {
         this.registeredPackets.put(packetInfo.getId(), packetInfo);
     }
 
-    public void registerPacket(PacketHandler handler) {
+    public void registerPacket(PacketHandler<? extends Packet> handler) {
         this.registerPacket(new PacketInfo(handler.getId(), handler.getPacketClass(), handler));
     }
 
@@ -41,49 +46,39 @@ public class PacketManager {
     }
 
     /**
-     * Sends a query and accepts the {@code result} when the value is available
+     * Sends a query and completes the future when the value is available
      *
      * @param networkParticipant the participant in the network, where the packet will be send to
      * @param packet the query-packet
-     * @param result result-packet of the query
+     * @return future for the packet
      */
 
-    public void packetQueryAsync(NetworkParticipant networkParticipant, Packet packet, Consumer<Packet> result) {
+    public CompletableFuture<Packet> packetQueryAsync(NetworkParticipant networkParticipant, Packet packet) {
+        this.convertToQueryPacket(packet, UUID.randomUUID());
         networkParticipant.sendPacket(packet);
-        this.pendingQueries.put(packet.getQueryUUID(), result);
+        CompletableFuture<Packet> future = new CompletableFuture<>();
+        this.pendingQueries.put(packet.getQueryUUID(), future);
+        return future;
     }
 
     /**
-     * Sends a query and waits for the result
+     * Sends a query and waits for the result up to 6 seconds
      *
      * @param networkParticipant the participant in the network, where the packet will be send to
      * @param packet the query-packet
-     * @return the result-packet of the query
+     * @return the result-packet of the query or null
      */
 
     public Packet packetQuery(NetworkParticipant networkParticipant, Packet packet) {
-        AtomicReference<Packet> reference = new AtomicReference<>();
-        Object lock = new Object();
-
-        this.packetQueryAsync(networkParticipant, packet, result -> {
-            reference.set(result);
-            synchronized (lock) {
-                lock.notify();
-            }
-        });
-
         try {
-            synchronized (lock) {
-                lock.wait(TimeUnit.SECONDS.toMillis(6));
-            }
-        } catch (InterruptedException e) {
+            return this.packetQueryAsync(networkParticipant, packet).get(6, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
+            return null;
         }
-
-        return reference.get();
     }
 
-    public Consumer<Packet> getQueryAndRemove(UUID uuid) {
+    public CompletableFuture<Packet> getQueryAndRemove(UUID uuid) {
         return this.pendingQueries.remove(uuid);
     }
 

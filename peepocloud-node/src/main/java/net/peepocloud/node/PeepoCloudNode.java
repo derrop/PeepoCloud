@@ -23,6 +23,7 @@ import net.peepocloud.api.server.bungee.BungeeGroup;
 import net.peepocloud.api.server.minecraft.MinecraftGroup;
 import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.api.server.minecraft.MinecraftState;
+import net.peepocloud.lib.scheduler.Scheduler;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.addon.AddonManager;
 import net.peepocloud.node.addon.defaults.DefaultAddonManager;
@@ -87,6 +88,8 @@ public class PeepoCloudNode extends PeepoAPI {
 
     @Getter
     private static PeepoCloudNode instance;
+
+    private Scheduler scheduler;
 
     private ColoredLogger logger;
     private CommandManager commandManager;
@@ -204,13 +207,18 @@ public class PeepoCloudNode extends PeepoAPI {
         Preconditions.checkArgument(instance == null, "instance is already defined");
         instance = this;
 
+
         PeepoAPI.setInstance(this);
+
+        this.scheduler = new Scheduler();
+        this.executorService.execute(this.scheduler);
 
         try {
             Field field = Charset.class.getDeclaredField("defaultCharset");
             field.setAccessible(true);
             field.set(null, StandardCharsets.UTF_8);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException exception) {
+            System.err.println("Failed to set default charset");
         }
 
         ConsoleReader consoleReader = new ConsoleReader(System.in, System.out);
@@ -288,19 +296,11 @@ public class PeepoCloudNode extends PeepoAPI {
 
         this.installUpdatesSync(this.commandManager.getConsole());
 
-        this.executorService.execute(() -> {
-            Thread thread = Thread.currentThread();
-            while (!thread.isInterrupted()) {
-                try {
-                    Thread.sleep(1500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                this.nodeInfo.setUsedMemory(this.getMemoryUsedOnThisInstance());
-                this.nodeInfo.setCpuUsage(SystemUtils.cpuUsageProcess());
-                this.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
-            }
-        });
+        this.scheduler.repeat(() -> {
+            this.nodeInfo.setUsedMemory(this.getMemoryUsedOnThisInstance());
+            this.nodeInfo.setCpuUsage(SystemUtils.cpuUsageProcess());
+            this.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
+        }, 10, 30, false);
 
         this.minecraftGroups = this.groupsConfig.loadMinecraftGroups();
         this.bungeeGroups = this.groupsConfig.loadBungeeGroups();
@@ -1107,17 +1107,17 @@ public class PeepoCloudNode extends PeepoAPI {
 
     @Override
     public void stopBungeeProxy(BungeeCordProxyInfo proxyInfo) {
-//TODO
+        //TODO
     }
 
     @Override
     public void stopMinecraftServer(String name) {
-//TODO
+        //TODO
     }
 
     @Override
     public void stopMinecraftServer(MinecraftServerInfo serverInfo) {
-//TODO
+        //TODO
     }
 
     public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group) {
@@ -1225,10 +1225,10 @@ public class PeepoCloudNode extends PeepoAPI {
     }
 
     /**
-     * Gets all ports binded by the servers/proxies of this Node
-     * @return a collection with all binded ports
+     * Gets all ports bound by the servers/proxies of this Node
+     * @return a collection with all bound ports
      */
-    public Collection<Integer> getBindedPorts() {
+    public Collection<Integer> getBoundPorts() {
         Collection<Integer> a = this.processManager.getProcesses().values().stream().map(CloudProcess::getPort).collect(Collectors.toList());
         for (CloudProcess serverProcess : this.processManager.getServerQueue().getServerProcesses()) {
             a.add(serverProcess.getPort());
@@ -1237,9 +1237,9 @@ public class PeepoCloudNode extends PeepoAPI {
     }
 
     private int findServerPort(MinecraftGroup group) {
-        Collection<Integer> bindedPorts = this.getBindedPorts();
+        Collection<Integer> boundPorts = this.getBoundPorts();
         int port = group.getStartPort();
-        while (bindedPorts.contains(port)) {
+        while (boundPorts.contains(port)) {
             port += ThreadLocalRandom.current().nextInt(15);
         }
         return port;

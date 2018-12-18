@@ -5,7 +5,7 @@ import net.peepocloud.lib.network.packet.Packet;
 
 import java.net.InetSocketAddress;
 
-public class NetworkParticipant implements INetworkPacketSender {
+public class NetworkParticipant implements NetworkPacketSender {
     private String name;
     protected Channel channel;
     protected long connectedAt;
