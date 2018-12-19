@@ -3,8 +3,8 @@ package net.peepocloud.node.network.packet.out.screen;
  * Created by Mc_Ruben on 12.12.2018
  */
 
-import net.peepocloud.lib.config.json.SimpleJsonObject;
-import net.peepocloud.lib.network.packet.JsonPacket;
+import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.api.network.packet.JsonPacket;
 
 public class PacketOutScreenLine extends JsonPacket {
     public PacketOutScreenLine(int id) {

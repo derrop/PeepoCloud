@@ -42,7 +42,7 @@ public class MinecraftServerInfo {
         return PeepoAPI.getInstance().getMinecraftGroup(this.groupName);
     }
 
-    public void stop() {
+    public void shutdown() {
         PeepoAPI.getInstance().stopMinecraftServer(this);
     }
 

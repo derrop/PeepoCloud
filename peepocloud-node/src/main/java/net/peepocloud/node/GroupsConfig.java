@@ -4,7 +4,7 @@ package net.peepocloud.node;
  */
 
 import com.google.gson.JsonElement;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.commons.config.json.SimpleJsonObject;
 import net.peepocloud.api.server.bungee.BungeeGroup;
 import net.peepocloud.api.server.minecraft.MinecraftGroup;
 import net.peepocloud.node.database.Database;

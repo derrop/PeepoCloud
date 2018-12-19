@@ -14,7 +14,7 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.PacketOutAuth;
-import net.peepocloud.lib.network.packet.PacketManager;
+import net.peepocloud.api.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.coding.PacketDecoder;
 import net.peepocloud.lib.network.packet.coding.PacketEncoder;
 import net.peepocloud.lib.network.packet.handler.ChannelHandler;

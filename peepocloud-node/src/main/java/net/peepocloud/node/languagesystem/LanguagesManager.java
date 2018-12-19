@@ -8,8 +8,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import lombok.*;
 import net.md_5.bungee.http.HttpClient;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
-import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.commons.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 
 import java.io.IOException;

@@ -5,12 +5,14 @@ package net.peepocloud.node.server.process.handler;
 
 import net.peepocloud.api.server.bungee.BungeeGroup;
 import net.peepocloud.api.server.minecraft.MinecraftGroup;
-import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.commons.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 
 public class ProcessStartupHandler implements Runnable {
     @Override
     public void run() {
+        SystemUtils.sleepUninterruptedly(3000);
+
         while (!Thread.interrupted() && PeepoCloudNode.getInstance().isRunning()) {
             if (!PeepoCloudNode.getInstance().getNetworkServer().isSelfNodeCore()) {
                 SystemUtils.sleepUninterruptedly(2000);

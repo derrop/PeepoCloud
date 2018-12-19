@@ -21,8 +21,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import lombok.Getter;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
-import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.commons.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.websocket.server.WebSocket;
 

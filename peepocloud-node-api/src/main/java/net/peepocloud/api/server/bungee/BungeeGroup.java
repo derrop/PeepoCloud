@@ -70,4 +70,9 @@ public class BungeeGroup {
     public void startBungeeProxy(BungeeCordProxyInfo proxyInfo) {
         PeepoAPI.getInstance().startBungeeProxy(proxyInfo);
     }
+
+    public void shutdown() {
+        PeepoAPI.getInstance().stopBungeeGroup(this);
+    }
+
 }

@@ -5,11 +5,13 @@ package net.peepocloud.api;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.peepocloud.api.event.EventManager;
 import net.peepocloud.api.node.NodeInfo;
 import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.api.server.bungee.BungeeGroup;
 import net.peepocloud.api.server.minecraft.MinecraftGroup;
 import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.users.UserManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -91,11 +93,27 @@ public abstract class PeepoAPI {
 
     public abstract void stopBungeeProxy(String name);
 
-    public abstract void stopBungeeProxy(BungeeCordProxyInfo proxyInfo);
+    public void stopBungeeProxy(BungeeCordProxyInfo proxyInfo) {
+        this.stopBungeeProxy(proxyInfo.getComponentName());
+    }
 
     public abstract void stopMinecraftServer(String name);
 
-    public abstract void stopMinecraftServer(MinecraftServerInfo serverInfo);
+    public void stopMinecraftServer(MinecraftServerInfo serverInfo) {
+        this.stopMinecraftServer(serverInfo.getComponentName());
+    }
+
+    public abstract void stopBungeeGroup(String name);
+
+    public void stopBungeeGroup(BungeeGroup group) {
+        this.stopBungeeGroup(group.getName());
+    }
+
+    public abstract void stopMinecraftGroup(String name);
+
+    public void stopMinecraftGroup(MinecraftGroup group) {
+        this.stopMinecraftGroup(group.getName());
+    }
 
     /**
      * Gets all {@link BungeeCordProxyInfo}'s which are from the group specified in the parameters of the starting proxies in the network (on all nodes)
@@ -157,12 +175,30 @@ public abstract class PeepoAPI {
      */
     public abstract Collection<MinecraftServerInfo> getMinecraftServers(String group);
 
+    public abstract Collection<NodeInfo> getNodeInfos();
+
     /**
      * Gets the best {@link NodeInfo} of a node in the network sorted by their memory usage, it must have the given {@code memoryNeeded} memory free
+     *
      * @param memoryNeeded the memory the node needs that it can be the best
      * @return the best {@link NodeInfo} in the network sorted by the memory which has {@code memoryNeeded} free memory, or null if no node in the network has the {@code memoryNeeded} free
      */
-    public abstract NodeInfo getBestNodeInfo(int memoryNeeded);
+    public NodeInfo getBestNodeInfo(int memoryNeeded) {
+        NodeInfo best = null;
+        Collection<NodeInfo> infos = getNodeInfos();
+        for (NodeInfo value : infos) {
+            if (value != null && value.getMaxMemory() - value.getUsedMemory() >= memoryNeeded) {
+                if (best == null) {
+                    best = value;
+                } else {
+                    if (value.getUsedMemory() < best.getUsedMemory()) {
+                        best = value;
+                    }
+                }
+            }
+        }
+        return best;
+    }
 
     public abstract void updateProxyInfo(BungeeCordProxyInfo proxyInfo);
 
@@ -185,5 +221,19 @@ public abstract class PeepoAPI {
      * @return the memory of all nodes in the network
      */
     public abstract int getMaxMemory();
+
+    /**
+     * Gets the {@link EventManager} instance of this API
+     *
+     * @return the instance of {@link EventManager} in this API instance
+     */
+    public abstract EventManager getEventManager();
+
+    /**
+     * Gets the {@link UserManager} instance of this API
+     *
+     * @return the instance of {@link UserManager} in this API instance
+     */
+    public abstract UserManager getUserManager();
 
 }

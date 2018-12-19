@@ -4,7 +4,7 @@ package net.peepocloud.node.api.event.process.server;
  */
 
 import lombok.Getter;
-import net.peepocloud.lib.config.Configurable;
+import net.peepocloud.commons.config.Configurable;
 import net.peepocloud.node.api.event.process.ProcessEvent;
 import net.peepocloud.node.server.process.CloudProcess;
 

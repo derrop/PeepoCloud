@@ -35,7 +35,7 @@ public class BungeeCordProxyInfo {
         return PeepoAPI.getInstance().getBungeeGroup(this.groupName);
     }
 
-    public void stop() {
+    public void shutdown() {
         PeepoAPI.getInstance().stopBungeeProxy(this);
     }
 

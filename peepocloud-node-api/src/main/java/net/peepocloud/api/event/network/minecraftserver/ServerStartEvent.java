@@ -1,0 +1,17 @@
+package net.peepocloud.api.event.network.minecraftserver;
+/*
+ * Created by Mc_Ruben on 11.11.2018
+ */
+
+import lombok.Getter;
+import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
+
+@Getter
+/**
+ * Called when a server is started on one node in the network
+ */
+public class ServerStartEvent extends NetworkServerEvent {
+    public ServerStartEvent(MinecraftServerInfo serverInfo) {
+        super(serverInfo);
+    }
+}

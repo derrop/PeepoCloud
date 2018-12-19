@@ -5,7 +5,7 @@ package net.peepocloud.lib.network.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.commons.config.json.SimpleJsonObject;
 
 @Getter
 @AllArgsConstructor

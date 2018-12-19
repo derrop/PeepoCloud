@@ -1,11 +1,13 @@
 package net.peepocloud.api.internal.bukkit;
 
 import net.peepocloud.api.PeepoAPI;
+import net.peepocloud.api.event.EventManager;
 import net.peepocloud.api.node.NodeInfo;
 import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.api.server.bungee.BungeeGroup;
 import net.peepocloud.api.server.minecraft.MinecraftGroup;
 import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.users.UserManager;
 
 import java.util.Collection;
 
@@ -130,6 +132,14 @@ public class BukkitAPI extends PeepoAPI {
 
     }
 
+    public void stopBungeeGroup(String name) {
+
+    }
+
+    public void stopMinecraftGroup(String name) {
+
+    }
+
     public Collection<BungeeCordProxyInfo> getStartedBungeeProxies(String group) {
         return null;
     }
@@ -162,6 +172,10 @@ public class BukkitAPI extends PeepoAPI {
         return null;
     }
 
+    public Collection<NodeInfo> getNodeInfos() {
+        return null;
+    }
+
     public NodeInfo getBestNodeInfo(int memoryNeeded) {
         return null;
     }
@@ -188,5 +202,13 @@ public class BukkitAPI extends PeepoAPI {
 
     public int getMaxMemory() {
         return 0;
+    }
+
+    public EventManager getEventManager() {
+        return null;
+    }
+
+    public UserManager getUserManager() {
+        return null;
     }
 }

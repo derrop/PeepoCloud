@@ -6,7 +6,7 @@ package net.peepocloud.node.api.event.process.bungee;
 import lombok.Getter;
 import lombok.Setter;
 import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.node.api.event.internal.Cancellable;
+import net.peepocloud.api.event.Cancellable;
 import net.peepocloud.node.api.event.process.ProcessEvent;
 import net.peepocloud.node.server.process.BungeeProcess;
 

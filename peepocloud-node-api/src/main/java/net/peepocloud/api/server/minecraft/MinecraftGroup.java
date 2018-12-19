@@ -72,4 +72,8 @@ public class MinecraftGroup {
     public void startMinecraftServer(MinecraftServerInfo proxyInfo) {
         PeepoAPI.getInstance().startMinecraftServer(proxyInfo);
     }
+
+    public void shutdown() {
+        PeepoAPI.getInstance().stopMinecraftGroup(this);
+    }
 }
