@@ -5,7 +5,7 @@ package net.peepocloud.node.network.packet.out.group;
 
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.packet.JsonPacket;
-import net.peepocloud.api.server.bungee.BungeeGroup;
+import net.peepocloud.lib.server.bungee.BungeeGroup;
 
 public class PacketOutCreateBungeeGroup extends JsonPacket {
     public PacketOutCreateBungeeGroup(int id) {

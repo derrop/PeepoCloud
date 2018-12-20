@@ -10,7 +10,7 @@ import lombok.ToString;
 import net.md_5.bungee.config.Configuration;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.config.yaml.YamlConfigurable;
-import net.peepocloud.api.node.NodeInfo;
+import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.lib.utility.network.NetworkAddress;
 import net.peepocloud.node.network.ConnectableNode;

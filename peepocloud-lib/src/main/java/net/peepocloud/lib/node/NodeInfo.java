@@ -1,18 +1,20 @@
-package net.peepocloud.api.server;
+package net.peepocloud.lib.node;
 /*
  * Created by Mc_Ruben on 14.11.2018
  */
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
+@Data
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class Template {
+public class NodeInfo {
     private String name;
-    private String storage;
+    private int maxMemory;
+    private int usedMemory;
+    private double cpuUsage;
 }

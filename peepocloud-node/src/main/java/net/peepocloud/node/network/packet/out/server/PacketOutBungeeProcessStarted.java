@@ -5,7 +5,7 @@ package net.peepocloud.node.network.packet.out.server;
 
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.packet.JsonPacket;
-import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 
 public class PacketOutBungeeProcessStarted extends JsonPacket {
     public PacketOutBungeeProcessStarted(BungeeCordProxyInfo proxyInfo) {

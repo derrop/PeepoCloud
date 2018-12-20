@@ -7,7 +7,7 @@ import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
-import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.network.minecraftserver.ServerStartEvent;
 import net.peepocloud.node.network.participant.NodeParticipant;

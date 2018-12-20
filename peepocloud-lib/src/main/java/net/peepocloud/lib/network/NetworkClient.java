@@ -72,15 +72,16 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
     }
 
     public void shutdown() {
-        super.channel.close();
+        if(super.isConnected())
+            super.channel.close();
     }
 
     public PacketManager getPacketManager() {
         return packetManager;
     }
 
-    public ChannelHandler getCurrentHandler() {
-        return super.channel.pipeline().get(MainChannelHandler.class).getChannelHandler();
+    public MainChannelHandler getPipelineHandler() {
+        return super.channel.pipeline().get(MainChannelHandler.class);
     }
 
 

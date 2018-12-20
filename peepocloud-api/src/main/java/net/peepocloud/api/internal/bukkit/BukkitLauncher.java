@@ -1,18 +1,18 @@
 package net.peepocloud.api.internal.bukkit;
 
-
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BukkitLauncher extends JavaPlugin {
-    private BukkitAPI bukkitAPI;
+    private PeepoBukkitAPI bukkitAPI;
 
     @Override
     public void onEnable() {
-        this.bukkitAPI = new BukkitAPI();
+        this.bukkitAPI = new PeepoBukkitAPI(this);
+        this.bukkitAPI.bootstrap();
     }
 
     @Override
     public void onDisable() {
-
+        this.bukkitAPI.shutdown();
     }
 }

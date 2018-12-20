@@ -7,8 +7,6 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import jline.console.ConsoleReader;
 import lombok.Getter;
-import net.peepocloud.api.PeepoAPI;
-import net.peepocloud.api.server.Template;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
@@ -17,13 +15,14 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
-import net.peepocloud.api.node.NodeInfo;
-import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.api.server.bungee.BungeeGroup;
-import net.peepocloud.api.server.minecraft.MinecraftGroup;
-import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.api.server.minecraft.MinecraftState;
+import net.peepocloud.lib.node.NodeInfo;
+import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.lib.server.bungee.BungeeGroup;
+import net.peepocloud.lib.server.minecraft.MinecraftGroup;
+import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.server.minecraft.MinecraftState;
 import net.peepocloud.lib.scheduler.Scheduler;
+import net.peepocloud.lib.server.Template;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.addon.AddonManager;
 import net.peepocloud.node.addon.defaults.DefaultAddonManager;
@@ -62,7 +61,6 @@ import net.peepocloud.node.updater.UpdateCheckResponse;
 import net.peepocloud.node.utility.NodeUtils;
 import net.peepocloud.node.utility.users.UserManager;
 import org.reflections.Reflections;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -84,7 +82,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Getter
-public class PeepoCloudNode extends PeepoAPI {
+public class PeepoCloudNode {
 
     @Getter
     private static PeepoCloudNode instance;
@@ -207,8 +205,6 @@ public class PeepoCloudNode extends PeepoAPI {
         Preconditions.checkArgument(instance == null, "instance is already defined");
         instance = this;
 
-
-        PeepoAPI.setInstance(this);
 
         this.scheduler = new Scheduler();
         this.executorService.execute(this.scheduler);
@@ -336,10 +332,6 @@ public class PeepoCloudNode extends PeepoAPI {
         this.logger.debug("Registered " + this.packetManager.getRegisteredPackets().size() + " packet handlers");
     }
 
-    @Override
-    public boolean isNode() {
-        return true;
-    }
 
     private void initCommands(CommandManager commandManager) {
         commandManager.registerCommands(
@@ -413,8 +405,7 @@ public class PeepoCloudNode extends PeepoAPI {
         this.nodeInfo = this.cloudConfig.loadNodeInfo(this.processManager == null ? 0 : this.getMemoryUsedOnThisInstance());
 
         if (this.networkServer == null) {
-            this.networkServer = new NetworkServer(this.cloudConfig.getHost().getHost().equals("*") ? new InetSocketAddress(this.cloudConfig.getHost().getPort())
-                    : new InetSocketAddress(this.cloudConfig.getHost().getHost(), this.cloudConfig.getHost().getPort()), this.packetManager);
+            this.networkServer = new NetworkServer(this.cloudConfig.getHost().toInetSocketAddress(), this.packetManager);
             this.networkServer.run();
         }
 
@@ -510,7 +501,7 @@ public class PeepoCloudNode extends PeepoAPI {
                     .filter(process -> process instanceof ServerProcess).map(process -> ((ServerProcess) process).getServerInfo()).collect(Collectors.toList()));
         }
         ClientNode client = new ClientNode(
-                new InetSocketAddress(node.getAddress().getHost(), node.getAddress().getPort()),
+                node.getAddress().toInetSocketAddress(),
                 this.packetManager,
                 new ChannelHandlerAdapter() {
                     @Override
@@ -1100,22 +1091,18 @@ public class PeepoCloudNode extends PeepoAPI {
         }
     }
 
-    @Override
     public void stopBungeeProxy(String name) {
         //TODO
     }
 
-    @Override
     public void stopBungeeProxy(BungeeCordProxyInfo proxyInfo) {
         //TODO
     }
 
-    @Override
     public void stopMinecraftServer(String name) {
         //TODO
     }
 
-    @Override
     public void stopMinecraftServer(MinecraftServerInfo serverInfo) {
         //TODO
     }

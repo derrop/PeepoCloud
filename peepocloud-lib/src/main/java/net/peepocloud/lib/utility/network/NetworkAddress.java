@@ -5,6 +5,8 @@ package net.peepocloud.lib.utility.network;
 
 import lombok.*;
 
+import java.net.InetSocketAddress;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,5 +18,9 @@ public class NetworkAddress {
     @Override
     public String toString() {
         return this.host + ":" + this.port;
+    }
+
+    public InetSocketAddress toInetSocketAddress() {
+        return this.host.equals("*") ? new InetSocketAddress(this.port) : new InetSocketAddress(this.host, this.port);
     }
 }

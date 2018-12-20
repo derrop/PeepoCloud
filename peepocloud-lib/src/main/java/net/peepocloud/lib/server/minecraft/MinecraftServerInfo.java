@@ -1,11 +1,10 @@
-package net.peepocloud.api.server.minecraft;
+package net.peepocloud.lib.server.minecraft;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */
 
 import lombok.*;
-import net.peepocloud.api.PeepoAPI;
-import net.peepocloud.api.server.Template;
+import net.peepocloud.lib.server.Template;
 
 import java.util.Map;
 import java.util.UUID;
@@ -38,12 +37,5 @@ public class MinecraftServerInfo {
     @Setter
     private long startup;
 
-    public MinecraftGroup getGroup() {
-        return PeepoAPI.getInstance().getMinecraftGroup(this.groupName);
-    }
-
-    public void stop() {
-        PeepoAPI.getInstance().stopMinecraftServer(this);
-    }
 
 }

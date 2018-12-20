@@ -8,7 +8,7 @@ import net.peepocloud.lib.network.NetworkClient;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandler;
-import net.peepocloud.api.node.NodeInfo;
+import net.peepocloud.lib.node.NodeInfo;
 
 import java.net.InetSocketAddress;
 

@@ -1,11 +1,10 @@
-package net.peepocloud.api.server.bungee;
+package net.peepocloud.lib.server.bungee;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */
 
 import lombok.*;
-import net.peepocloud.api.PeepoAPI;
-import net.peepocloud.api.server.Template;
+import net.peepocloud.lib.server.Template;
 
 import java.util.Map;
 import java.util.UUID;
@@ -31,12 +30,5 @@ public class BungeeCordProxyInfo {
     @Setter
     private long startup;
 
-    public BungeeGroup getGroup() {
-        return PeepoAPI.getInstance().getBungeeGroup(this.groupName);
-    }
-
-    public void stop() {
-        PeepoAPI.getInstance().stopBungeeProxy(this);
-    }
 
 }

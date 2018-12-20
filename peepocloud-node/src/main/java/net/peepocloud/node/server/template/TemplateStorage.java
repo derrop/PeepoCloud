@@ -3,7 +3,7 @@ package net.peepocloud.node.server.template;
  * Created by Mc_Ruben on 08.12.2018
  */
 
-import net.peepocloud.api.server.Template;
+import net.peepocloud.lib.server.Template;
 import net.peepocloud.node.server.process.CloudProcess;
 
 import java.nio.file.Path;

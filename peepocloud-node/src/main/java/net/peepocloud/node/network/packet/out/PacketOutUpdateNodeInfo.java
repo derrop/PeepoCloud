@@ -5,7 +5,7 @@ package net.peepocloud.node.network.packet.out;
 
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.packet.JsonPacket;
-import net.peepocloud.api.node.NodeInfo;
+import net.peepocloud.lib.node.NodeInfo;
 
 public class PacketOutUpdateNodeInfo extends JsonPacket {
     public PacketOutUpdateNodeInfo(NodeInfo nodeInfo) {

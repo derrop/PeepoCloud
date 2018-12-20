@@ -13,10 +13,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
-    @Setter
     private NetworkParticipant participant;
     private PacketManager packetManager;
-    @Setter
     private ChannelHandler channelHandler;
 
     public MainChannelHandler(PacketManager packetManager, ChannelHandler firstHandler) {
@@ -67,7 +65,24 @@ public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
         }
     }
 
+    public void setParticipant(NetworkParticipant participant) {
+        this.participant = participant;
+    }
+
+    public NetworkParticipant getParticipant() {
+        return participant;
+    }
+
+    public PacketManager getPacketManager() {
+        return packetManager;
+    }
+
+    public void setChannelHandler(ChannelHandler channelHandler) {
+        this.channelHandler = channelHandler;
+    }
+
     public ChannelHandler getChannelHandler() {
         return channelHandler;
     }
+
 }

@@ -4,7 +4,7 @@ package net.peepocloud.node.api.event.network.bungeecord;
  */
 
 import lombok.*;
-import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 
 @Getter
 /**

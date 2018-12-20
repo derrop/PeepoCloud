@@ -7,6 +7,7 @@ import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.packet.Packet;
 
 public class ChannelHandlerAdapter implements ChannelHandler {
+
     @Override
     public void connected(NetworkParticipant networkParticipant) {
     }
