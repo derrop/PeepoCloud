@@ -1,7 +1,7 @@
-package net.peepocloud.api.network.packet;
+package net.peepocloud.lib.network.packet;
 
 
-import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 
 import java.io.DataInput;
 import java.io.DataOutput;

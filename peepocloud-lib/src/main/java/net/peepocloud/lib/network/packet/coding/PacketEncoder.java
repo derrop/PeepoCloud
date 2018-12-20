@@ -6,8 +6,8 @@ import com.google.common.io.ByteStreams;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import net.peepocloud.api.network.packet.Packet;
-import net.peepocloud.commons.utility.network.PacketUtils;
+import net.peepocloud.lib.network.packet.Packet;
+import net.peepocloud.lib.utility.network.PacketUtils;
 
 public class PacketEncoder extends MessageToByteEncoder<Packet> {
 

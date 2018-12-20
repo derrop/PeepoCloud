@@ -1,11 +1,11 @@
-package net.peepocloud.api.users;
+package net.peepocloud.lib.users;
 /*
  * Created by Mc_Ruben on 09.12.2018
  */
 
 import lombok.*;
-import net.peepocloud.commons.config.json.SimpleJsonObject;
-import net.peepocloud.commons.utility.SystemUtils;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.utility.SystemUtils;
 
 @Data
 @ToString

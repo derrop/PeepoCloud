@@ -5,9 +5,9 @@ package net.peepocloud.node.addon;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import net.peepocloud.commons.config.Configurable;
-import net.peepocloud.commons.config.yaml.YamlConfigurable;
-import net.peepocloud.commons.utility.SystemUtils;
+import net.peepocloud.lib.config.Configurable;
+import net.peepocloud.lib.config.yaml.YamlConfigurable;
+import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 
 import java.nio.file.Path;

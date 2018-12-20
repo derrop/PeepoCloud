@@ -3,7 +3,7 @@ package net.peepocloud.node.database;
  * Created by Mc_Ruben on 05.11.2018
  */
 
-import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 
 import java.util.function.Consumer;
 

@@ -4,8 +4,7 @@ package net.peepocloud.node.screen.network;
  */
 
 import lombok.Getter;
-import net.peepocloud.api.network.NetworkPacketSender;
-import net.peepocloud.lib.network.NetworkParticipant;
+import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;

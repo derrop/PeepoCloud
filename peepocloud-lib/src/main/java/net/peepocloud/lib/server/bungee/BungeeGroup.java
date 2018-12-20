@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.server.GroupMode;
 import net.peepocloud.lib.server.Template;
 

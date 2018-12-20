@@ -1,8 +1,8 @@
-package net.peepocloud.api.network.packet;
+package net.peepocloud.lib.network.packet;
 
 
-import net.peepocloud.api.network.NetworkPacketSender;
-import net.peepocloud.api.network.packet.handler.PacketHandler;
+import net.peepocloud.lib.network.NetworkPacketSender;
+import net.peepocloud.lib.network.packet.handler.PacketHandler;
 
 import java.util.HashMap;
 import java.util.Map;

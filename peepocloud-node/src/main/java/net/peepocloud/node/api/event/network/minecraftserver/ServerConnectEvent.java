@@ -4,7 +4,7 @@ package net.peepocloud.node.api.event.network.minecraftserver;
  */
 
 import lombok.*;
-import net.peepocloud.api.event.network.minecraftserver.NetworkServerEvent;
+import net.peepocloud.node.api.event.network.minecraftserver.NetworkServerEvent;
 import net.peepocloud.node.network.participant.MinecraftServerParticipant;
 
 @Getter

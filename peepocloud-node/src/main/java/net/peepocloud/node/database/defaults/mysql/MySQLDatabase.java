@@ -4,7 +4,7 @@ package net.peepocloud.node.database.defaults.mysql;
  */
 
 import lombok.*;
-import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.database.Database;
 

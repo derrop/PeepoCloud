@@ -4,13 +4,16 @@ package net.peepocloud.node.server.process;
  */
 
 import lombok.*;
-import net.peepocloud.api.event.network.minecraftserver.ServerStartEvent;
-import net.peepocloud.commons.config.UnmodifiableConfigurable;
-import net.peepocloud.commons.config.props.PropertiesConfigurable;
-import net.peepocloud.api.server.GroupMode;
-import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.commons.utility.SystemUtils;
-import net.peepocloud.commons.utility.ZipUtils;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.network.auth.Auth;
+import net.peepocloud.lib.network.auth.NetworkComponentType;
+import net.peepocloud.node.api.event.network.minecraftserver.ServerStartEvent;
+import net.peepocloud.lib.config.UnmodifiableConfigurable;
+import net.peepocloud.lib.config.props.PropertiesConfigurable;
+import net.peepocloud.lib.server.GroupMode;
+import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.lib.utility.ZipUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.process.server.MinecraftServerConfigFillEvent;
 import net.peepocloud.node.api.event.process.server.MinecraftServerPostConfigFillEvent;
@@ -86,6 +89,7 @@ public class ServerProcess implements CloudProcess {
         this.loadTemplate();
         this.loadSpigot();
         this.loadServerConfig();
+        this.createNodeInfo();
         this.doStart();
     }
 
@@ -154,6 +158,16 @@ public class ServerProcess implements CloudProcess {
         PeepoCloudNode.getInstance().getEventManager().callEvent(configFillEvent);
         configFillEvent.getConfigurable().saveAsFile(configFillEvent.getConfigPath());
         PeepoCloudNode.getInstance().getEventManager().callEvent(new MinecraftServerPostConfigFillEvent(this, UnmodifiableConfigurable.create(configurable)));
+    }
+
+    private void createNodeInfo() {
+        SimpleJsonObject nodeInfo = new SimpleJsonObject();
+
+        nodeInfo.append("auth", new Auth(PeepoCloudNode.getInstance().getNetworkAuthKey(), this.serverInfo.getComponentName(),
+                NetworkComponentType.MINECRAFT_SERVER, PeepoCloudNode.getInstance().getCloudConfig().getNodeName(), new SimpleJsonObject()));
+        nodeInfo.append("networkAddress", PeepoCloudNode.getInstance().getCloudConfig().getHost().toInetSocketAddress());
+
+        nodeInfo.saveAsFile(Paths.get(this.directory.toString(), "nodeInfo.json"));
     }
 
     @Override

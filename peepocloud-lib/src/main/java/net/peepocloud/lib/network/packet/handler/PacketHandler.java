@@ -1,7 +1,7 @@
-package net.peepocloud.api.network.packet.handler;
+package net.peepocloud.lib.network.packet.handler;
 
-import net.peepocloud.api.network.NetworkPacketSender;
-import net.peepocloud.api.network.packet.Packet;
+import net.peepocloud.lib.network.NetworkPacketSender;
+import net.peepocloud.lib.network.packet.Packet;
 
 import java.util.function.Consumer;
 

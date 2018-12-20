@@ -1,8 +1,7 @@
 package net.peepocloud.lib.network;
 
 import io.netty.channel.Channel;
-import net.peepocloud.api.network.NetworkPacketSender;
-import net.peepocloud.api.network.packet.Packet;
+import net.peepocloud.lib.network.packet.Packet;
 
 import java.net.InetSocketAddress;
 

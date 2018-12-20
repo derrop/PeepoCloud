@@ -3,8 +3,8 @@ package net.peepocloud.node.database;
  * Created by Mc_Ruben on 05.11.2018
  */
 
-import net.peepocloud.commons.config.yaml.YamlConfigurable;
-import net.peepocloud.commons.utility.SystemUtils;
+import net.peepocloud.lib.config.yaml.YamlConfigurable;
+import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.addon.AddonManager;
 import net.peepocloud.node.database.defaults.arango.ArangoDatabaseManager;

@@ -7,30 +7,29 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import jline.console.ConsoleReader;
 import lombok.Getter;
-import net.peepocloud.api.PeepoAPI;
-import net.peepocloud.api.event.DefaultEventManager;
-import net.peepocloud.api.event.EventManager;
-import net.peepocloud.api.server.Template;
-import net.peepocloud.api.users.UserManager;
-import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.server.Template;
+import net.peepocloud.lib.users.UserManager;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
-import net.peepocloud.api.network.packet.Packet;
-import net.peepocloud.api.network.packet.PacketManager;
+import net.peepocloud.lib.network.packet.Packet;
+import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
-import net.peepocloud.api.network.packet.handler.PacketHandler;
-import net.peepocloud.api.node.NodeInfo;
-import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.api.server.bungee.BungeeGroup;
-import net.peepocloud.api.server.minecraft.MinecraftGroup;
-import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.api.server.minecraft.MinecraftState;
+import net.peepocloud.lib.network.packet.handler.PacketHandler;
+import net.peepocloud.lib.node.NodeInfo;
+import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.lib.server.bungee.BungeeGroup;
+import net.peepocloud.lib.server.minecraft.MinecraftGroup;
+import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.server.minecraft.MinecraftState;
 import net.peepocloud.lib.scheduler.Scheduler;
-import net.peepocloud.commons.utility.SystemUtils;
+import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.addon.AddonManager;
 import net.peepocloud.node.addon.defaults.DefaultAddonManager;
 import net.peepocloud.node.addon.node.NodeAddon;
+import net.peepocloud.node.api.event.DefaultEventManager;
+import net.peepocloud.node.api.event.EventManager;
 import net.peepocloud.node.command.CommandManager;
 import net.peepocloud.node.command.CommandSender;
 import net.peepocloud.node.command.defaults.*;
@@ -64,7 +63,6 @@ import net.peepocloud.node.updater.UpdateCheckResponse;
 import net.peepocloud.node.utility.NodeUtils;
 import net.peepocloud.node.utility.users.NodeUserManager;
 import org.reflections.Reflections;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -86,7 +84,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Getter
-public class PeepoCloudNode extends PeepoAPI {
+public class PeepoCloudNode {
 
     @Getter
     private static PeepoCloudNode instance;
@@ -210,7 +208,6 @@ public class PeepoCloudNode extends PeepoAPI {
         instance = this;
 
 
-        PeepoAPI.setInstance(this);
 
         this.scheduler = new Scheduler();
         this.executorService.execute(this.scheduler);
@@ -339,10 +336,6 @@ public class PeepoCloudNode extends PeepoAPI {
         this.logger.debug("Registered " + this.packetManager.getRegisteredPackets().size() + " packet handlers");
     }
 
-    @Override
-    public boolean isNode() {
-        return true;
-    }
 
     private void initCommands(CommandManager commandManager) {
         commandManager.registerCommands(
@@ -830,7 +823,6 @@ public class PeepoCloudNode extends PeepoAPI {
         return serverInfos;
     }
 
-    @Override
     public Collection<NodeInfo> getNodeInfos() {
         Collection<NodeInfo> infos = this.connectedNodes.values().stream().map(ClientNode::getNodeInfo).collect(Collectors.toList());
         infos.add(this.nodeInfo);
@@ -1110,34 +1102,30 @@ public class PeepoCloudNode extends PeepoAPI {
         }
     }
 
-    @Override
     public void stopBungeeProxy(String name) {
         //TODO
     }
 
-    @Override
     public void stopBungeeProxy(BungeeCordProxyInfo proxyInfo) {
         //TODO
     }
 
-    @Override
+
     public void stopMinecraftServer(String name) {
         //TODO
     }
 
-    @Override
     public void stopMinecraftServer(MinecraftServerInfo serverInfo) {
         //TODO
     }
 
-    @Override
+
     public void stopBungeeGroup(String name) {
-        this.getBungeeProxies(name).forEach(BungeeCordProxyInfo::shutdown);
+
     }
 
-    @Override
+
     public void stopMinecraftGroup(String name) {
-        this.getMinecraftServers(name).forEach(MinecraftServerInfo::shutdown);
     }
 
     public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group) {

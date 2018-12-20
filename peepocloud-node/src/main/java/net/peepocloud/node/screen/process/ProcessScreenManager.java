@@ -5,8 +5,7 @@ package net.peepocloud.node.screen.process;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import net.peepocloud.api.network.NetworkPacketSender;
-import net.peepocloud.lib.network.NetworkParticipant;
+import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.node.network.packet.out.screen.PacketOutScreenLine;
 import net.peepocloud.node.screen.EnabledScreen;
 import net.peepocloud.node.server.process.CloudProcess;

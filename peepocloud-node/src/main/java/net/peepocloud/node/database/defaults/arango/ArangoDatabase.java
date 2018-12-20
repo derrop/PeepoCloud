@@ -10,7 +10,7 @@ import com.arangodb.model.AqlQueryOptions;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.database.Database;
 

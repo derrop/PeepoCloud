@@ -6,10 +6,10 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.EmptyByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import net.peepocloud.api.network.packet.Packet;
-import net.peepocloud.api.network.packet.PacketInfo;
-import net.peepocloud.api.network.packet.PacketManager;
-import net.peepocloud.commons.utility.network.PacketUtils;
+import net.peepocloud.lib.network.packet.Packet;
+import net.peepocloud.lib.network.packet.PacketInfo;
+import net.peepocloud.lib.network.packet.PacketManager;
+import net.peepocloud.lib.utility.network.PacketUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

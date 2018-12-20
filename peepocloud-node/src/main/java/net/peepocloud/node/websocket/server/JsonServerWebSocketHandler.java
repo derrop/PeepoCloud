@@ -5,7 +5,7 @@ package net.peepocloud.node.websocket.server;
 
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 
 import java.util.function.Consumer;
 

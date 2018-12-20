@@ -87,6 +87,7 @@ public class AddonManager<Addon extends net.peepocloud.node.addon.Addon> {
                         configuration.getString("author"),
                         configuration.getString("main"),
                         path.getFileName().toString(),
+                        configuration.getString("website"),
                         configuration.contains("reloadType") ? AddonConfig.ReloadType.valueOf(configuration.getString("reloadType")) : AddonConfig.ReloadType.ALWAYS
                 );
                 if (this.loadedAddons.containsKey(config.getName()))

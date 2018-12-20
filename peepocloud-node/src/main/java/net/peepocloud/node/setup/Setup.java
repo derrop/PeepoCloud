@@ -3,8 +3,8 @@ package net.peepocloud.node.setup;
  * Created by Mc_Ruben on 12.11.2018
  */
 
-import net.peepocloud.commons.config.Configurable;
-import net.peepocloud.commons.utility.SystemUtils;
+import net.peepocloud.lib.config.Configurable;
+import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.logging.ColoredLogger;
 import net.peepocloud.node.setup.type.BooleanSetupAcceptable;

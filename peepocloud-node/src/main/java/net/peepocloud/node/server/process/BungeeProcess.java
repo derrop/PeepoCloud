@@ -8,13 +8,16 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import net.md_5.bungee.config.Configuration;
-import net.peepocloud.api.event.network.bungeecord.BungeeStartEvent;
-import net.peepocloud.commons.config.UnmodifiableConfigurable;
-import net.peepocloud.commons.config.yaml.YamlConfigurable;
-import net.peepocloud.api.server.GroupMode;
-import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.commons.utility.SystemUtils;
-import net.peepocloud.commons.utility.ZipUtils;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.network.auth.Auth;
+import net.peepocloud.lib.network.auth.NetworkComponentType;
+import net.peepocloud.node.api.event.network.bungeecord.BungeeStartEvent;
+import net.peepocloud.lib.config.UnmodifiableConfigurable;
+import net.peepocloud.lib.config.yaml.YamlConfigurable;
+import net.peepocloud.lib.server.GroupMode;
+import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.lib.utility.ZipUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.process.bungee.BungeeCordConfigFillEvent;
 import net.peepocloud.node.api.event.process.bungee.BungeeCordPostConfigFillEvent;
@@ -91,6 +94,7 @@ public class BungeeProcess implements CloudProcess {
         this.loadTemplate();
         this.loadBungee();
         this.loadServerConfig();
+        this.createNodeInfo();
         this.doStart();
     }
 
@@ -190,6 +194,16 @@ public class BungeeProcess implements CloudProcess {
         PeepoCloudNode.getInstance().getEventManager().callEvent(configFillEvent);
         configFillEvent.getConfigurable().saveAsFile(configFillEvent.getConfigPath());
         PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeCordPostConfigFillEvent(this, UnmodifiableConfigurable.create(configurable)));
+    }
+
+    private void createNodeInfo() {
+        SimpleJsonObject nodeInfo = new SimpleJsonObject();
+
+        nodeInfo.append("auth", new Auth(PeepoCloudNode.getInstance().getNetworkAuthKey(), this.proxyInfo.getComponentName(),
+                NetworkComponentType.BUNGEECORD, PeepoCloudNode.getInstance().getCloudConfig().getNodeName(), new SimpleJsonObject()));
+        nodeInfo.append("networkAddress", PeepoCloudNode.getInstance().getCloudConfig().getHost().toInetSocketAddress());
+
+        nodeInfo.saveAsFile(Paths.get(this.directory.toString(), "nodeInfo.json"));
     }
 
     @Override

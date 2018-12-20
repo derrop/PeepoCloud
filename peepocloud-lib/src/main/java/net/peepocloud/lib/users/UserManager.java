@@ -1,4 +1,4 @@
-package net.peepocloud.api.users;
+package net.peepocloud.lib.users;
 /*
  * Created by Mc_Ruben on 17.12.2018
  */

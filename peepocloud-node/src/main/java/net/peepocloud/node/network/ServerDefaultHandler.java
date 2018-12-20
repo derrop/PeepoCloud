@@ -4,7 +4,7 @@ package net.peepocloud.node.network;
  */
 
 import net.peepocloud.lib.network.NetworkParticipant;
-import net.peepocloud.api.network.packet.Packet;
+import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.network.bungeecord.BungeeDisconnectEvent;

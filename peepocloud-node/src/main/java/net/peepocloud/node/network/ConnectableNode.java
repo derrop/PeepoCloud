@@ -4,7 +4,7 @@ package net.peepocloud.node.network;
  */
 
 import lombok.*;
-import net.peepocloud.commons.utility.network.NetworkAddress;
+import net.peepocloud.lib.utility.network.NetworkAddress;
 
 @Getter
 @AllArgsConstructor

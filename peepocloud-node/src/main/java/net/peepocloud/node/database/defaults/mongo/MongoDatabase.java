@@ -6,7 +6,7 @@ package net.peepocloud.node.database.defaults.mongo;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import lombok.*;
-import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.database.Database;
 import org.bson.Document;

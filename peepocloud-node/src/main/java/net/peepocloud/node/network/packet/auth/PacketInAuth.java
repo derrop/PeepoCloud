@@ -4,13 +4,13 @@ package net.peepocloud.node.network.packet.auth;
  */
 
 import lombok.AllArgsConstructor;
-import net.peepocloud.api.network.NetworkPacketSender;
-import net.peepocloud.api.network.packet.handler.PacketHandler;
-import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.lib.network.NetworkPacketSender;
+import net.peepocloud.lib.network.packet.handler.PacketHandler;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
-import net.peepocloud.api.network.packet.JsonPacket;
-import net.peepocloud.api.network.packet.Packet;
+import net.peepocloud.lib.network.packet.JsonPacket;
+import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.node.network.NetworkServer;
 
 import java.util.function.Consumer;

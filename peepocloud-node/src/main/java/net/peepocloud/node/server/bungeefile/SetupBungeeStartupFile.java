@@ -3,7 +3,7 @@ package net.peepocloud.node.server.bungeefile;
  * Created by Mc_Ruben on 23.11.2018
  */
 
-import net.peepocloud.commons.config.yaml.YamlConfigurable;
+import net.peepocloud.lib.config.yaml.YamlConfigurable;
 import net.peepocloud.node.logging.ColoredLogger;
 import net.peepocloud.node.server.ServerVersion;
 import net.peepocloud.node.setup.type.ArraySetupAcceptable;

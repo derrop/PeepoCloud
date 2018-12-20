@@ -3,9 +3,9 @@ package net.peepocloud.node.network.packet.out.group;
  * Created by Mc_Ruben on 14.11.2018
  */
 
-import net.peepocloud.commons.config.json.SimpleJsonObject;
-import net.peepocloud.api.network.packet.JsonPacket;
-import net.peepocloud.api.server.minecraft.MinecraftGroup;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.network.packet.JsonPacket;
+import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 
 public class PacketOutCreateMinecraftGroup extends JsonPacket {
     public PacketOutCreateMinecraftGroup(MinecraftGroup group) {

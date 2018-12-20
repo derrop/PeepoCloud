@@ -4,7 +4,7 @@ package net.peepocloud.node.api.event.process;
  */
 
 import lombok.*;
-import net.peepocloud.api.event.Event;
+import net.peepocloud.node.api.event.Event;
 import net.peepocloud.node.server.process.CloudProcess;
 
 @Getter

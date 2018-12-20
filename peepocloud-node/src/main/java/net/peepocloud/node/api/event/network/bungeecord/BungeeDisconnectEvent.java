@@ -4,7 +4,7 @@ package net.peepocloud.node.api.event.network.bungeecord;
  */
 
 import lombok.Getter;
-import net.peepocloud.api.event.network.bungeecord.NetworkBungeeEvent;
+import net.peepocloud.node.api.event.network.bungeecord.NetworkBungeeEvent;
 import net.peepocloud.node.network.participant.BungeeCordParticipant;
 
 @Getter

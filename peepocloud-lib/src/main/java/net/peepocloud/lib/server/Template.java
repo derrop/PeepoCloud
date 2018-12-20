@@ -5,7 +5,6 @@ package net.peepocloud.lib.server;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 
 @AllArgsConstructor

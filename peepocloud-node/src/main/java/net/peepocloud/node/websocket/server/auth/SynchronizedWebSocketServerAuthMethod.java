@@ -3,8 +3,8 @@ package net.peepocloud.node.websocket.server.auth;
  * Created by Mc_Ruben on 09.12.2018
  */
 
-import net.peepocloud.commons.config.json.SimpleJsonObject;
-import net.peepocloud.commons.utility.SystemUtils;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.websocket.server.WebSocket;
 
 import java.util.concurrent.atomic.AtomicReference;

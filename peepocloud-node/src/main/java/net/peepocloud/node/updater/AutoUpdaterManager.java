@@ -6,8 +6,8 @@ package net.peepocloud.node.updater;
 import io.netty.util.internal.PlatformDependent;
 import io.netty.util.internal.ThreadLocalRandom;
 import net.md_5.bungee.http.HttpClient;
-import net.peepocloud.commons.config.json.SimpleJsonObject;
-import net.peepocloud.commons.utility.SystemUtils;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.utility.FileDownloading;
 
