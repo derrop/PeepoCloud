@@ -64,11 +64,11 @@ public class MongoDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean isConnected() {
-        return true; //TODO
+        return true;
     }
 
     @Override
-    public void connect(DatabaseConfig config) {
+    public boolean connect(DatabaseConfig config) throws Exception {
         this.mongoClient = MongoClients.create(
                 new ConnectionString(
                         MessageFormat.format(
@@ -84,6 +84,7 @@ public class MongoDatabaseManager implements DatabaseManager {
         );
         System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.mongodb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
         this.mongoDatabase = this.mongoClient.getDatabase(config.getDatabase());
+        return true;
     }
 
     @Override

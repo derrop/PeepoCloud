@@ -9,9 +9,11 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import net.peepocloud.api.PeepoAPI;
 import net.peepocloud.api.node.NodeInfo;
+import net.peepocloud.api.node.NodeStartupPriority;
 import net.peepocloud.api.server.GroupMode;
 import net.peepocloud.api.server.Template;
 
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -20,6 +22,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class BungeeGroup {
     private String name;
+    private Collection<NodeStartupPriority> nodes;
     private GroupMode groupMode;
     private List<Template> templates;
     private int memory;

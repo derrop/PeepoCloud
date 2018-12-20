@@ -15,6 +15,7 @@ public class AddonConfig {
     private String author;
     private String main;
     private String fileName;
+    private String website;
     private ReloadType reloadType;
 
     public static enum ReloadType {

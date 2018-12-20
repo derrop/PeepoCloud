@@ -24,7 +24,7 @@ public interface DatabaseManager {
 
     boolean isConnected();
 
-    void connect(DatabaseConfig config) throws Exception;
+    boolean connect(DatabaseConfig config) throws Exception;
 
     void shutdown();
 
