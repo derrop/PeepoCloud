@@ -1,76 +1,28 @@
-package net.peepocloud.api.internal;
+package net.peepocloud.api.internal.bukkit;
 
-import net.peepocloud.api.internal.bukkit.PeepoBukkitAPI;
-import net.peepocloud.api.internal.bungee.PeepoBungeeAPI;
-import net.peepocloud.lib.node.NodeInfo;
-import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
-import net.peepocloud.lib.server.bungee.BungeeGroup;
-import net.peepocloud.lib.server.minecraft.MinecraftGroup;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
-import net.peepocloud.lib.network.NetworkClient;
-import net.peepocloud.lib.network.auth.Auth;
-import net.peepocloud.lib.network.packet.PacketManager;
-import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
-import net.peepocloud.lib.utility.network.NetworkAddress;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import net.peepocloud.api.PeepoAPI;
+import net.peepocloud.api.event.EventManager;
+import net.peepocloud.api.node.NodeInfo;
+import net.peepocloud.api.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.api.server.bungee.BungeeGroup;
+import net.peepocloud.api.server.minecraft.MinecraftGroup;
+import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.users.UserManager;
+
 import java.util.Collection;
 
-public abstract class NodeChildAPI {
-    private static NodeChildAPI instance;
+public class BukkitAPI extends PeepoAPI {
 
-    private PacketManager packetManager = new PacketManager();
-    private NetworkClient nodeConnector;
 
-    public NodeChildAPI(File nodeInfoFile) {
-        instance = this;
-
-        if(nodeInfoFile == null) {
-            this.shutdown();
-            throw new NullPointerException("nodeInfoFile not specified");
-        }
-        SimpleJsonObject nodeInfo = new SimpleJsonObject(nodeInfoFile);
-        this.nodeConnector = new NetworkClient(nodeInfo.getObject("networkAddress", NetworkAddress.class)
-                .toInetSocketAddress(), this.packetManager, new ChannelHandlerAdapter(), nodeInfo.getObject("auth", Auth.class));
-
-        // deleting the file because the info has been read
-        try {
-            Files.delete(nodeInfoFile.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public boolean isSpigot() {
+        // TODO: Check if spnge :smart:
+        return true;
     }
 
-    public void bootstrap() {
-        this.nodeConnector.run();
-        if(!this.nodeConnector.isConnected()) {
-            this.shutdown();
-            return;
-        }
+    public MinecraftGroup getMinecraftGroup(String name) {
+        return null;
     }
-
-    public void shutdown() {
-        this.nodeConnector.shutdown();
-    }
-
-    public abstract boolean isBungee();
-
-    public abstract boolean isBukkit();
-
-    public PeepoBukkitAPI toBukkit() {
-        if(this.isBukkit())
-            return (PeepoBukkitAPI) this;
-        throw new UnsupportedOperationException("This instance does not support bukkit");
-    }
-
-    public PeepoBungeeAPI toBungee() {
-        if(this.isBungee())
-            return (PeepoBungeeAPI) this;
-        throw new UnsupportedOperationException("This instance does not support bungeecord");
-    }
-
 
     public BungeeGroup getBungeeGroup(String name) {
         return null;
@@ -180,6 +132,14 @@ public abstract class NodeChildAPI {
 
     }
 
+    public void stopBungeeGroup(String name) {
+
+    }
+
+    public void stopMinecraftGroup(String name) {
+
+    }
+
     public Collection<BungeeCordProxyInfo> getStartedBungeeProxies(String group) {
         return null;
     }
@@ -212,6 +172,10 @@ public abstract class NodeChildAPI {
         return null;
     }
 
+    public Collection<NodeInfo> getNodeInfos() {
+        return null;
+    }
+
     public NodeInfo getBestNodeInfo(int memoryNeeded) {
         return null;
     }
@@ -240,15 +204,11 @@ public abstract class NodeChildAPI {
         return 0;
     }
 
-    public PacketManager getPacketManager() {
-        return packetManager;
-    }
-
-    public MinecraftGroup getMinecraftGroup(String name) {
+    public EventManager getEventManager() {
         return null;
     }
 
-    public static NodeChildAPI getInstance() {
-        return instance;
+    public UserManager getUserManager() {
+        return null;
     }
 }

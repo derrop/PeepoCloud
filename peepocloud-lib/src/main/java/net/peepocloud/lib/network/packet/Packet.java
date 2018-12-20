@@ -1,4 +1,4 @@
-package net.peepocloud.lib.network.packet;
+package net.peepocloud.api.network.packet;
 
 import java.io.DataInput;
 import java.io.DataOutput;

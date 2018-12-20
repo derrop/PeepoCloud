@@ -6,7 +6,7 @@ package net.peepocloud.node.network;
 import lombok.*;
 import net.peepocloud.lib.network.NetworkClient;
 import net.peepocloud.lib.network.auth.Auth;
-import net.peepocloud.lib.network.packet.PacketManager;
+import net.peepocloud.api.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandler;
 import net.peepocloud.lib.node.NodeInfo;
 

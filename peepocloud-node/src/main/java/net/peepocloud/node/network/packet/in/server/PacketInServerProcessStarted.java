@@ -3,20 +3,21 @@ package net.peepocloud.node.network.packet.in.server;
  * Created by Mc_Ruben on 06.12.2018
  */
 
+import net.peepocloud.api.event.network.minecraftserver.ServerStartEvent;
+import net.peepocloud.api.network.NetworkPacketSender;
 import net.peepocloud.lib.network.NetworkParticipant;
-import net.peepocloud.lib.network.packet.JsonPacket;
-import net.peepocloud.lib.network.packet.Packet;
-import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.api.network.packet.JsonPacket;
+import net.peepocloud.api.network.packet.Packet;
+import net.peepocloud.api.network.packet.handler.JsonPacketHandler;
+import net.peepocloud.api.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.api.event.network.minecraftserver.ServerStartEvent;
 import net.peepocloud.node.network.participant.NodeParticipant;
 
 import java.util.function.Consumer;
 
 public class PacketInServerProcessStarted extends JsonPacketHandler {
     @Override
-    public void handlePacket(NetworkParticipant networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
+    public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
         if (!(networkParticipant instanceof NodeParticipant))
             return;
         MinecraftServerInfo serverInfo = packet.getSimpleJsonObject().getObject("serverInfo", MinecraftServerInfo.class);

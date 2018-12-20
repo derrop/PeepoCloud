@@ -1,8 +1,8 @@
-package net.peepocloud.lib.network.packet;
+package net.peepocloud.api.network.packet;
 
 
-import net.peepocloud.lib.network.NetworkParticipant;
-import net.peepocloud.lib.network.packet.handler.PacketHandler;
+import net.peepocloud.api.network.NetworkPacketSender;
+import net.peepocloud.api.network.packet.handler.PacketHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,10 +11,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 public class PacketManager {
     private Map<Integer, PacketInfo> registeredPackets = new HashMap<>();
@@ -48,12 +44,12 @@ public class PacketManager {
     /**
      * Sends a query and completes the future when the value is available
      *
-     * @param networkParticipant the participant in the network, where the packet will be send to
+     * @param networkParticipant the participant in the network, where the packet will be sent to
      * @param packet the query-packet
      * @return future for the packet
      */
 
-    public CompletableFuture<Packet> packetQueryAsync(NetworkParticipant networkParticipant, Packet packet) {
+    public CompletableFuture<Packet> packetQueryAsync(NetworkPacketSender networkParticipant, Packet packet) {
         this.convertToQueryPacket(packet, UUID.randomUUID());
         networkParticipant.sendPacket(packet);
         CompletableFuture<Packet> future = new CompletableFuture<>();
@@ -64,12 +60,12 @@ public class PacketManager {
     /**
      * Sends a query and waits for the result up to 6 seconds
      *
-     * @param networkParticipant the participant in the network, where the packet will be send to
+     * @param networkParticipant the participant in the network, where the packet will be sent to
      * @param packet the query-packet
      * @return the result-packet of the query or null
      */
 
-    public Packet packetQuery(NetworkParticipant networkParticipant, Packet packet) {
+    public Packet packetQuery(NetworkPacketSender networkParticipant, Packet packet) {
         try {
             return this.packetQueryAsync(networkParticipant, packet).get(6, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {

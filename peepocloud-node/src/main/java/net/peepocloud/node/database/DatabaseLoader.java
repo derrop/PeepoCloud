@@ -3,7 +3,8 @@ package net.peepocloud.node.database;
  * Created by Mc_Ruben on 05.11.2018
  */
 
-import net.peepocloud.lib.config.yaml.YamlConfigurable;
+import net.peepocloud.commons.config.yaml.YamlConfigurable;
+import net.peepocloud.commons.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.addon.AddonManager;
 import net.peepocloud.node.database.defaults.arango.ArangoDatabaseManager;
@@ -18,7 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class DatabaseLoader { //TODO implement languagesystem
+public class DatabaseLoader {
 
     private AddonManager<DatabaseAddon> addonManager;
 
@@ -32,29 +33,52 @@ public class DatabaseLoader { //TODO implement languagesystem
         this.addonManager.disableAndUnloadAddons();
     }
 
-    void enableDatabase(DatabaseAddon addon, DatabaseManager databaseManager) {
-        System.out.println("&eLoading database &9" + databaseManager.getClass().getSimpleName() + " &eby &6" + addon.getAddonConfig().getAuthor() + "&e...");
+    private void connectFailed() {
+        System.err.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.connectFailed"));
+        SystemUtils.sleepUninterruptedly(5000);
+        System.exit(0);
+    }
 
-        if (PeepoCloudNode.getInstance().getDatabaseManager() != null) {
-            PeepoCloudNode.getInstance().getDatabaseManager().shutdown();
+    private boolean doConnect(DatabaseManager databaseManager, DatabaseConfig config) {
+        System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.connecting")
+                .replace("%host%", config.getHost() + ":" + config.getPort()));
+        try {
+            if (databaseManager.connect(config)) {
+                System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.successConnect")
+                        .replace("%name%", databaseManager.getClass().getSimpleName())
+                        .replace("%host%", config.getHost() + ":" + config.getPort()));
+                return true;
+            } else {
+                System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.failedConnect")
+                        .replace("%name%", databaseManager.getClass().getSimpleName())
+                        .replace("%host%", config.getHost() + ":" + config.getPort()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return false;
+    }
+
+    void enableDatabase(DatabaseAddon addon, DatabaseManager databaseManager) {
+        System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.loading")
+                .replace("%name%", databaseManager.getClass().getSimpleName()).replace("%author%", addon.getAddonConfig().getAuthor()));
+
+        DatabaseManager oldDatabaseManager = PeepoCloudNode.getInstance().getDatabaseManager();
 
         PeepoCloudNode.getInstance().setDatabaseManager(databaseManager);
         DatabaseConfig config = loadConfig(databaseManager);
-        System.out.println("&eTrying to connect to database &7@" + config.getHost() + ":" + config.getPort() + "&e...");
-        try {
-            databaseManager.connect(config);
-            System.out.println("&aSuccessfully loaded database &9" + databaseManager.getClass().getSimpleName() + " &eby &6" + addon.getAddonConfig().getAuthor());
-            System.out.println("&aSuccessfully connected to database &7@" + config.getHost() + ":" + config.getPort() + " &c(MAKE SURE THAT ALL NODES ARE CONNECTED TO THE SAME DATABASE)");
-        } catch (Exception e) {
-            System.err.println("&cCould not connect to database, system will exit in 5 seconds...");
-            e.printStackTrace();
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
+        if (doConnect(databaseManager, config)) {
+            oldDatabaseManager.shutdown();
+            System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.successLoad")
+                    .replace("%name%", databaseManager.getClass().getSimpleName()).replace("%author%", addon.getAddonConfig().getAuthor()));
+        } else {
+            if (oldDatabaseManager == null || !oldDatabaseManager.isConnected()) {
+                connectFailed();
+            } else {
+                System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.connectFailedUsingOld")
+                        .replace("%name%", databaseManager.getClass().getSimpleName())
+                        .replace("%old%", oldDatabaseManager.getClass().getSimpleName()));
             }
-            System.exit(0);
         }
     }
 
@@ -90,8 +114,8 @@ public class DatabaseLoader { //TODO implement languagesystem
                         String dbs = dbsBuilder.substring(0, dbsBuilder.length() - 2);
                         setup.request(
                                 "db",
-                                "Please specify the database that you want to use: " + dbs,
-                                "Invalid input, please choose one of the following and if you want more databases than those, make suggestions on our discord or write your own: " + dbs,
+                                PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.setup.request").replace("%dbs%", dbs),
+                                PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.setup.invalid").replace("%dbs%", dbs),
                                 new ArraySetupAcceptable<>(databases.keySet().toArray())
                         );
                         node.getInternalConfig().append("databaseManager", setup.getData().getString("db").toLowerCase());
@@ -107,19 +131,8 @@ public class DatabaseLoader { //TODO implement languagesystem
 
         DatabaseConfig config = loadConfig(databaseManager);
 
-        System.out.println("&eTrying to connect to database &7@" + config.getHost() + ":" + config.getPort() + "&e...");
-        try {
-            databaseManager.connect(config);
-            System.out.println("&aSuccessfully connected to database &7@" + config.getHost() + ":" + config.getPort() + " &c(MAKE SURE THAT ALL NODES ARE CONNECTED TO THE SAME DATABASE)");
-        } catch (Exception e) {
-            System.err.println("&cCould not connect to database, system will exit in 5 seconds...");
-            e.printStackTrace();
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-            System.exit(0);
+        if (!this.doConnect(databaseManager, config)) {
+            connectFailed();
         }
 
         return databaseManager;
@@ -155,8 +168,7 @@ public class DatabaseLoader { //TODO implement languagesystem
                     .append("database", config.getDatabase())
                     .saveAsFile(path);
 
-            System.out.println("&4Your database configuration file was created, please configure it and restart the System");
-            System.out.println("&aThe System will exit in 5 seconds...");
+            System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.configCreate"));
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {

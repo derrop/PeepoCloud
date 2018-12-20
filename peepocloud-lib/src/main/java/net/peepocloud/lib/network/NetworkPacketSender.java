@@ -1,10 +1,10 @@
-package net.peepocloud.lib.network;
+package net.peepocloud.api.network;
 /*
  * Created by Mc_Ruben on 08.12.2018
  */
 
-import net.peepocloud.lib.network.packet.FilePacket;
-import net.peepocloud.lib.network.packet.Packet;
+import net.peepocloud.api.network.packet.FilePacket;
+import net.peepocloud.api.network.packet.Packet;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -28,5 +28,7 @@ public interface NetworkPacketSender {
     }
 
     void sendPacketSync(Packet packet);
+
+    void close();
 
 }

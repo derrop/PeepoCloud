@@ -1,7 +1,8 @@
 package net.peepocloud.lib.network;
 
 import io.netty.channel.Channel;
-import net.peepocloud.lib.network.packet.Packet;
+import net.peepocloud.api.network.NetworkPacketSender;
+import net.peepocloud.api.network.packet.Packet;
 
 import java.net.InetSocketAddress;
 
@@ -34,6 +35,12 @@ public class NetworkParticipant implements NetworkPacketSender {
     public void sendPacketSync(Packet packet) {
         if (this.isConnected())
             this.channel.writeAndFlush(packet).syncUninterruptibly();
+    }
+
+    @Override
+    public void close() {
+        if (this.channel != null)
+            this.channel.close();
     }
 
     public boolean isConnected() {

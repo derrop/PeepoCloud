@@ -6,8 +6,8 @@ package net.peepocloud.node.server.minecraftserverfile;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.reflect.TypeToken;
 import lombok.*;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
-import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.commons.config.json.SimpleJsonObject;
+import net.peepocloud.commons.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.server.ServerVersion;
 

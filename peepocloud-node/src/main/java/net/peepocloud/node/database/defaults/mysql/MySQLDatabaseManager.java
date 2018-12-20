@@ -99,9 +99,10 @@ public class MySQLDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public void connect(DatabaseConfig config) throws Exception {
-        if (connectionClosed)
-            return;
+    public boolean connect(DatabaseConfig config) throws Exception {
+        if (connectionClosed) {
+            return false;
+        }
 
         Class.forName("com.mysql.cj.jdbc.Driver");
 
@@ -114,8 +115,11 @@ public class MySQLDatabaseManager implements DatabaseManager {
                         "?autoReconnect=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
                 config.getUsername(),
                 config.getPassword());
-        System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.mysqldb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
-        getDatabases(strings -> {});
+        if (this.isConnected()) {
+            System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.mysqldb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
+            return true;
+        }
+        return false;
     }
 
     @Override

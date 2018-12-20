@@ -1,10 +1,10 @@
-package net.peepocloud.lib.network.packet;
+package net.peepocloud.api.network.packet;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */
 
-import net.peepocloud.lib.utility.ZipUtils;
-import net.peepocloud.lib.utility.network.PacketUtils;
+import net.peepocloud.commons.utility.ZipUtils;
+import net.peepocloud.commons.utility.network.PacketUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;

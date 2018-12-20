@@ -3,12 +3,13 @@ package net.peepocloud.node.command.defaults;
  * Created by Mc_Ruben on 25.11.2018
  */
 
-import net.peepocloud.lib.config.yaml.YamlConfigurable;
-import net.peepocloud.lib.server.GroupMode;
-import net.peepocloud.lib.server.Template;
-import net.peepocloud.lib.server.bungee.BungeeGroup;
-import net.peepocloud.lib.server.minecraft.MinecraftGroup;
-import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.api.users.User;
+import net.peepocloud.commons.config.yaml.YamlConfigurable;
+import net.peepocloud.api.server.GroupMode;
+import net.peepocloud.api.server.Template;
+import net.peepocloud.api.server.bungee.BungeeGroup;
+import net.peepocloud.api.server.minecraft.MinecraftGroup;
+import net.peepocloud.commons.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.command.Command;
 import net.peepocloud.node.command.CommandSender;
@@ -18,7 +19,6 @@ import net.peepocloud.node.setup.type.ArraySetupAcceptable;
 import net.peepocloud.node.setup.type.EnumSetupAcceptable;
 import net.peepocloud.node.setup.type.IntegerSetupAcceptable;
 import net.peepocloud.node.setup.type.StringSetupAcceptable;
-import net.peepocloud.node.utility.users.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;

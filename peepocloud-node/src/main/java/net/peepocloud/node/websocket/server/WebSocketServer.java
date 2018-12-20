@@ -15,9 +15,8 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
-import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import lombok.Getter;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.commons.config.json.SimpleJsonObject;
 import net.peepocloud.node.websocket.server.auth.WebSocketServerAuthMethod;
 
 import java.io.IOException;

@@ -1,6 +1,6 @@
-package net.peepocloud.lib.network.packet;
+package net.peepocloud.api.network.packet;
 
-import net.peepocloud.lib.network.packet.handler.PacketHandler;
+import net.peepocloud.api.network.packet.handler.PacketHandler;
 
 public class PacketInfo {
     private int id;

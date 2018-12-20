@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.commons.utility.SystemUtils;
 import net.peepocloud.node.logging.ColoredLogger;
 import net.peepocloud.node.logging.animated.ConsoleProgressBarAnimation;
 

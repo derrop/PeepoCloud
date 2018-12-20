@@ -65,11 +65,11 @@ public class ArangoDatabaseManager implements DatabaseManager {
 
     @Override
     public boolean isConnected() {
-        return true;//TODO
+        return this.arangoDatabase.exists();
     }
 
     @Override
-    public void connect(DatabaseConfig config) {
+    public boolean connect(DatabaseConfig config) {
         this.arangoDB = new ArangoDB.Builder()
                 .host(config.getHost(), config.getPort())
                 .user(config.getUsername())
@@ -78,6 +78,7 @@ public class ArangoDatabaseManager implements DatabaseManager {
         System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.arangodb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
 
         this.arangoDatabase = this.arangoDB.db(config.getDatabase());
+        return this.isConnected();
     }
 
     @Override

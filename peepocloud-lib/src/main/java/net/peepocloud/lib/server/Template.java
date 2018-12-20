@@ -8,11 +8,28 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
 public class Template {
     private String name;
     private String storage;
+
+    /**
+     * Gets the name of this {@link Template}
+     *
+     * @return the name of this {@link Template}
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets the storage of this {@link Template}
+     *
+     * @return the storage of this {@link Template}
+     */
+    public String getStorage() {
+        return storage;
+    }
 }

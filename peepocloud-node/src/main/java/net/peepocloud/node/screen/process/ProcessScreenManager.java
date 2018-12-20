@@ -5,6 +5,7 @@ package net.peepocloud.node.screen.process;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.peepocloud.api.network.NetworkPacketSender;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.node.network.packet.out.screen.PacketOutScreenLine;
 import net.peepocloud.node.screen.EnabledScreen;
@@ -20,20 +21,20 @@ import java.util.function.Consumer;
 @Getter
 public class ProcessScreenManager {
 
-    private Map<CloudProcess, Collection<NetworkParticipant>> networkScreens = new ConcurrentHashMap<>();
+    private Map<CloudProcess, Collection<NetworkPacketSender>> networkScreens = new ConcurrentHashMap<>();
 
-    public void enableNetworkScreen(CloudProcess process, NetworkParticipant node) {
+    public void enableNetworkScreen(CloudProcess process, NetworkPacketSender node) {
         if (!this.networkScreens.containsKey(process))
             this.networkScreens.put(process, new ArrayList<>());
         this.networkScreens.get(process).add(node);
-        Collection<NetworkParticipant> nodes = this.networkScreens.get(process);
+        Collection<NetworkPacketSender> nodes = this.networkScreens.get(process);
         process.getCachedLog().forEach(s -> node.sendPacket(new PacketOutScreenLine(process.getName(), s)));
         if (process.getNetworkScreenHandler() == null) {
             process.setNetworkScreenHandler(s -> nodes.forEach(networkParticipant -> networkParticipant.sendPacket(new PacketOutScreenLine(process.getName(), s))));
         }
     }
 
-    public void disableNetworkScreen(CloudProcess process, NetworkParticipant node) {
+    public void disableNetworkScreen(CloudProcess process, NetworkPacketSender node) {
         if (!this.networkScreens.containsKey(process)) {
             process.setNetworkScreenHandler(null);
             return;

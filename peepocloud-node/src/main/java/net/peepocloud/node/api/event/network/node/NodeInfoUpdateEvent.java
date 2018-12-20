@@ -4,8 +4,8 @@ package net.peepocloud.node.api.event.network.node;
  */
 
 import lombok.Getter;
-import net.peepocloud.lib.node.NodeInfo;
-import net.peepocloud.node.api.event.network.NetworkEvent;
+import net.peepocloud.api.event.network.NetworkEvent;
+import net.peepocloud.api.node.NodeInfo;
 import net.peepocloud.node.network.ClientNode;
 
 @Getter

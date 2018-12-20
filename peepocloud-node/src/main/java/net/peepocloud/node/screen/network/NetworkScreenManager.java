@@ -4,6 +4,7 @@ package net.peepocloud.node.screen.network;
  */
 
 import lombok.Getter;
+import net.peepocloud.api.network.NetworkPacketSender;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
@@ -98,7 +99,7 @@ public class NetworkScreenManager {
         });
     }
 
-    public void dispatchScreenInput(NetworkParticipant node, String name, String line) {
+    public void dispatchScreenInput(NetworkPacketSender node, String name, String line) {
         if (line == null)
             return;
         if (!this.screens.containsKey(name)) {

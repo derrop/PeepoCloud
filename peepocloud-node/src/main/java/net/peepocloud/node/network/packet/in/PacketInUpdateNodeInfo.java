@@ -3,11 +3,12 @@ package net.peepocloud.node.network.packet.in;
  * Created by Mc_Ruben on 14.11.2018
  */
 
+import net.peepocloud.api.network.NetworkPacketSender;
 import net.peepocloud.lib.network.NetworkParticipant;
-import net.peepocloud.lib.network.packet.JsonPacket;
-import net.peepocloud.lib.network.packet.Packet;
-import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
-import net.peepocloud.lib.node.NodeInfo;
+import net.peepocloud.api.network.packet.JsonPacket;
+import net.peepocloud.api.network.packet.Packet;
+import net.peepocloud.api.network.packet.handler.JsonPacketHandler;
+import net.peepocloud.api.node.NodeInfo;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.network.node.NodeInfoUpdateEvent;
 import net.peepocloud.node.network.ClientNode;
@@ -23,7 +24,7 @@ public class PacketInUpdateNodeInfo extends JsonPacketHandler {
     }
 
     @Override
-    public void handlePacket(NetworkParticipant networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
+    public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
         ClientNode node = PeepoCloudNode.getInstance().getConnectedNode(networkParticipant.getName());
         if (node != null) {
             NodeInfo nodeInfo = packet.getSimpleJsonObject().getObject("nodeInfo", NodeInfo.class);
