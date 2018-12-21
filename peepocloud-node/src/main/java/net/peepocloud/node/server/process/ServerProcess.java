@@ -154,6 +154,7 @@ public class ServerProcess implements CloudProcess {
             }
             this.serverInfo.setMaxPlayers(maxPlayers);
         }
+        configurable.append("server-name", this.serverInfo.getComponentName());
         MinecraftServerConfigFillEvent configFillEvent = new MinecraftServerConfigFillEvent(this, path, configurable);
         PeepoCloudNode.getInstance().getEventManager().callEvent(configFillEvent);
         configFillEvent.getConfigurable().saveAsFile(configFillEvent.getConfigPath());

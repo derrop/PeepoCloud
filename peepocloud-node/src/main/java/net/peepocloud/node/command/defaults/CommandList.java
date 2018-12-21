@@ -31,45 +31,48 @@ public class CommandList extends Command {
 
         this.sendNodeInfo(sender, PeepoCloudNode.getInstance().getProcessManager());
         sender.sendMessage("Memory global: " + PeepoCloudNode.getInstance().getMemoryUsed() + "/" + PeepoCloudNode.getInstance().getMaxMemory() + " MB");
-        sender.sendMessage("Nodes:");
-        for (NodeParticipant value : PeepoCloudNode.getInstance().getServerNodes().values()) {
-            sender.sendMessage(" " + value.getName() + " @" + value.getAddress());
-            if (value.getNodeInfo() != null) {
-                sender.sendMessage("  Memory: " + value.getNodeInfo().getUsedMemory() + "/" + value.getNodeInfo().getMaxMemory() + " MB");
-                sender.sendMessage("  CPU: " + value.getNodeInfo().getCpuUsage());
-            }
-            if (!value.getServers().isEmpty() || !value.getStartingServers().isEmpty() || !value.getWaitingServers().isEmpty()) {
-                sender.sendMessage("  Servers:");
-                if (!value.getServers().isEmpty()) {
-                    sender.sendMessage("   Running:");
-                    value.getServers().values().forEach(minecraftServerInfo -> this.server(sender, minecraftServerInfo));
-                }
-                if (!value.getStartingServers().isEmpty()) {
-                    sender.sendMessage("   Starting:");
-                    value.getStartingServers().values().forEach(minecraftServerInfo -> this.server(sender, minecraftServerInfo));
-                }
-                if (!value.getWaitingServers().isEmpty()) {
-                    sender.sendMessage("   Queued:");
-                    value.getWaitingServers().values().forEach(minecraftServerInfo -> this.server(sender, minecraftServerInfo));
-                }
-            }
 
-            if (!value.getProxies().isEmpty() || !value.getStartingProxies().isEmpty() || !value.getWaitingProxies().isEmpty()) {
-                sender.sendMessage("  Proxies:");
-                if (!value.getProxies().isEmpty()) {
-                    sender.sendMessage("   Running:");
-                    value.getProxies().values().forEach(minecraftServerInfo -> this.proxy(sender, minecraftServerInfo));
+        if (!PeepoCloudNode.getInstance().getServerNodes().isEmpty()) {
+            sender.sendMessage("Nodes:");
+            for (NodeParticipant value : PeepoCloudNode.getInstance().getServerNodes().values()) {
+                sender.sendMessage(" " + value.getName() + " @" + value.getAddress());
+                if (value.getNodeInfo() != null) {
+                    sender.sendMessage("  Memory: " + value.getNodeInfo().getUsedMemory() + "/" + value.getNodeInfo().getMaxMemory() + " MB");
+                    sender.sendMessage("  CPU: " + value.getNodeInfo().getCpuUsage());
                 }
-                if (!value.getStartingProxies().isEmpty()) {
-                    sender.sendMessage("   Starting:");
-                    value.getStartingProxies().values().forEach(minecraftServerInfo -> this.proxy(sender, minecraftServerInfo));
+                if (!value.getServers().isEmpty() || !value.getStartingServers().isEmpty() || !value.getWaitingServers().isEmpty()) {
+                    sender.sendMessage("  Servers:");
+                    if (!value.getServers().isEmpty()) {
+                        sender.sendMessage("   Running:");
+                        value.getServers().values().forEach(minecraftServerInfo -> this.server(sender, minecraftServerInfo));
+                    }
+                    if (!value.getStartingServers().isEmpty()) {
+                        sender.sendMessage("   Starting:");
+                        value.getStartingServers().values().forEach(minecraftServerInfo -> this.server(sender, minecraftServerInfo));
+                    }
+                    if (!value.getWaitingServers().isEmpty()) {
+                        sender.sendMessage("   Queued:");
+                        value.getWaitingServers().values().forEach(minecraftServerInfo -> this.server(sender, minecraftServerInfo));
+                    }
                 }
-                if (!value.getWaitingProxies().isEmpty()) {
-                    sender.sendMessage("   Queued:");
-                    value.getWaitingProxies().values().forEach(minecraftServerInfo -> this.proxy(sender, minecraftServerInfo));
-                }
-            }
 
+                if (!value.getProxies().isEmpty() || !value.getStartingProxies().isEmpty() || !value.getWaitingProxies().isEmpty()) {
+                    sender.sendMessage("  Proxies:");
+                    if (!value.getProxies().isEmpty()) {
+                        sender.sendMessage("   Running:");
+                        value.getProxies().values().forEach(minecraftServerInfo -> this.proxy(sender, minecraftServerInfo));
+                    }
+                    if (!value.getStartingProxies().isEmpty()) {
+                        sender.sendMessage("   Starting:");
+                        value.getStartingProxies().values().forEach(minecraftServerInfo -> this.proxy(sender, minecraftServerInfo));
+                    }
+                    if (!value.getWaitingProxies().isEmpty()) {
+                        sender.sendMessage("   Queued:");
+                        value.getWaitingProxies().values().forEach(minecraftServerInfo -> this.proxy(sender, minecraftServerInfo));
+                    }
+                }
+
+            }
         }
     }
 
