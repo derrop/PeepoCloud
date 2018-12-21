@@ -1,4 +1,7 @@
 {
   "nodePath": "peepocloud-node/target/PeepoCloud-Node.jar",
-  "nodeDocsPath": "peepocloud-node-api/target/apidocs"
+  "docs": {
+    "Node": "peepocloud-node/target/apidocs",
+    "ServerAPI": "peepocloud-api/target/apidocs"
+  }
 }
