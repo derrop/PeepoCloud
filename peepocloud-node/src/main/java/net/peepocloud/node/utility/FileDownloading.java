@@ -33,7 +33,17 @@ public class FileDownloading {
      * @throws IOException if an I/O Error occurs
      */
     public static void copyStreamWithProgessBar(ColoredLogger logger, int length, InputStream inputStream, OutputStream outputStream) throws IOException {
-        ConsoleProgressBarAnimation animation = new ConsoleProgressBarAnimation(logger, length, 0, '=', '>', "<!", "!> %value% bytes / %length% bytes | %percent%%, %time% seconds, %bps% KBit/s");
+        ConsoleProgressBarAnimation animation = new ConsoleProgressBarAnimation(logger, length, 0, '=', '>', "<!", "!> %value% MB / %length% MB | %percent%%, %time% seconds, %bps% KBit/s") {
+            @Override
+            protected String formatCurrentValue(long currentValue) {
+                return String.format("%.3f", (double) currentValue / 1000D / 1000D); //format to MB
+            }
+
+            @Override
+            protected String formatLength(long length) {
+                return this.formatCurrentValue(length);
+            }
+        };
 
         logger.startAnimation(animation);
 

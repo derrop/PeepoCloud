@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.peepocloud.node.PeepoCloudNode;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,6 +44,11 @@ public class AddonLoader {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             System.err.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("addons.loadingMainClassError")
                     .replace("%main%", config.getMain()).replace("%addon%", config.getName()));
+            try {
+                this.classLoader.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             e.printStackTrace();
         }
         return t;

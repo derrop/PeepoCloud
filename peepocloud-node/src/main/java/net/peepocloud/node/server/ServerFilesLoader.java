@@ -5,6 +5,7 @@ package net.peepocloud.node.server;
 
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.process.bungee.BungeeCordStartupFileCopyEvent;
 import net.peepocloud.node.api.event.process.server.MinecraftServerStartupFileCopyEvent;
@@ -20,6 +21,8 @@ import java.nio.file.Paths;
 
 public class ServerFilesLoader {
 
+    private static boolean installingSpigot = false, installingBungee = false;
+
     public static void tryInstallSpigot() {
         Path source = Paths.get("files/server.jar");
         installServer(source);
@@ -27,6 +30,7 @@ public class ServerFilesLoader {
 
     private static void installServer(Path source) {
         if (!Files.exists(source)) {
+            installingSpigot = true;
             if (!Files.exists(source.getParent())) {
                 try {
                     Files.createDirectory(source.getParent());
@@ -35,6 +39,7 @@ public class ServerFilesLoader {
                 }
             }
             SetupMinecraftServerStartupFile.installServer(PeepoCloudNode.getInstance().getLogger(), source);
+            installingSpigot = false;
         }
     }
 
@@ -45,6 +50,7 @@ public class ServerFilesLoader {
 
     private static void installBungee(Path source) {
         if (!Files.exists(source)) {
+            installingBungee = true;
             if (!Files.exists(source.getParent())) {
                 try {
                     Files.createDirectory(source.getParent());
@@ -53,10 +59,15 @@ public class ServerFilesLoader {
                 }
             }
             SetupBungeeStartupFile.installBungee(PeepoCloudNode.getInstance().getLogger(), source);
+            installingBungee = false;
         }
     }
 
     public static void copySpigot(CloudProcess cloudProcess, MinecraftServerInfo serverInfo, Path path) {
+        while (installingSpigot) {
+            SystemUtils.sleepUninterruptedly(150);
+        }
+
         if (!Files.exists(path)) {
             Path source = Paths.get("files/server.jar");
             installServer(source);
@@ -78,6 +89,10 @@ public class ServerFilesLoader {
     }
 
     public static void copyBungee(CloudProcess cloudProcess, BungeeCordProxyInfo proxyInfo, Path path) {
+        while (installingBungee) {
+            SystemUtils.sleepUninterruptedly(150);
+        }
+
         if (!Files.exists(path)) {
             Path source = Paths.get("files/bungee.jar");
             installBungee(source);

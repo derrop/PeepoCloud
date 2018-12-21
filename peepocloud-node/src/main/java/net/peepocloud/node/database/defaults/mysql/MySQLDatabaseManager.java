@@ -91,7 +91,7 @@ public class MySQLDatabaseManager implements DatabaseManager {
     @Override
     public boolean isConnected() {
         try {
-            return connection != null && !connection.isClosed();
+            return connection != null && !connection.isClosed() && connection.isValid(250);
         } catch (SQLException e) {
             e.printStackTrace();
         }

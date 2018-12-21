@@ -5,11 +5,13 @@ package net.peepocloud.node.server.process.handler;
 
 import lombok.RequiredArgsConstructor;
 import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.node.server.process.BungeeProcess;
 import net.peepocloud.node.server.process.CloudProcess;
 import net.peepocloud.node.server.process.ProcessManager;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 
 @RequiredArgsConstructor
 public class ProcessLogHandler implements Runnable {
@@ -40,13 +42,22 @@ public class ProcessLogHandler implements Runnable {
                 stringBuffer.append(new String(buf, 0, len, StandardCharsets.UTF_8));
             }
 
-            for (String line : stringBuffer.toString().split("\n")) {
-                if (line.trim().isEmpty())
-                    continue;
-                process.getCachedLog().add(line);
-                process.getScreenHandlers().values().forEach(consumer -> consumer.accept(line));
-                if (process.getNetworkScreenHandler() != null) {
-                    process.getNetworkScreenHandler().accept(line);
+            for (String b : stringBuffer.toString().split("\n")) {
+                for (String line : b.split("\r")) {
+                    if (process instanceof BungeeProcess) {
+                        if (line.startsWith(">"))
+                            line = line.substring(1);
+                    }
+                    String a = line.trim();
+                    if (a.isEmpty() || a.equals("\n"))
+                        continue;
+                    process.getCachedLog().add(line);
+                    for (Consumer<String> value : process.getScreenHandlers().values()) {
+                        value.accept(line);
+                    }
+                    if (process.getNetworkScreenHandler() != null) {
+                        process.getNetworkScreenHandler().accept(line);
+                    }
                 }
             }
             stringBuffer.setLength(0);

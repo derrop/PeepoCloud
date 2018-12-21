@@ -64,6 +64,14 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
         }
     }
 
+    protected String formatCurrentValue(long currentValue) {
+        return String.valueOf(currentValue);
+    }
+
+    protected String formatLength(long length) {
+        return String.valueOf(length);
+    }
+
     private void doUpdate(double percent) {
         char[] chars = new char[100];
         for (int i = 0; i < (int) percent; i++) {
@@ -87,8 +95,8 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
     private String format(String input, double percent) {
         long time = (System.currentTimeMillis() - start) / 1000;
         return input == null ? "" : input
-                .replace("%value%", String.valueOf(this.currentValue))
-                .replace("%length%", String.valueOf(this.length))
+                .replace("%value%", formatCurrentValue(this.currentValue))
+                .replace("%length%", formatLength(this.length))
                 .replace("%percent%", String.format("%.2f", percent))
                 .replace("%time%", String.valueOf(time))
                 .replace("%bps%", String.valueOf(time == 0 ? "0" : ((currentValue / 1000) / time) * 8)); //bits per second
