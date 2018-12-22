@@ -9,7 +9,8 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
 import net.peepocloud.node.server.process.ServerProcess;
 
 import java.util.function.Consumer;
@@ -20,7 +21,7 @@ public class PacketInUpdateServer extends JsonPacketHandler {
         boolean a = false;
         MinecraftServerInfo serverInfo = packet.getSimpleJsonObject().getObject("serverInfo", MinecraftServerInfo.class);
         if (PeepoCloudNode.getInstance().getServersOnThisNode().containsKey(serverInfo.getComponentName())) {
-            PeepoCloudNode.getInstance().getServersOnThisNode().get(serverInfo.getComponentName()).setServerInfo(serverInfo);
+            ((MinecraftServerParticipantImpl) PeepoCloudNode.getInstance().getServersOnThisNode().get(serverInfo.getComponentName())).setServerInfo(serverInfo);
             a = true;
         }
         if (PeepoCloudNode.getInstance().getProcessManager().getProcesses().containsKey(serverInfo.getComponentName())) {

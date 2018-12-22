@@ -7,6 +7,7 @@ import lombok.*;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.CloudConfig;
 import net.peepocloud.node.PeepoCloudNode;
+import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.network.packet.out.server.PacketOutBungeeProcessStarted;
 import net.peepocloud.node.network.packet.out.server.PacketOutServerProcessStarted;
 import net.peepocloud.node.server.process.handler.ProcessLogHandler;
@@ -43,7 +44,7 @@ public class ProcessManager {
     private Consumer<Integer> bungeeMemoryAdd;
     private Consumer<Integer> serverMemoryAdd;
 
-    private Map<String, CloudProcess> processes = new HashMap<>();
+    private Map<String, CloudProcessImpl> processes = new HashMap<>();
 
     public void shutdown() {
         System.out.println("&eStopping server and proxy processes...");
@@ -98,7 +99,7 @@ public class ProcessManager {
         PeepoCloudNode.getInstance().getScreenManager().handleProcessStop(process);
     }
 
-    void handleProcessStart(CloudProcess process) {
+    void handleProcessStart(CloudProcessImpl process) {
         this.processes.put(process.getName(), process);
         if (process instanceof BungeeProcess) {
             PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeProcessStarted(((BungeeProcess) process).getProxyInfo()));

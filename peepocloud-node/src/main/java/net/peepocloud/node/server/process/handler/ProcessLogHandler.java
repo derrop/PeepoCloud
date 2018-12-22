@@ -6,7 +6,8 @@ package net.peepocloud.node.server.process.handler;
 import lombok.RequiredArgsConstructor;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.server.process.BungeeProcess;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.server.process.CloudProcessImpl;
 import net.peepocloud.node.server.process.ProcessManager;
 
 import java.io.InputStream;
@@ -22,14 +23,14 @@ public class ProcessLogHandler implements Runnable {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            for (CloudProcess value : this.processManager.getProcesses().values()) {
+            for (CloudProcessImpl value : this.processManager.getProcesses().values()) {
                 this.readLog(value);
             }
             SystemUtils.sleepUninterruptedly(50);
         }
     }
 
-    private void readLog(CloudProcess process) {
+    private void readLog(CloudProcessImpl process) {
         try {
             if (!process.isRunning())
                 return;

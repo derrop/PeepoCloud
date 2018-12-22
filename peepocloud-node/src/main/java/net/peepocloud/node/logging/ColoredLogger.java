@@ -8,7 +8,10 @@ import jline.console.ConsoleReader;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import net.peepocloud.node.command.CommandManager;
+import net.peepocloud.node.api.logging.AbstractConsoleAnimation;
+import net.peepocloud.node.api.logging.ConsoleColor;
+import net.peepocloud.node.api.logging.ConsoleLogger;
+import net.peepocloud.node.command.CommandManagerImpl;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -24,7 +27,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.*;
 
-public class ColoredLogger extends Logger {
+public class ColoredLogger extends Logger implements ConsoleLogger {
 
     private ConsoleReader consoleReader;
 
@@ -62,7 +65,7 @@ public class ColoredLogger extends Logger {
     }
 
     /**
-     * @deprecated don't use after {@link CommandManager} has been started
+     * @deprecated don't use after {@link CommandManagerImpl} has been started
      * @return the line read from the console
      */
     @Deprecated
@@ -105,13 +108,6 @@ public class ColoredLogger extends Logger {
         return line;
     }
 
-    /**
-     * Reads the lines until the {@link Function#apply(String)} returns {@code true}
-     * @param function the {@link Function} which must return {@code true} to break the loop and let it return the input of the user
-     * @param invalidInputMessage the message which is printed when the {@link Function#apply(String)} returns {@code false}
-     * @param nullOn if the input of the user is equal to nullOn, {@code null} is returned
-     * @return the user input line when the {@link Function#apply(String)} returns {@code true}
-     */
     public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage, String nullOn) {
         String line;
         while (!function.apply(line = this.readLine()) || (line.equalsIgnoreCase(nullOn))) {
@@ -123,27 +119,14 @@ public class ColoredLogger extends Logger {
         return line;
     }
 
-    /**
-     * Reads the lines until the {@link Function#apply(String)} returns {@code true}
-     * @param function the {@link Function} which must return {@code true} to break the loop and let it return the input of the user
-     * @param invalidInputMessage the message which is printed when the {@link Function#apply(String)} returns {@code false}
-     * @return the user input line when the {@link Function#apply(String)} returns {@code true}
-     */
     public String readLineUntil(Function<String, Boolean> function, String invalidInputMessage) {
         return this.readLineUntil(function, invalidInputMessage, null);
     }
 
-    /**
-     * Gets the {@link ConsoleReader} of this {@link ColoredLogger}
-     * @return the {@link ConsoleReader} of this {@link ColoredLogger}
-     */
     public ConsoleReader getConsoleReader() {
         return consoleReader;
     }
 
-    /**
-     * Clears the console screen
-     */
     public void clearScreen() {
         try {
             this.consoleReader.clearScreen();
@@ -154,10 +137,6 @@ public class ColoredLogger extends Logger {
             this.runningAnimation.cursorUp = 1;
     }
 
-    /**
-     * Prints the specified line to this {@link ColoredLogger}
-     * @param line the line to print
-     */
     public void print(String line) {
         line = ConsoleColor.toColouredString(line);
 
@@ -171,10 +150,6 @@ public class ColoredLogger extends Logger {
         this.updateAnimation();
     }
 
-    /**
-     * Prints the specified line without removing the command prompt and reset line to this {@link ColoredLogger}
-     * @param line the line to print
-     */
     public void printRaw(String line) {
         line = ConsoleColor.toColouredString(line);
 
@@ -185,44 +160,18 @@ public class ColoredLogger extends Logger {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.updateAnimation();
     }
 
-    void print0(String line) {
-        line = ConsoleColor.toColouredString(line);
-
-        try {
-            consoleReader.print(Ansi.ansi().eraseLine(Ansi.Erase.ALL).toString() + ConsoleReader.RESET_LINE + line + Ansi.ansi().reset().toString());
-            consoleReader.drawLine();
-            consoleReader.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Prints the given {@code line} to this {@link ColoredLogger} if {@code debugging} is enabled
-     * @param line the line to print
-     */
     public void debug(String line) {
         if (this.debugging) {
             this.print("&5[DEBUG] " + line);
         }
     }
 
-    /**
-     * Checks if there is an {@link AbstractConsoleAnimation} running in this {@link ColoredLogger}
-     * @return {@code true} if the running {@link AbstractConsoleAnimation} is not null or {@code false} if it is null
-     */
     public boolean isAnimationRunning() {
         return runningAnimation != null;
     }
 
-    /**
-     * Starts a {@link AbstractConsoleAnimation} to this {@link ColoredLogger} if there is no other animation running
-     * @param animation the animation to start
-     * @throws IllegalArgumentException if there is already an {@link AbstractConsoleAnimation} running in this {@link ColoredLogger}
-     */
     public void startAnimation(AbstractConsoleAnimation animation) {
         Preconditions.checkArgument(this.runningAnimation == null, "there is already another animation running in this logger");
         this.runningAnimation = animation;

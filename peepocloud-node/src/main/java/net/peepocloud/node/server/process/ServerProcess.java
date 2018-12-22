@@ -20,6 +20,8 @@ import net.peepocloud.node.api.event.process.server.MinecraftServerConfigFillEve
 import net.peepocloud.node.api.event.process.server.MinecraftServerPostConfigFillEvent;
 import net.peepocloud.node.api.event.process.server.MinecraftServerPostTemplateCopyEvent;
 import net.peepocloud.node.api.event.process.server.MinecraftServerTemplateCopyEvent;
+import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.server.ServerFilesLoader;
 
 import java.io.IOException;
@@ -32,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Getter
-public class ServerProcess implements CloudProcess {
+public class ServerProcess implements CloudProcessImpl {
 
     private Process process;
     private Path directory;
@@ -86,6 +88,28 @@ public class ServerProcess implements CloudProcess {
     @Override
     public int getPort() {
         return this.serverInfo.getPort();
+    }
+
+    @Override
+    public void copyToTemplate(Template template) {
+        TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
+        if (storage == null)
+            storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
+        if (storage == null)
+            return;
+        storage.copyToTemplate(this.serverInfo, this.directory, template);
+    }
+
+    @Override
+    public void copyToTemplate(Template template, String... files) {
+        if (files.length == 0)
+            return;
+        TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
+        if (storage == null)
+            storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
+        if (storage == null)
+            return;
+        storage.copyFilesToTemplate(this.serverInfo, this.directory, template, files);
     }
 
     @Override

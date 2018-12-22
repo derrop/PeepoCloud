@@ -8,7 +8,7 @@ import com.mongodb.client.model.Filters;
 import lombok.*;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.database.Database;
+import net.peepocloud.node.api.database.Database;
 import org.bson.Document;
 
 import java.util.function.Consumer;

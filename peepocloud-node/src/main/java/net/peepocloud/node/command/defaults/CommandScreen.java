@@ -6,16 +6,19 @@ package net.peepocloud.node.command.defaults;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.command.Command;
-import net.peepocloud.node.command.CommandSender;
-import net.peepocloud.node.command.TabCompletable;
-import net.peepocloud.node.network.participant.NodeParticipant;
-import net.peepocloud.node.screen.EnabledScreen;
+import net.peepocloud.node.api.command.Command;
+import net.peepocloud.node.api.command.CommandSender;
+import net.peepocloud.node.api.command.TabCompletable;
+import net.peepocloud.node.api.network.NodeParticipant;
+import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.api.server.screen.EnabledScreen;
 import net.peepocloud.node.server.process.BungeeProcess;
-import net.peepocloud.node.server.process.CloudProcess;
 import net.peepocloud.node.server.process.ServerProcess;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 public class CommandScreen extends Command implements TabCompletable {

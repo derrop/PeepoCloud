@@ -4,9 +4,9 @@ package net.peepocloud.node.database.defaults.mysql;
  */
 
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.database.Database;
-import net.peepocloud.node.database.DatabaseConfig;
-import net.peepocloud.node.database.DatabaseManager;
+import net.peepocloud.node.api.database.Database;
+import net.peepocloud.node.api.database.DatabaseConfig;
+import net.peepocloud.node.api.database.DatabaseManager;
 
 import java.sql.*;
 import java.util.*;

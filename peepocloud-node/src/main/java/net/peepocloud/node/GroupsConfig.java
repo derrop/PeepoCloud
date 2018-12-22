@@ -7,7 +7,7 @@ import com.google.gson.JsonElement;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
-import net.peepocloud.node.database.Database;
+import net.peepocloud.node.api.database.Database;
 
 import java.util.HashMap;
 import java.util.Map;

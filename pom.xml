@@ -13,6 +13,7 @@
         <module>peepocloud-lib</module>
         <module>peepocloud-api</module>
         <module>peepocloud-node</module>
+        <module>peepocloud-node-api</module>
         <module>peepocloud-addons</module>
     </modules>
 

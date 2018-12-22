@@ -32,4 +32,8 @@ public interface NetworkPacketSender {
 
     void close();
 
+    String getAddress();
+
+    long getConnectedAt();
+
 }

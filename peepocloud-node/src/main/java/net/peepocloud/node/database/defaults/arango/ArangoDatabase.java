@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.database.Database;
+import net.peepocloud.node.api.database.Database;
 
 import java.util.HashMap;
 import java.util.function.Consumer;

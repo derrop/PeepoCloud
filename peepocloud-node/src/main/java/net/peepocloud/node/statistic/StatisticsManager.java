@@ -10,7 +10,7 @@ import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.network.node.NodeConnectEvent;
-import net.peepocloud.node.database.Database;
+import net.peepocloud.node.api.database.Database;
 import net.peepocloud.node.api.event.EventHandler;
 import net.peepocloud.node.websocket.WebSocketClient;
 

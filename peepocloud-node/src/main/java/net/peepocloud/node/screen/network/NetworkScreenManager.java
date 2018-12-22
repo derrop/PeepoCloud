@@ -10,9 +10,10 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.lib.network.packet.out.screen.PacketOutDispatchProxyCommand;
 import net.peepocloud.lib.network.packet.out.screen.PacketOutDispatchServerCommand;
+import net.peepocloud.node.api.network.NodeParticipant;
 import net.peepocloud.node.network.packet.out.screen.PacketOutToggleScreen;
-import net.peepocloud.node.network.participant.NodeParticipant;
-import net.peepocloud.node.screen.EnabledScreen;
+import net.peepocloud.node.network.participant.NodeParticipantImpl;
+import net.peepocloud.node.api.server.screen.EnabledScreen;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class NetworkScreenManager {
         return true;
     }
 
-    public void handleNodeDisconnect(NodeParticipant participant) {
+    public void handleNodeDisconnect(NodeParticipantImpl participant) {
         new HashMap<>(this.screens).forEach((s, networkScreen) -> { //prevent ConcurrentModificationException
             if (networkScreen.getParticipant().equals(participant)) {
                 this.screens.remove(s);

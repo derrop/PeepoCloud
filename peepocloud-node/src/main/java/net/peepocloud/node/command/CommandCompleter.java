@@ -5,6 +5,8 @@ package net.peepocloud.node.command;
 
 import jline.console.completer.Completer;
 import lombok.*;
+import net.peepocloud.node.api.command.Command;
+import net.peepocloud.node.api.command.TabCompletable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CommandCompleter implements Completer {
 
-    private CommandManager commandManager;
+    private CommandManagerImpl commandManager;
 
     @Override
     public int complete(String buffer, int cursor, List<CharSequence> candidates) {

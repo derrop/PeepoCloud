@@ -9,8 +9,9 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.node.PeepoCloudNode;
+import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
 import net.peepocloud.node.server.process.BungeeProcess;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.CloudProcess;
 
 import java.util.function.Consumer;
 
@@ -20,7 +21,7 @@ public class PacketInUpdateBungee extends JsonPacketHandler {
         boolean a = false;
         BungeeCordProxyInfo serverInfo = packet.getSimpleJsonObject().getObject("proxyInfo", BungeeCordProxyInfo.class);
         if (PeepoCloudNode.getInstance().getProxiesOnThisNode().containsKey(serverInfo.getComponentName())) {
-            PeepoCloudNode.getInstance().getProxiesOnThisNode().get(serverInfo.getComponentName()).setProxyInfo(serverInfo);
+            ((BungeeCordParticipantImpl) PeepoCloudNode.getInstance().getProxiesOnThisNode().get(serverInfo.getComponentName())).setProxyInfo(serverInfo);
             a = true;
         }
         if (PeepoCloudNode.getInstance().getProcessManager().getProcesses().containsKey(serverInfo.getComponentName())) {

@@ -6,7 +6,7 @@ package net.peepocloud.node.database.defaults.mysql;
 import lombok.*;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.database.Database;
+import net.peepocloud.node.api.database.Database;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

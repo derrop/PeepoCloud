@@ -6,7 +6,7 @@ package net.peepocloud.node.screen.network;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import net.peepocloud.node.network.participant.NodeParticipant;
+import net.peepocloud.node.api.network.NodeParticipant;
 
 import java.util.HashMap;
 import java.util.Map;

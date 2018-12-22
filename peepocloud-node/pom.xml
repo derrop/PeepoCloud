@@ -55,6 +55,13 @@
     <dependencies>
         <dependency>
             <groupId>net.peepocloud</groupId>
+            <artifactId>peepocloud-node-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.peepocloud</groupId>
             <artifactId>peepocloud-lib</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>

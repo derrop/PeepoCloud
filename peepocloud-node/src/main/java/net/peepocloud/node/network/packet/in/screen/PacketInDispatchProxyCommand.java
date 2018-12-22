@@ -8,7 +8,7 @@ import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.CloudProcess;
 
 import java.util.function.Consumer;
 

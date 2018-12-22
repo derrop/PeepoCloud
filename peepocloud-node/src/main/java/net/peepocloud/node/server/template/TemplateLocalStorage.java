@@ -9,7 +9,8 @@ import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.utility.SystemUtils;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.TemplateStorage;
+import net.peepocloud.node.api.server.CloudProcess;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,14 +35,32 @@ public class TemplateLocalStorage extends TemplateStorage {
     }
 
     @Override
-    public void copyToTemplate(CloudProcess process, Template template) {
-        SystemUtils.copyDirectory(process.getDirectory(), "templates/" + process.getGroupName() + "/" + template.getName());
+    public void copyToTemplate(MinecraftServerInfo serverInfo, Path directory, Template template) {
+        this.copyToTemplate(directory, serverInfo.getGroupName(), template);
     }
 
     @Override
-    public void copyFilesToTemplate(CloudProcess process, Template template, String[] files) {
-        String dir = process.getDirectory().toString();
-        String templateDir = "templates/" + process.getGroupName() + "/" + template.getName();
+    public void copyFilesToTemplate(MinecraftServerInfo serverInfo, Path directory, Template template, String[] files) {
+        this.copyFilesToTemplate(directory, serverInfo.getGroupName(), template, files);
+    }
+
+    @Override
+    public void copyToTemplate(BungeeCordProxyInfo proxyInfo, Path directory, Template template) {
+        this.copyToTemplate(directory, proxyInfo.getGroupName(), template);
+    }
+
+    @Override
+    public void copyFilesToTemplate(BungeeCordProxyInfo proxyInfo, Path directory, Template template, String[] files) {
+        this.copyFilesToTemplate(directory, proxyInfo.getGroupName(), template, files);
+    }
+
+    private void copyToTemplate(Path directory, String group, Template template) {
+        SystemUtils.copyDirectory(directory, "templates/" + group + "/" + template.getName());
+    }
+
+    private void copyFilesToTemplate(Path directory, String group, Template template, String[] files) {
+        String dir = directory.toString();
+        String templateDir = "templates/" + group + "/" + template.getName();
         for (String file : files) {
             Path path = Paths.get(dir, file);
             if (!Files.exists(path))

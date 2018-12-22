@@ -8,9 +8,9 @@ import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.command.Command;
-import net.peepocloud.node.command.CommandSender;
-import net.peepocloud.node.command.TabCompletable;
+import net.peepocloud.node.api.command.Command;
+import net.peepocloud.node.api.command.CommandSender;
+import net.peepocloud.node.api.command.TabCompletable;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;

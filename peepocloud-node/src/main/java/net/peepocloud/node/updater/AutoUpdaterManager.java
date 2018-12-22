@@ -9,7 +9,7 @@ import net.md_5.bungee.http.HttpClient;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.utility.FileDownloading;
+import net.peepocloud.node.api.utility.FileDownloading;
 
 import java.io.IOException;
 import java.io.InputStream;

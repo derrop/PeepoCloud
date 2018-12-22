@@ -33,10 +33,11 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.network.bungeecord.BungeeConnectEvent;
 import net.peepocloud.node.api.event.network.minecraftserver.ServerConnectEvent;
 import net.peepocloud.node.api.event.network.node.NodeConnectEvent;
+import net.peepocloud.node.api.network.NodeParticipant;
 import net.peepocloud.node.network.packet.auth.PacketInAuth;
-import net.peepocloud.node.network.participant.BungeeCordParticipant;
-import net.peepocloud.node.network.participant.MinecraftServerParticipant;
-import net.peepocloud.node.network.participant.NodeParticipant;
+import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
+import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
+import net.peepocloud.node.network.participant.NodeParticipantImpl;
 import net.peepocloud.node.utility.NodeUtils;
 
 import java.net.InetSocketAddress;
@@ -105,8 +106,8 @@ public class NetworkServer implements Runnable {
         return connectedNodes;
     }
 
-    public NodeParticipant getConnectedNode(String id) {
-        return this.connectedNodes.get(id);
+    public NodeParticipantImpl getConnectedNode(String id) {
+        return (NodeParticipantImpl) this.connectedNodes.get(id);
     }
 
     public void closeNodeConnection(String host) {
@@ -118,7 +119,7 @@ public class NetworkServer implements Runnable {
         }
     }
 
-    public void handleNodeDisconnect(NodeParticipant participant) {
+    public void handleNodeDisconnect(NodeParticipantImpl participant) {
         this.connectedNodes.remove(participant.getName());
         if (this.connectedNodes.isEmpty()) {
             this.coreNode = null;
@@ -168,46 +169,46 @@ public class NetworkServer implements Runnable {
                     if (!accept)
                         break;
 
-                    networkParticipant = new NodeParticipant(networkParticipant.getChannel(), auth);
+                    networkParticipant = new NodeParticipantImpl(networkParticipant.getChannel(), auth);
 
                     if (auth.getExtraData().contains("servers")) {
-                        ((NodeParticipant) networkParticipant).getServers().putAll(
+                        ((NodeParticipantImpl) networkParticipant).getServers().putAll(
                                 ((Collection<MinecraftServerInfo>) auth.getExtraData().getObject("servers", new TypeToken<Collection<MinecraftServerInfo>>() {
                                 }.getType())).stream().collect(Collectors.toMap(MinecraftServerInfo::getComponentName, o -> o))
                         );
                     }
                     if (auth.getExtraData().contains("startingServers")) {
-                        ((NodeParticipant) networkParticipant).getStartingServers().putAll(
+                        ((NodeParticipantImpl) networkParticipant).getStartingServers().putAll(
                                 ((Collection<MinecraftServerInfo>) auth.getExtraData().getObject("startingServers", new TypeToken<Collection<MinecraftServerInfo>>() {
                                 }.getType())).stream().collect(Collectors.toMap(MinecraftServerInfo::getComponentName, o -> o))
                         );
                     }
                     if (auth.getExtraData().contains("queuedServers")) {
-                        ((NodeParticipant) networkParticipant).getWaitingServers().putAll(
+                        ((NodeParticipantImpl) networkParticipant).getWaitingServers().putAll(
                                 ((Collection<MinecraftServerInfo>) auth.getExtraData().getObject("queuedServers", new TypeToken<Collection<MinecraftServerInfo>>() {
                                 }.getType())).stream().collect(Collectors.toMap(MinecraftServerInfo::getComponentName, o -> o))
                         );
                     }
 
                     if (auth.getExtraData().contains("proxies")) {
-                        ((NodeParticipant) networkParticipant).getProxies().putAll(
+                        ((NodeParticipantImpl) networkParticipant).getProxies().putAll(
                                 ((Collection<BungeeCordProxyInfo>) auth.getExtraData().getObject("proxies", new TypeToken<Collection<BungeeCordProxyInfo>>() {
                                 }.getType())).stream().collect(Collectors.toMap(BungeeCordProxyInfo::getComponentName, o -> o))
                         );
                     }
                     if (auth.getExtraData().contains("startingProxies")) {
-                        ((NodeParticipant) networkParticipant).getStartingProxies().putAll(
+                        ((NodeParticipantImpl) networkParticipant).getStartingProxies().putAll(
                                 ((Collection<BungeeCordProxyInfo>) auth.getExtraData().getObject("startingProxies", new TypeToken<Collection<BungeeCordProxyInfo>>() {
                                 }.getType())).stream().collect(Collectors.toMap(BungeeCordProxyInfo::getComponentName, o -> o))
                         );
                     }
                     if (auth.getExtraData().contains("queuedProxies")) {
-                        ((NodeParticipant) networkParticipant).getWaitingProxies().putAll(
+                        ((NodeParticipantImpl) networkParticipant).getWaitingProxies().putAll(
                                 ((Collection<BungeeCordProxyInfo>) auth.getExtraData().getObject("queuedProxies", new TypeToken<Collection<BungeeCordProxyInfo>>() {
                                 }.getType())).stream().collect(Collectors.toMap(BungeeCordProxyInfo::getComponentName, o -> o))
                         );
                     }
-                    this.connectedNodes.put(auth.getComponentName(), (NodeParticipant) networkParticipant);
+                    this.connectedNodes.put(auth.getComponentName(), (NodeParticipantImpl) networkParticipant);
 
                     String address = networkParticipant.getAddress();
                     PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
@@ -215,20 +216,20 @@ public class NetworkServer implements Runnable {
                         PeepoCloudNode.getInstance().tryConnectToNode(address);
                     });
                     boolean core = true;
-                    for (ClientNode clientNode : PeepoCloudNode.getInstance().getConnectedNodes().values()) {
+                    for (ClientNodeImpl clientNode : PeepoCloudNode.getInstance().getConnectedNodes().values()) {
                         if (clientNode.getAddress() != null && clientNode.getAddress().equals(address)) {
                             core = false;
                         }
                     }
                     if (core) {
-                        this.coreNode = (NodeParticipant) networkParticipant;
+                        this.coreNode = (NodeParticipantImpl) networkParticipant;
                     }
 
-                    PeepoCloudNode.getInstance().getServerNodes().put(networkParticipant.getName(), (NodeParticipant) networkParticipant);
+                    PeepoCloudNode.getInstance().getServerNodes().put(networkParticipant.getName(), (NodeParticipantImpl) networkParticipant);
 
                     successful = true;
 
-                    PeepoCloudNode.getInstance().getEventManager().callEvent(new NodeConnectEvent((NodeParticipant) networkParticipant));
+                    PeepoCloudNode.getInstance().getEventManager().callEvent(new NodeConnectEvent((NodeParticipantImpl) networkParticipant));
                     NodeUtils.updateNodeInfoForSupport(null);
                 }
                 break;
@@ -243,11 +244,11 @@ public class NetworkServer implements Runnable {
                     if (!PeepoCloudNode.getInstance().getProcessManager().getProcesses().containsKey(auth.getComponentName()))
                         break;
 
-                    networkParticipant = new MinecraftServerParticipant(networkParticipant.getChannel(), auth);
+                    networkParticipant = new MinecraftServerParticipantImpl(networkParticipant.getChannel(), auth);
 
-                    PeepoCloudNode.getInstance().getServersOnThisNode().put(auth.getComponentName(), (MinecraftServerParticipant) networkParticipant);
+                    PeepoCloudNode.getInstance().getServersOnThisNode().put(auth.getComponentName(), (MinecraftServerParticipantImpl) networkParticipant);
                     successful = true;
-                    PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerConnectEvent((MinecraftServerParticipant) networkParticipant));
+                    PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerConnectEvent((MinecraftServerParticipantImpl) networkParticipant));
 
                 }
                 break;
@@ -262,12 +263,12 @@ public class NetworkServer implements Runnable {
                     if (!PeepoCloudNode.getInstance().getProcessManager().getProcesses().containsKey(auth.getComponentName()))
                         break;
 
-                    networkParticipant = new BungeeCordParticipant(networkParticipant.getChannel(), auth);
+                    networkParticipant = new BungeeCordParticipantImpl(networkParticipant.getChannel(), auth);
 
-                    PeepoCloudNode.getInstance().getProxiesOnThisNode().put(auth.getComponentName(), (BungeeCordParticipant) networkParticipant);
+                    PeepoCloudNode.getInstance().getProxiesOnThisNode().put(auth.getComponentName(), (BungeeCordParticipantImpl) networkParticipant);
 
                     successful = true;
-                    PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeConnectEvent((BungeeCordParticipant) networkParticipant));
+                    PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeConnectEvent((BungeeCordParticipantImpl) networkParticipant));
 
                 }
                 break;

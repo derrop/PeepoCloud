@@ -4,9 +4,9 @@ package net.peepocloud.node.command.defaults;
  */
 
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.command.Command;
-import net.peepocloud.node.command.CommandSender;
-import net.peepocloud.node.addon.defaults.DefaultAddonConfig;
+import net.peepocloud.node.api.command.Command;
+import net.peepocloud.node.api.command.CommandSender;
+import net.peepocloud.node.api.addon.defaults.DefaultAddonConfig;
 
 public class CommandAddon extends Command {
     public CommandAddon() {

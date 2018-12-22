@@ -12,6 +12,7 @@ import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.server.Template;
+import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.api.event.network.bungeecord.BungeeStartEvent;
 import net.peepocloud.lib.config.UnmodifiableConfigurable;
 import net.peepocloud.lib.config.yaml.YamlConfigurable;
@@ -24,6 +25,8 @@ import net.peepocloud.node.api.event.process.bungee.BungeeCordConfigFillEvent;
 import net.peepocloud.node.api.event.process.bungee.BungeeCordPostConfigFillEvent;
 import net.peepocloud.node.api.event.process.bungee.BungeeCordPostTemplateCopyEvent;
 import net.peepocloud.node.api.event.process.bungee.BungeeCordTemplateCopyEvent;
+import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.server.ServerFilesLoader;
 
 import java.io.IOException;
@@ -38,7 +41,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @ToString
-public class BungeeProcess implements CloudProcess {
+public class BungeeProcess implements CloudProcessImpl {
     private Path directory;
     private Process process;
     @Setter
@@ -91,6 +94,28 @@ public class BungeeProcess implements CloudProcess {
     @Override
     public int getPort() {
         return this.proxyInfo.getPort();
+    }
+
+    @Override
+    public void copyToTemplate(Template template) {
+        TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
+        if (storage == null)
+            storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
+        if (storage == null)
+            return;
+        storage.copyToTemplate(this.proxyInfo, this.directory, template);
+    }
+
+    @Override
+    public void copyToTemplate(Template template, String... files) {
+        if (files.length == 0)
+            return;
+        TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
+        if (storage == null)
+            storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
+        if (storage == null)
+            return;
+        storage.copyFilesToTemplate(this.proxyInfo, this.directory, template, files);
     }
 
     @Override

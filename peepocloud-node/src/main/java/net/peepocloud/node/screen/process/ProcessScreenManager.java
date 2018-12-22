@@ -7,8 +7,9 @@ import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.node.network.packet.out.screen.PacketOutScreenLine;
-import net.peepocloud.node.screen.EnabledScreen;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.screen.EnabledScreen;
+import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.server.process.CloudProcessImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +23,7 @@ public class ProcessScreenManager {
 
     private Map<CloudProcess, Collection<NetworkPacketSender>> networkScreens = new ConcurrentHashMap<>();
 
-    public void enableNetworkScreen(CloudProcess process, NetworkPacketSender node) {
+    public void enableNetworkScreen(CloudProcessImpl process, NetworkPacketSender node) {
         if (!this.networkScreens.containsKey(process))
             this.networkScreens.put(process, new ArrayList<>());
         this.networkScreens.get(process).add(node);
@@ -33,7 +34,7 @@ public class ProcessScreenManager {
         }
     }
 
-    public void disableNetworkScreen(CloudProcess process, NetworkPacketSender node) {
+    public void disableNetworkScreen(CloudProcessImpl process, NetworkPacketSender node) {
         if (!this.networkScreens.containsKey(process)) {
             process.setNetworkScreenHandler(null);
             return;
@@ -45,7 +46,7 @@ public class ProcessScreenManager {
         }
     }
 
-    public EnabledScreen loadScreen(CloudProcess process, Consumer<String> consumer) {
+    public EnabledScreen loadScreen(CloudProcessImpl process, Consumer<String> consumer) {
         Preconditions.checkArgument(process.isRunning(), "process must be active to start a screen");
         UUID uniqueId = UUID.randomUUID();
         new ArrayList<>(process.getCachedLog()).forEach(consumer);
@@ -58,14 +59,14 @@ public class ProcessScreenManager {
         };
     }
 
-    public boolean disableScreen(CloudProcess process, UUID uniqueId) {
+    public boolean disableScreen(CloudProcessImpl process, UUID uniqueId) {
         if (!process.getScreenHandlers().containsKey(uniqueId))
             return false;
         process.getScreenHandlers().remove(uniqueId);
         return true;
     }
 
-    public boolean disableScreen(CloudProcess process) {
+    public boolean disableScreen(CloudProcessImpl process) {
         process.getScreenHandlers().clear();
         return true;
     }

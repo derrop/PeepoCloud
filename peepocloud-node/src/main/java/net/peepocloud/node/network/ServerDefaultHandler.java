@@ -10,25 +10,25 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.network.bungeecord.BungeeDisconnectEvent;
 import net.peepocloud.node.api.event.network.minecraftserver.ServerDisconnectEvent;
 import net.peepocloud.node.api.event.network.node.NodeDisconnectEvent;
-import net.peepocloud.node.network.participant.BungeeCordParticipant;
-import net.peepocloud.node.network.participant.MinecraftServerParticipant;
-import net.peepocloud.node.network.participant.NodeParticipant;
+import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
+import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
+import net.peepocloud.node.network.participant.NodeParticipantImpl;
 import net.peepocloud.node.utility.NodeUtils;
 
 public class ServerDefaultHandler extends ChannelHandlerAdapter {
     @Override
     public void disconnected(NetworkParticipant networkParticipant) {
-        if (networkParticipant instanceof NodeParticipant) {
-            PeepoCloudNode.getInstance().getEventManager().callEvent(new NodeDisconnectEvent((NodeParticipant) networkParticipant));
-            PeepoCloudNode.getInstance().getScreenManager().getNetworkScreenManager().handleNodeDisconnect((NodeParticipant) networkParticipant);
-            PeepoCloudNode.getInstance().getNetworkServer().handleNodeDisconnect((NodeParticipant) networkParticipant);
+        if (networkParticipant instanceof NodeParticipantImpl) {
+            PeepoCloudNode.getInstance().getEventManager().callEvent(new NodeDisconnectEvent((NodeParticipantImpl) networkParticipant));
+            PeepoCloudNode.getInstance().getScreenManager().getNetworkScreenManager().handleNodeDisconnect((NodeParticipantImpl) networkParticipant);
+            PeepoCloudNode.getInstance().getNetworkServer().handleNodeDisconnect((NodeParticipantImpl) networkParticipant);
             NodeUtils.updateNodeInfoForSupport(null);
-        } else if (networkParticipant instanceof BungeeCordParticipant) {
-            BungeeCordParticipant participant = (BungeeCordParticipant) networkParticipant;
+        } else if (networkParticipant instanceof BungeeCordParticipantImpl) {
+            BungeeCordParticipantImpl participant = (BungeeCordParticipantImpl) networkParticipant;
             PeepoCloudNode.getInstance().getProxiesOnThisNode().remove(participant.getName());
             PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeDisconnectEvent(participant));
-        } else if (networkParticipant instanceof MinecraftServerParticipant) {
-            MinecraftServerParticipant participant = (MinecraftServerParticipant) networkParticipant;
+        } else if (networkParticipant instanceof MinecraftServerParticipantImpl) {
+            MinecraftServerParticipantImpl participant = (MinecraftServerParticipantImpl) networkParticipant;
             PeepoCloudNode.getInstance().getServersOnThisNode().remove(participant.getName());
             PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerDisconnectEvent(participant));
         }

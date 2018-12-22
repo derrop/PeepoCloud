@@ -10,19 +10,19 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.network.participant.NodeParticipant;
+import net.peepocloud.node.network.participant.NodeParticipantImpl;
 
 import java.util.function.Consumer;
 
 public class PacketInBungeeProcessStarted extends JsonPacketHandler {
     @Override
     public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
-        if (!(networkParticipant instanceof NodeParticipant))
+        if (!(networkParticipant instanceof NodeParticipantImpl))
             return;
         BungeeCordProxyInfo proxyInfo = packet.getSimpleJsonObject().getObject("proxyInfo", BungeeCordProxyInfo.class);
         if (proxyInfo.getParentComponentName().equals(networkParticipant.getName())) {
-            ((NodeParticipant) networkParticipant).getStartingProxies().put(proxyInfo.getComponentName(), proxyInfo);
-            ((NodeParticipant) networkParticipant).getWaitingProxies().remove(proxyInfo.getComponentName());
+            ((NodeParticipantImpl) networkParticipant).getStartingProxies().put(proxyInfo.getComponentName(), proxyInfo);
+            ((NodeParticipantImpl) networkParticipant).getWaitingProxies().remove(proxyInfo.getComponentName());
         }
         PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeStartEvent(proxyInfo));
     }

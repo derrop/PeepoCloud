@@ -11,7 +11,7 @@ import net.peepocloud.node.api.event.process.bungee.BungeeCordStartupFileCopyEve
 import net.peepocloud.node.api.event.process.server.MinecraftServerStartupFileCopyEvent;
 import net.peepocloud.node.server.bungeefile.SetupBungeeStartupFile;
 import net.peepocloud.node.server.minecraftserverfile.SetupMinecraftServerStartupFile;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.CloudProcess;
 
 import java.io.IOException;
 import java.io.InputStream;

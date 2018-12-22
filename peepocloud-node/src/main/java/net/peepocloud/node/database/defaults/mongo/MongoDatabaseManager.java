@@ -9,9 +9,9 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.database.Database;
-import net.peepocloud.node.database.DatabaseConfig;
-import net.peepocloud.node.database.DatabaseManager;
+import net.peepocloud.node.api.database.Database;
+import net.peepocloud.node.api.database.DatabaseConfig;
+import net.peepocloud.node.api.database.DatabaseManager;
 
 import java.net.URLEncoder;
 import java.text.MessageFormat;

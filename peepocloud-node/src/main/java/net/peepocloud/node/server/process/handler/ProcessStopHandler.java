@@ -5,7 +5,7 @@ package net.peepocloud.node.server.process.handler;
 
 import lombok.*;
 import net.peepocloud.lib.utility.SystemUtils;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.server.process.ProcessManager;
 
 import java.util.ArrayList;

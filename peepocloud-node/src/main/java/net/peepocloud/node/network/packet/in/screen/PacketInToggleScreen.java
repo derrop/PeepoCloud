@@ -8,14 +8,15 @@ import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.server.process.CloudProcess;
+import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.server.process.CloudProcessImpl;
 
 import java.util.function.Consumer;
 
 public class PacketInToggleScreen extends JsonPacketHandler {
     @Override
     public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
-        CloudProcess process = PeepoCloudNode.getInstance().getProcessManager().getProcesses().get(packet.getSimpleJsonObject().getString("name"));
+        CloudProcessImpl process = PeepoCloudNode.getInstance().getProcessManager().getProcesses().get(packet.getSimpleJsonObject().getString("name"));
         if (process != null) {
             if (packet.getSimpleJsonObject().getBoolean("enable")) {
                 PeepoCloudNode.getInstance().getScreenManager().getProcessScreenManager().enableNetworkScreen(process, networkParticipant);

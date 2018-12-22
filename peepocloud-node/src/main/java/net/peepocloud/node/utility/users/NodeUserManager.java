@@ -13,7 +13,7 @@ import net.peepocloud.lib.users.UserManager;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.database.Database;
+import net.peepocloud.node.api.database.Database;
 
 import java.util.ArrayList;
 import java.util.Collection;

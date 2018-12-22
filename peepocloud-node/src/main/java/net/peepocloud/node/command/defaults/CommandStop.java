@@ -4,8 +4,8 @@ package net.peepocloud.node.command.defaults;
  */
 
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.command.Command;
-import net.peepocloud.node.command.CommandSender;
+import net.peepocloud.node.api.command.Command;
+import net.peepocloud.node.api.command.CommandSender;
 
 public class CommandStop extends Command {
     public CommandStop() {
