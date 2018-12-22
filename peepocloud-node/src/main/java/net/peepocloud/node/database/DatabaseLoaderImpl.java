@@ -3,8 +3,8 @@ package net.peepocloud.node.database;
  * Created by Mc_Ruben on 05.11.2018
  */
 
-import javafx.util.Pair;
 import net.peepocloud.lib.config.yaml.YamlConfigurable;
+import net.peepocloud.lib.utility.Pair;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.addon.AddonManagerImpl;
