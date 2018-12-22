@@ -52,5 +52,15 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <finalName>PeepoCloudAPI</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
 
 </project>

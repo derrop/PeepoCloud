@@ -8,6 +8,7 @@ import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.node.NodeInfo;
 
 public class PacketOutUpdateNodeInfo extends JsonPacket {
+
     public PacketOutUpdateNodeInfo(NodeInfo nodeInfo) {
         super(14);
         this.setSimpleJsonObject(new SimpleJsonObject().append("nodeInfo", nodeInfo));

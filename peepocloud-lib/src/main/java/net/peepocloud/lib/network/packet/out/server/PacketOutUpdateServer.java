@@ -1,4 +1,4 @@
-package net.peepocloud.node.network.packet.out.server;
+package net.peepocloud.lib.network.packet.out.server;
 /*
  * Created by Mc_Ruben on 09.12.2018
  */

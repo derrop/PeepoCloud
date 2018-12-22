@@ -1,4 +1,4 @@
-package net.peepocloud.node.network.packet.out.group;
+package net.peepocloud.lib.network.packet.out.group;
 /*
  * Created by Mc_Ruben on 14.11.2018
  */

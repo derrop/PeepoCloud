@@ -1,7 +1,7 @@
 package net.peepocloud.api.internal.network.packet.in;
 
 
-import net.peepocloud.api.internal.NodeChildAPI;
+import net.peepocloud.api.internal.PeepoCloudAPI;
 import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.network.packet.JsonPacket;
@@ -22,7 +22,7 @@ public class PacketInAPIServerStarted extends JsonPacketHandler {
     public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
         if(packet.getSimpleJsonObject() == null || !packet.getSimpleJsonObject().contains("serverInfo"))
             return;
-        if(NodeChildAPI.getInstance().isBungee())
-            NodeChildAPI.getInstance().toBungee().registerServerInfo(packet.getSimpleJsonObject().getObject("serverInfo", MinecraftServerInfo.class));
+        if(PeepoCloudAPI.getInstance().isBungee())
+            PeepoCloudAPI.getInstance().toBungee().registerServerInfo(packet.getSimpleJsonObject().getObject("serverInfo", MinecraftServerInfo.class));
     }
 }

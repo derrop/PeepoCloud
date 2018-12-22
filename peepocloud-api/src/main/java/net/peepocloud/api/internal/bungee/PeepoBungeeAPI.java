@@ -1,12 +1,12 @@
 package net.peepocloud.api.internal.bungee;
 
 import net.md_5.bungee.api.config.ServerInfo;
-import net.peepocloud.api.internal.NodeChildAPI;
+import net.peepocloud.api.internal.PeepoCloudAPI;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import java.io.File;
 import java.net.InetSocketAddress;
 
-public class PeepoBungeeAPI extends NodeChildAPI {
+public class PeepoBungeeAPI extends PeepoCloudAPI {
     private BungeeLauncher plugin;
 
     PeepoBungeeAPI(BungeeLauncher plugin) {

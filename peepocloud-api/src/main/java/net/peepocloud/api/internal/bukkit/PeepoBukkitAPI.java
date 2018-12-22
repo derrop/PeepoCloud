@@ -1,10 +1,10 @@
 package net.peepocloud.api.internal.bukkit;
 
-import net.peepocloud.api.internal.NodeChildAPI;
+import net.peepocloud.api.internal.PeepoCloudAPI;
 
 import java.io.File;
 
-public class PeepoBukkitAPI extends NodeChildAPI {
+public class PeepoBukkitAPI extends PeepoCloudAPI {
     private BukkitLauncher plugin;
 
     PeepoBukkitAPI(BukkitLauncher plugin) {

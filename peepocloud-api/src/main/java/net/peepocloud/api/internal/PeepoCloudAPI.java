@@ -2,6 +2,10 @@ package net.peepocloud.api.internal;
 
 import net.peepocloud.api.internal.bukkit.PeepoBukkitAPI;
 import net.peepocloud.api.internal.bungee.PeepoBungeeAPI;
+import net.peepocloud.lib.network.packet.out.server.PacketOutStopBungee;
+import net.peepocloud.lib.network.packet.out.server.PacketOutStopServer;
+import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateBungee;
+import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateServer;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
@@ -18,20 +22,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
 
-public abstract class NodeChildAPI {
-    private static NodeChildAPI instance;
+public abstract class PeepoCloudAPI {
+    private static PeepoCloudAPI instance;
 
     private PacketManager packetManager = new PacketManager();
     private NetworkClient nodeConnector;
 
-    public NodeChildAPI(File nodeInfoFile) {
+    public PeepoCloudAPI(File nodeInfoFile) {
         instance = this;
 
         if (nodeInfoFile == null) {
             this.shutdown();
             throw new NullPointerException("nodeInfoFile not specified");
         }
-        SimpleJsonObject nodeInfo = new SimpleJsonObject(nodeInfoFile);
+        SimpleJsonObject nodeInfo = SimpleJsonObject.load(nodeInfoFile.toPath());
         this.nodeConnector = new NetworkClient(nodeInfo.getObject("networkAddress", NetworkAddress.class)
                 .toInetSocketAddress(), this.packetManager, new ChannelHandlerAdapter(), nodeInfo.getObject("auth", Auth.class));
 
@@ -169,7 +173,7 @@ public abstract class NodeChildAPI {
     }
 
     public void stopBungeeProxy(BungeeCordProxyInfo proxyInfo) {
-
+        this.nodeConnector.sendPacket(new PacketOutStopBungee(proxyInfo));
     }
 
     public void stopMinecraftServer(String name) {
@@ -177,7 +181,7 @@ public abstract class NodeChildAPI {
     }
 
     public void stopMinecraftServer(MinecraftServerInfo serverInfo) {
-
+        this.nodeConnector.sendPacket(new PacketOutStopServer(serverInfo));
     }
 
     public Collection<BungeeCordProxyInfo> getStartedBungeeProxies(String group) {
@@ -212,16 +216,12 @@ public abstract class NodeChildAPI {
         return null;
     }
 
-    public NodeInfo getBestNodeInfo(int memoryNeeded) {
-        return null;
-    }
-
     public void updateProxyInfo(BungeeCordProxyInfo proxyInfo) {
-
+        this.nodeConnector.sendPacket(new PacketOutUpdateBungee(proxyInfo));
     }
 
     public void updateServerInfo(MinecraftServerInfo serverInfo) {
-
+        this.nodeConnector.sendPacket(new PacketOutUpdateServer(serverInfo));
     }
 
     public void updateBungeeGroup(BungeeGroup group) {
@@ -232,13 +232,6 @@ public abstract class NodeChildAPI {
 
     }
 
-    public int getMemoryUsed() {
-        return 0;
-    }
-
-    public int getMaxMemory() {
-        return 0;
-    }
 
     public PacketManager getPacketManager() {
         return packetManager;
@@ -248,7 +241,7 @@ public abstract class NodeChildAPI {
         return null;
     }
 
-    public static NodeChildAPI getInstance() {
+    public static PeepoCloudAPI getInstance() {
         return instance;
     }
 }
