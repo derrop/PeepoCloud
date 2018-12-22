@@ -8,6 +8,8 @@ public class BungeeLauncher extends Plugin  {
     @Override
     public void onEnable() {
         this.bungeeAPI = new PeepoBungeeAPI(this);
+        this.bungeeAPI.registerNetHandler(new BungeeNetHandler(this.bungeeAPI));
+
         this.bungeeAPI.bootstrap();
     }
 

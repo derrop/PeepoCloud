@@ -22,7 +22,7 @@ public class PacketInAPIServerStarted extends JsonPacketHandler {
     public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
         if(packet.getSimpleJsonObject() == null || !packet.getSimpleJsonObject().contains("serverInfo"))
             return;
-        if(PeepoCloudAPI.getInstance().isBungee())
-            PeepoCloudAPI.getInstance().toBungee().registerServerInfo(packet.getSimpleJsonObject().getObject("serverInfo", MinecraftServerInfo.class));
+        MinecraftServerInfo serverInfo = packet.getSimpleJsonObject().getObject("serverInfo", MinecraftServerInfo.class);
+        PeepoCloudAPI.getInstance().getNetHandlers().forEach(handler -> handler.handleServerAdd(serverInfo));
     }
 }

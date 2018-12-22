@@ -5,12 +5,13 @@ import net.peepocloud.api.internal.PeepoCloudAPI;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.nio.file.Paths;
 
 public class PeepoBungeeAPI extends PeepoCloudAPI {
     private BungeeLauncher plugin;
 
     PeepoBungeeAPI(BungeeLauncher plugin) {
-        super(new File("nodeInfo.json"));
+        super(Paths.get("nodeInfo.json"));
         this.plugin = plugin;
     }
 
@@ -18,6 +19,10 @@ public class PeepoBungeeAPI extends PeepoCloudAPI {
         ServerInfo newServer = this.plugin.getProxy().constructServerInfo(serverInfo.getComponentName(),
                 new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort()), serverInfo.getMotd(), false);
         this.plugin.getProxy().getServers().put(serverInfo.getComponentName(), newServer);
+    }
+
+    public void unregisterServerInfo(MinecraftServerInfo serverInfo) {
+        this.plugin.getProxy().getServers().remove(serverInfo.getComponentName());
     }
 
     @Override
