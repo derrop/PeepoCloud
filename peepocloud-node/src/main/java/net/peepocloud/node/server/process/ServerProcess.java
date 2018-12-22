@@ -7,6 +7,7 @@ import lombok.*;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
+import net.peepocloud.lib.server.Template;
 import net.peepocloud.node.api.event.network.minecraftserver.ServerStartEvent;
 import net.peepocloud.lib.config.UnmodifiableConfigurable;
 import net.peepocloud.lib.config.props.PropertiesConfigurable;
@@ -70,6 +71,11 @@ public class ServerProcess implements CloudProcess {
     @Override
     public String getGroupName() {
         return this.serverInfo.getGroupName();
+    }
+
+    @Override
+    public Template getTemplate() {
+        return this.serverInfo.getTemplate();
     }
 
     @Override

@@ -11,6 +11,7 @@ import net.md_5.bungee.config.Configuration;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
+import net.peepocloud.lib.server.Template;
 import net.peepocloud.node.api.event.network.bungeecord.BungeeStartEvent;
 import net.peepocloud.lib.config.UnmodifiableConfigurable;
 import net.peepocloud.lib.config.yaml.YamlConfigurable;
@@ -75,6 +76,11 @@ public class BungeeProcess implements CloudProcess {
     @Override
     public String getGroupName() {
         return this.proxyInfo.getGroupName();
+    }
+
+    @Override
+    public Template getTemplate() {
+        return this.proxyInfo.getTemplate();
     }
 
     @Override

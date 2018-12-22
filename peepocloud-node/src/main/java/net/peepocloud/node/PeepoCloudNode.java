@@ -542,7 +542,7 @@ public class PeepoCloudNode {
         TemplateStorage storage = this.getTemplateStorage(template.getName());
         if (storage == null)
             storage = this.getTemplateStorage("local");
-        storage.copy(group, template, target);
+        storage.copyToPath(group, template, target);
     }
 
     /**
