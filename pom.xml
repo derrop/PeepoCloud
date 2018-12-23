@@ -11,10 +11,11 @@
 
     <modules>
         <module>peepocloud-lib</module>
-        <module>peepocloud-api</module>
         <module>peepocloud-node</module>
         <module>peepocloud-node-api</module>
         <module>peepocloud-addons</module>
+        <module>peepocloud-plugin</module>
+        <module>peepocloud-plugin-api</module>
     </modules>
 
     <build>
@@ -43,7 +44,6 @@
         <cloud.version>1.0</cloud.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.targetEncoding>UTF-8</project.build.targetEncoding>
-        <kotlin.version>1.2.71</kotlin.version>
     </properties>
 
 
