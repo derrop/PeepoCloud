@@ -15,5 +15,10 @@ public abstract class EnabledScreen {
     private String componentName;
     private UUID uniqueId;
 
+    /**
+     * Dispatches the given command to this screen
+     *
+     * @param line the command to dispatch
+     */
     public abstract void write(String line);
 }

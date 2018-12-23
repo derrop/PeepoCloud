@@ -300,7 +300,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
         this.nodeAddonManager = new AddonManagerImpl<>();
 
-        this.installUpdatesSync(this.commandManager.getConsole());
+        if (this.cloudConfig.isAutoUpdate()) {
+            this.installUpdatesSync(this.commandManager.getConsole());
+        }
 
         this.scheduler.repeat(() -> {
             this.nodeInfo.setUsedMemory(this.getMemoryUsedOnThisInstance());
@@ -503,9 +505,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         }
         if (this.processManager != null && !this.processManager.getServerQueue().getServerProcesses().isEmpty()) {
             authData.append("queuedProxies", this.processManager.getServerQueue().getServerProcesses().stream()
-                    .filter(process -> process instanceof BungeeProcess).map(process -> ((BungeeProcess) process).getProxyInfo()).collect(Collectors.toList()));
+                    .filter(process -> process instanceof BungeeProcess).map(CloudProcess::getProxyInfo).collect(Collectors.toList()));
             authData.append("queuedServers", this.processManager.getServerQueue().getServerProcesses().stream()
-                    .filter(process -> process instanceof ServerProcess).map(process -> ((ServerProcess) process).getServerInfo()).collect(Collectors.toList()));
+                    .filter(process -> process instanceof ServerProcess).map(CloudProcess::getServerInfo).collect(Collectors.toList()));
         }
         ClientNodeImpl client = new ClientNodeImpl(
                 new InetSocketAddress(node.getAddress().getHost(), node.getAddress().getPort()),
@@ -573,8 +575,6 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
      * @param sender the sender to which the messages should be send
      */
     public void installUpdates(CommandSender sender) {
-        if (!this.cloudConfig.isAutoUpdate())
-            return;
         PeepoCloudNode.getInstance().getAutoUpdaterManager().checkUpdates(updateCheckResponse -> this.installUpdates0(sender, updateCheckResponse));
     }
 
@@ -583,8 +583,6 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
      * @param sender the sender to which the messages should be send
      */
     public void installUpdatesSync(CommandSender sender) {
-        if (!this.cloudConfig.isAutoUpdate())
-            return;
         this.installUpdates0(sender, PeepoCloudNode.getInstance().getAutoUpdaterManager().checkUpdatesSync());
     }
 

@@ -62,8 +62,8 @@ public class ScreenManagerImpl implements ScreenManager {
     }
 
     /**
-     * @deprecated for internal use only
      * @param process the process which was stopped
+     * @deprecated for internal use only
      */
     @Deprecated
     public void handleProcessStop(CloudProcess process) {

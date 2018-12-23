@@ -265,8 +265,20 @@ public abstract class PeepoCloudNodeAPI {
      */
     public abstract Collection<NodeInfo> getNodeInfos();
 
+    /**
+     * Gets the next id for a server of the given {@code group}
+     *
+     * @param group the group to get the next id from
+     * @return the next id for the servers of the given {@code group}
+     */
     public abstract int getNextServerId(String group);
 
+    /**
+     * Gets the next id for a proxy of the given {@code group}
+     *
+     * @param group the group to get the next id from
+     * @return the next id for the proxies of the given {@code group}
+     */
     public abstract int getNextProxyId(String group);
 
     public abstract boolean isServerStarted(String name);

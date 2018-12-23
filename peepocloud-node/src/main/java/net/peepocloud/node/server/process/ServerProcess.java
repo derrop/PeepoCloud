@@ -113,6 +113,9 @@ public class ServerProcess implements CloudProcessImpl {
 
     @Override
     public void startup() {
+        if (this.isRunning())
+            return;
+
         this.processManager.handleProcessStart(this);
 
         this.loadTemplate();
