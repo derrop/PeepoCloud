@@ -24,5 +24,5 @@ public class BungeeGroup {
     private int minServers;
     private int maxServers;
     private int startPort;
-
+    private boolean maintenance;
 }

@@ -4,7 +4,6 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.api.bungee.PeepoCloudBungeeAPI;
-
 import java.net.InetSocketAddress;
 import java.nio.file.Paths;
 
@@ -37,6 +36,7 @@ public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBun
     public boolean isBukkit() {
         return false;
     }
+
 
     @Override
     public BungeeLauncher getPlugin() {

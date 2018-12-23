@@ -4,6 +4,8 @@ package net.peepocloud.plugin.api;
 import com.google.common.base.Preconditions;
 import net.peepocloud.lib.network.NetworkClient;
 import net.peepocloud.lib.network.packet.PacketManager;
+import net.peepocloud.lib.server.bungee.BungeeGroup;
+import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.plugin.api.bukkit.PeepoCloudBukkitAPI;
 import net.peepocloud.plugin.api.bungee.PeepoCloudBungeeAPI;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandler;
@@ -29,6 +31,9 @@ public abstract class PeepoCloudPluginAPI {
     public abstract boolean isBungee();
     public abstract PeepoCloudBukkitAPI toBukkit();
     public abstract PeepoCloudBungeeAPI toBungee();
+
+    public abstract MinecraftGroup getMinecraftGroup(String name);
+    public abstract BungeeGroup getBungeeGroup(String name);
 
     public abstract PacketManager getPacketManager();
     public abstract NetworkClient getNodeConnector();

@@ -2,7 +2,6 @@ package net.peepocloud.plugin.bukkit;
 
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.api.bukkit.PeepoCloudBukkitAPI;
-
 import java.nio.file.Paths;
 
 public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBukkitAPI {
@@ -17,6 +16,7 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
     public boolean isBungee() {
         return false;
     }
+
 
     @Override
     public boolean isBukkit() {

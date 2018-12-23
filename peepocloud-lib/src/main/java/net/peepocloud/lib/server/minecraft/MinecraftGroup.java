@@ -26,4 +26,6 @@ public class MinecraftGroup {
     private int maxPlayers;
     private String motd;
     private int startPort;
+    private boolean maintenance;
+    private String signLayoutName;
 }

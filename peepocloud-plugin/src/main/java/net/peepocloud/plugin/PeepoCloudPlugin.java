@@ -1,5 +1,7 @@
 package net.peepocloud.plugin;
 
+import net.peepocloud.lib.server.bungee.BungeeGroup;
+import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.plugin.api.PeepoCloudPluginAPI;
 import net.peepocloud.plugin.bungee.PeepoBungeePlugin;
 import net.peepocloud.plugin.bukkit.PeepoBukkitPlugin;
@@ -25,6 +27,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
 
     public PeepoCloudPlugin(Path nodeInfoFile) {
         instance = this;
+        PeepoCloudPlugin.setInstance(this);
 
         if (nodeInfoFile == null) {
             this.shutdown();
@@ -84,6 +87,16 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     @Override
     public boolean unregisterNetworkHandler(NetworkAPIHandler handler) {
         return this.networkHandlers.remove(handler);
+    }
+
+    @Override
+    public MinecraftGroup getMinecraftGroup(String name) {
+        return null;
+    }
+
+    @Override
+    public BungeeGroup getBungeeGroup(String name) {
+        return null;
     }
 
     @Override

@@ -112,7 +112,7 @@ public class CommandCreate extends Command {
                     );
                     int startPort = setup.getData().getInt("startPort");
 
-                    BungeeGroup group = new BungeeGroup(name, groupMode, templates, memory, minServers, maxServers, startPort);
+                    BungeeGroup group = new BungeeGroup(name, groupMode, templates, memory, minServers, maxServers, startPort, false);
 
                     PeepoCloudNode.getInstance().getGroupsConfig().createGroup(group, success -> {
                         if (success) {
@@ -214,7 +214,7 @@ public class CommandCreate extends Command {
                     );
                     String motd = setup.getData().getString("motd");
 
-                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort);
+                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort, false, "default");
 
                     PeepoCloudNode.getInstance().getGroupsConfig().createGroup(group, success -> {
                         if (success) {
