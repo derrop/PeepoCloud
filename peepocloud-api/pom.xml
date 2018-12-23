@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>peepocloud-api</artifactId>
+    <version>${cloud.version}</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -35,7 +36,7 @@
         <dependency>
             <groupId>net.peepocloud</groupId>
             <artifactId>peepocloud-lib</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${cloud.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

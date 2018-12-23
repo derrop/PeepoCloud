@@ -15,13 +15,18 @@ public class CommandSupportUpdate extends Command {
 
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
+        if (!PeepoCloudNode.getInstance().getInternalConfig().getBoolean("acceptedInformationsSendingToServer")) {
+            sender.sendMessageLanguageKey("support.infoUpdate.disabled");
+            return;
+        }
+
         if (!PeepoCloudNode.getInstance().getCloudConfig().loadCredentials()) {
             sender.sendMessageLanguageKey("support.infoUpdate.failure");
             return;
         }
         NodeUtils.updateNodeInfoForSupport(success -> {
             if (success == null) {
-                sender.sendMessageLanguageKey("support.infoUpdate.disabled");
+                sender.sendMessageLanguageKey("support.infoUpdate.wrongCredentials");
             } else if (success) {
                 sender.sendMessageLanguageKey("support.infoUpdate.success");
             } else {
