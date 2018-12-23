@@ -4,10 +4,8 @@ package net.peepocloud.node.api;
  */
 
 import com.google.common.base.Preconditions;
-import net.peepocloud.lib.network.packet.out.group.PacketOutCreateBungeeGroup;
-import net.peepocloud.lib.network.packet.out.group.PacketOutCreateMinecraftGroup;
-import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateBungee;
-import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateServer;
+import net.peepocloud.lib.network.packet.Packet;
+import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.lib.server.Template;
@@ -15,29 +13,26 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.lib.server.minecraft.MinecraftState;
 import net.peepocloud.node.api.addon.AddonManager;
 import net.peepocloud.node.api.addon.node.NodeAddon;
+import net.peepocloud.node.api.command.Command;
 import net.peepocloud.node.api.command.CommandManager;
-import net.peepocloud.node.api.command.CommandSender;
+import net.peepocloud.node.api.database.DatabaseAddon;
 import net.peepocloud.node.api.database.DatabaseManager;
+import net.peepocloud.node.api.event.Event;
 import net.peepocloud.node.api.event.EventManager;
+import net.peepocloud.node.api.languagesystem.Language;
 import net.peepocloud.node.api.languagesystem.LanguagesManager;
 import net.peepocloud.node.api.network.BungeeCordParticipant;
 import net.peepocloud.node.api.network.ClientNode;
 import net.peepocloud.node.api.network.MinecraftServerParticipant;
 import net.peepocloud.node.api.network.NodeParticipant;
-import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.api.server.TemplateStorage;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
 
 public abstract class PeepoCloudNodeAPI {
 
@@ -52,33 +47,111 @@ public abstract class PeepoCloudNodeAPI {
         return instance;
     }
 
-
+    /**
+     * Gets the {@link LanguagesManager} instance of this Node
+     *
+     * @return the {@link LanguagesManager} of this Node containing all messages for the selected {@link Language}
+     */
     public abstract LanguagesManager getLanguagesManager();
 
+    /**
+     * Gets the {@link AddonManager} loading all the {@link NodeAddon}s for this Node
+     *
+     * @return the {@link AddonManager} of this Node
+     */
     public abstract AddonManager<NodeAddon> getNodeAddonManager();
 
+    /**
+     * Gets the {@link DatabaseManager} of this Node which can be loaded directly in the Node or by {@link DatabaseAddon}s
+     *
+     * @return the {@link DatabaseManager} instance for this Node
+     */
     public abstract DatabaseManager getDatabaseManager();
 
+    /**
+     * Gets the {@link CommandManager} for this Node instance
+     *
+     * @return the {@link CommandManager} of this Node containing all {@link Command}s
+     */
     public abstract CommandManager getCommandManager();
 
+    /**
+     * Gets the {@link EventManager} for this Node instance
+     *
+     * @return the {@link EventManager} of this Node containing all registered Listeners which are called every time an {@link Event} is fired
+     */
     public abstract EventManager getEventManager();
 
+    /**
+     * Gets the {@link PacketManager} instance for this Node
+     *
+     * @return the {@link PacketManager} instance of this Node containing all registered {@link Packet}s
+     */
+    public abstract PacketManager getPacketManager();
+
+    /**
+     * Gets all servers which are connected to this Node
+     *
+     * @return a Map with all servers which are connected to this Node by their Names as Keys
+     */
     public abstract Map<String, MinecraftServerParticipant> getServersOnThisNode();
 
+    /**
+     * Gets all proxies which are connected to this Node
+     *
+     * @return a Map with all proxies which are connected to this Node by their Names as Keys
+     */
     public abstract Map<String, BungeeCordParticipant> getProxiesOnThisNode();
 
+    /**
+     * Gets the max memory of all proxies on this Node instance
+     *
+     * @return the max memory of all proxies on this Node
+     */
     public abstract int getMemoryUsedOnThisInstanceByBungee();
 
+    /**
+     * Gets the max memory of all servers on this Node instance
+     *
+     * @return the max memory of all servers on this Node
+     */
     public abstract int getMemoryUsedOnThisInstanceByServer();
 
+    /**
+     * Gets the time this Node has been started in milliseconds
+     *
+     * @return the time when this Node was started
+     */
     public abstract long getStartupTime();
 
+    /**
+     * Gets all {@link TemplateStorage}s registered in this Node
+     *
+     * @return a {@link Collection} containing all {@link TemplateStorage}s in this Node
+     */
     public abstract Collection<TemplateStorage> getTemplateStorages();
 
+    /**
+     * Gets an online player by their UniqueId
+     *
+     * @param uniqueId the uniqueId of the player
+     * @return the OnlinePlayer if it is online or {@code null} if no player with this {@code uniqueId} was found
+     */
     public abstract PeepoPlayer getPlayer(UUID uniqueId);
 
+    /**
+     * Gets an online player by their Name
+     *
+     * @param name the name of the player
+     * @return the OnlinePlayer if it is online or {@code null} if no player with this {@code name} was found
+     */
     public abstract PeepoPlayer getPlayer(String name);
 
+    /**
+     * Gets all online players connected to the network
+     *
+     * @return all players by their UniqueId
+     */
     public abstract Map<UUID, PeepoPlayer> getOnlinePlayers();
 
     /**
@@ -89,33 +162,108 @@ public abstract class PeepoCloudNodeAPI {
      */
     public abstract TemplateStorage getTemplateStorage(String name);
 
+    /**
+     * Updates a {@link MinecraftGroup} to the database
+     *
+     * @param group the group to update
+     */
     public abstract void updateMinecraftGroup(MinecraftGroup group);
 
+    /**
+     * Updates a {@link BungeeGroup} to the database
+     *
+     * @param group the group to update
+     */
     public abstract void updateBungeeGroup(BungeeGroup group);
 
+    /**
+     * Updates a {@link MinecraftServerInfo} to the network
+     *
+     * @param serverInfo the serverInfo to update
+     */
     public abstract void updateServerInfo(MinecraftServerInfo serverInfo);
 
+    /**
+     * Updates a {@link BungeeCordProxyInfo} to the network
+     *
+     * @param proxyInfo the proxyInfo to update
+     */
     public abstract void updateProxyInfo(BungeeCordProxyInfo proxyInfo);
 
+    /**
+     * Gets the best {@link NodeInfo} connected in the network which has the given {@code memoryNeeded} memory free
+     *
+     * @param memoryNeeded the memory the node must have
+     * @return the info of the best Node which has the given {@code memoryNeeded} free memory
+     */
     public abstract NodeInfo getBestNodeInfo(int memoryNeeded);
 
+    /**
+     * Gets the infos of all running/starting minecraft servers in the network
+     *
+     * @return the infos of all running/starting minecraft servers in the network
+     */
     public abstract Collection<MinecraftServerInfo> getMinecraftServers();
 
+    /**
+     * Gets the infos of all running/starting minecraft servers in the network by the given {@code group}
+     *
+     * @param group the group the servers must have
+     * @return the infos of all running/starting minecraft servers in the network which are from the group {@code group}
+     */
     public abstract Collection<MinecraftServerInfo> getMinecraftServers(String group);
 
-    public abstract Collection<NodeInfo> getNodeInfos();
-
+    /**
+     * Gets the infos of all running minecraft servers in the network
+     *
+     * @return the infos of all running minecraft servers in the network
+     */
     public abstract Collection<MinecraftServerInfo> getStartedMinecraftServers();
 
+    /**
+     * Gets the infos of all running minecraft servers in the network by the given {@code group}
+     *
+     * @param group the group the servers must have
+     * @return the infos of all running minecraft servers in the network which are from the group {@code group}
+     */
     public abstract Collection<MinecraftServerInfo> getStartedMinecraftServers(String group);
 
+    /**
+     * Gets the infos of all running/starting proxies in the network
+     *
+     * @return the infos of all running/starting proxies in the network
+     */
     public abstract Collection<BungeeCordProxyInfo> getBungeeProxies();
 
+    /**
+     * Gets the infos of all running/starting proxies in the network by the given {@code group}
+     *
+     * @param group the group the servers must have
+     * @return the infos of all running/starting proxies in the network which are from the group {@code group}
+     */
     public abstract Collection<BungeeCordProxyInfo> getBungeeProxies(String group);
 
+    /**
+     * Gets the infos of all running proxies in the network
+     *
+     * @return the infos of all running proxies in the network
+     */
     public abstract Collection<BungeeCordProxyInfo> getStartedBungeeProxies();
 
+    /**
+     * Gets the infos of all running proxies in the network by the given {@code group}
+     *
+     * @param group the group the servers must have
+     * @return the infos of all running proxies in the network which are from the group {@code group}
+     */
     public abstract Collection<BungeeCordProxyInfo> getStartedBungeeProxies(String group);
+
+    /**
+     * Gets the infos of all nodes connected in the network
+     *
+     * @return the {@link NodeInfo}s of all connected nodes
+     */
+    public abstract Collection<NodeInfo> getNodeInfos();
 
     public abstract int getNextServerId(String group);
 
@@ -155,14 +303,11 @@ public abstract class PeepoCloudNodeAPI {
 
     public abstract void stopBungeeProxy(BungeeCordProxyInfo proxyInfo);
 
-
     public abstract void stopMinecraftServer(String name);
 
     public abstract void stopMinecraftServer(MinecraftServerInfo serverInfo);
 
-
     public abstract void stopBungeeGroup(String name);
-
 
     public abstract void stopMinecraftGroup(String name);
 
@@ -261,7 +406,7 @@ public abstract class PeepoCloudNodeAPI {
     public abstract MinecraftGroup getMinecraftGroup(String name);
 
     /**
-     * Copies a template by the loaded {@link TemplateStorage} specified in the {@link Template} or if not found the {@link TemplateLocalStorage} to the given {@link Path}
+     * Copies a template by the loaded {@link TemplateStorage} specified in the {@link Template} or if not found the local storage to the given {@link Path}
      *
      * @param group    the group of the server/proxy
      * @param template the {@link Template} to copy

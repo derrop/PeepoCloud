@@ -3,12 +3,8 @@ package net.peepocloud.node.api.logging;
  * Created by Mc_Ruben on 22.12.2018
  */
 
-import com.google.common.base.Preconditions;
 import jline.console.ConsoleReader;
-import org.fusesource.jansi.Ansi;
 
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public interface ConsoleLogger {

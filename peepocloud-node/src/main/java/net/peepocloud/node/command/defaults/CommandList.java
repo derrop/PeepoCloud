@@ -11,7 +11,6 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.command.Command;
 import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.api.network.NodeParticipant;
-import net.peepocloud.node.network.participant.NodeParticipantImpl;
 import net.peepocloud.node.server.process.BungeeProcess;
 import net.peepocloud.node.server.process.ProcessManager;
 import net.peepocloud.node.server.process.ServerProcess;

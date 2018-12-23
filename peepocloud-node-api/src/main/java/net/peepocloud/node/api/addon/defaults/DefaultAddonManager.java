@@ -3,18 +3,9 @@ package net.peepocloud.node.api.addon.defaults;
  * Created by Mc_Ruben on 05.11.2018
  */
 
-import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
-import net.md_5.bungee.http.HttpClient;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
-import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.api.PeepoCloudNodeAPI;
-import net.peepocloud.node.api.addon.node.NodeAddon;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.function.Consumer;
 

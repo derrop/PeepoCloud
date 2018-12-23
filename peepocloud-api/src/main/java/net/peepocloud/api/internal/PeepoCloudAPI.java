@@ -18,7 +18,7 @@ import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.lib.utility.network.NetworkAddress;
-import java.io.File;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -490,10 +490,10 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         SimpleJsonObject authData = new SimpleJsonObject().append("nodeInfo", this.nodeInfo);
         if (this.processManager != null && !this.processManager.getProcesses().isEmpty()) {
             authData.append("startingProxies", this.processManager.getProcesses().values().stream()
-                    .filter(process -> process instanceof BungeeProcess && !this.proxiesOnThisNode.containsKey(process.getName())).map(process -> ((BungeeProcess) process).getProxyInfo()).collect(Collectors.toList()));
+                    .filter(process -> process instanceof BungeeProcess && !this.proxiesOnThisNode.containsKey(process.getName())).map(CloudProcess::getProxyInfo).collect(Collectors.toList()));
             authData.append("startingServers", this.processManager.getProcesses().values().stream()
-                    .filter(process -> process instanceof ServerProcess && ((ServerProcess) process).getServerInfo().getState() == MinecraftState.OFFLINE)
-                    .map(process -> ((ServerProcess) process).getServerInfo()).collect(Collectors.toList()));
+                    .filter(process -> process instanceof ServerProcess && process.getServerInfo().getState() == MinecraftState.OFFLINE)
+                    .map(CloudProcess::getServerInfo).collect(Collectors.toList()));
         }
         if (!this.proxiesOnThisNode.isEmpty()) {
             authData.append("proxies", this.proxiesOnThisNode.values().stream().map(BungeeCordParticipant::getProxyInfo).collect(Collectors.toList()));

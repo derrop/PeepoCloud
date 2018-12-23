@@ -10,7 +10,6 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.network.NodeParticipant;
 import net.peepocloud.node.api.server.screen.EnabledScreen;
 import net.peepocloud.node.api.server.screen.ScreenManager;
-import net.peepocloud.node.network.participant.NodeParticipantImpl;
 import net.peepocloud.node.screen.network.NetworkScreenManager;
 import net.peepocloud.node.screen.process.ProcessScreenManager;
 import net.peepocloud.node.api.server.CloudProcess;

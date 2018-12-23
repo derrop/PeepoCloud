@@ -20,7 +20,6 @@ import net.peepocloud.node.api.event.process.server.MinecraftServerConfigFillEve
 import net.peepocloud.node.api.event.process.server.MinecraftServerPostConfigFillEvent;
 import net.peepocloud.node.api.event.process.server.MinecraftServerPostTemplateCopyEvent;
 import net.peepocloud.node.api.event.process.server.MinecraftServerTemplateCopyEvent;
-import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.server.ServerFilesLoader;
 
