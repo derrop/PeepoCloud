@@ -172,7 +172,16 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
     public static SimpleJsonObject load(Path path) {
         if (!Files.exists(path))
             return new SimpleJsonObject();
-        try (InputStreamReader reader = new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            return load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new SimpleJsonObject();
+    }
+
+    public static SimpleJsonObject load(InputStream inputStream) {
+        try (InputStreamReader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
             return new SimpleJsonObject(reader);
         } catch (IOException e) {
             e.printStackTrace();
