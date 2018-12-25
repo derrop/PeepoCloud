@@ -310,6 +310,12 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
             this.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
         }, 10, 30, false);
 
+        try {
+            this.nodeAddonManager.loadAddons("nodeAddons");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         this.minecraftGroups = this.groupsConfig.loadMinecraftGroups();
         this.bungeeGroups = this.groupsConfig.loadBungeeGroups();
 
@@ -330,7 +336,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
             }
         }));
 
-        this.reloadAddons();
+        this.nodeAddonManager.enableAddons();
     }
 
     private void initPacketHandlers() {
