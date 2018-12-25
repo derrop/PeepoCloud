@@ -1,5 +1,6 @@
 package net.peepocloud.plugin;
 
+import net.peepocloud.lib.scheduler.Scheduler;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.plugin.api.PeepoCloudPluginAPI;
@@ -24,6 +25,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     private PacketManager packetManager = new PacketManager();
     private NetworkClient nodeConnector;
     private Collection<NetworkAPIHandler> networkHandlers = new ArrayList<>();
+    private Scheduler scheduler = new Scheduler();
 
     public PeepoCloudPlugin(Path nodeInfoFile) {
         instance = this;
@@ -47,6 +49,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
 
     @Override
     public void bootstrap() {
+        scheduler.getThreadPool().execute(scheduler);
+
         this.nodeConnector.run();
         if (!this.nodeConnector.isConnected()) {
             this.shutdown();
@@ -114,6 +118,10 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         return packetManager;
     }
 
+    @Override
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
 
     public static PeepoCloudPlugin getInstance() {
         return instance;

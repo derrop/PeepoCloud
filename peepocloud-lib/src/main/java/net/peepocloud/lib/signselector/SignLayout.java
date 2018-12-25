@@ -1,4 +1,4 @@
-package net.peepocloud.lib.signlayout;
+package net.peepocloud.lib.signselector;
 
 
 public class SignLayout {

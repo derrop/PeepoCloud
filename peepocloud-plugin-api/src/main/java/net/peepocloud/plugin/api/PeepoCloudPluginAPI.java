@@ -4,6 +4,7 @@ package net.peepocloud.plugin.api;
 import com.google.common.base.Preconditions;
 import net.peepocloud.lib.network.NetworkClient;
 import net.peepocloud.lib.network.packet.PacketManager;
+import net.peepocloud.lib.scheduler.Scheduler;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.plugin.api.bukkit.PeepoCloudBukkitAPI;
@@ -32,14 +33,17 @@ public abstract class PeepoCloudPluginAPI {
     public abstract PeepoCloudBukkitAPI toBukkit();
     public abstract PeepoCloudBungeeAPI toBungee();
 
+    public abstract void registerNetworkHandler(NetworkAPIHandler handler);
+    public abstract boolean unregisterNetworkHandler(NetworkAPIHandler handler);
+
     public abstract MinecraftGroup getMinecraftGroup(String name);
     public abstract BungeeGroup getBungeeGroup(String name);
 
     public abstract PacketManager getPacketManager();
     public abstract NetworkClient getNodeConnector();
     public abstract Collection<NetworkAPIHandler> getNetworkHandlers();
-    public abstract void registerNetworkHandler(NetworkAPIHandler handler);
-    public abstract boolean unregisterNetworkHandler(NetworkAPIHandler handler);
+    public abstract Scheduler getScheduler();
+
 
 
 }

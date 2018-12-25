@@ -1,8 +1,8 @@
-package net.peepocloud.lib.signlayout.sign;
+package net.peepocloud.lib.signselector.sign;
 
 
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.lib.signlayout.SignLayout;
+import net.peepocloud.lib.signselector.SignLayout;
 
 public class ServerSign {
     private SignLocation signLocation;

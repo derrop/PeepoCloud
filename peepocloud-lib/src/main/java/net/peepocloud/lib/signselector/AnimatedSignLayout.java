@@ -1,5 +1,7 @@
-package net.peepocloud.lib.signlayout;
+package net.peepocloud.lib.signselector;
 
+
+import com.google.common.base.Preconditions;
 
 public class AnimatedSignLayout {
     private SignLayout[] animationSteps;
@@ -7,12 +9,16 @@ public class AnimatedSignLayout {
     private transient int currentStep = 0;
 
     public AnimatedSignLayout(SignLayout[] animationSteps, int animationStepCount) {
+        Preconditions.checkArgument(animationStepCount > 0 && animationSteps.length > 0, "Animation must have at least one step");
+
         this.animationSteps = animationSteps;
         this.animationStepCount = animationStepCount;
     }
 
-    public void setCurrentStep(int currentStep) {
-        this.currentStep = currentStep;
+    public void nextStep() {
+        this.currentStep++;
+        if(this.currentStep >= this.animationStepCount - 1)
+            this.currentStep = 0;
     }
 
     public int getCurrentStep() {
