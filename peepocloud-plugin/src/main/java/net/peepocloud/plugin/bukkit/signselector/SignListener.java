@@ -27,8 +27,8 @@ public class SignListener implements Listener {
             Block block = event.getClickedBlock();
             if(block.getState() instanceof Sign) {
                 Location location = block.getLocation();
-                ServerSign serverSign = this.signSelector.getByLocation(
-                        new SignLocation(location.getX(), location.getY(), location.getZ(), location.getWorld().getName()));
+                ServerSign serverSign = this.signSelector.getSignProvider().getByLocation(
+                        new SignLocation((int) location.getX(), (int) location.getY(), (int) location.getZ(), location.getWorld().getName()));
                 if(serverSign != null) {
                     MinecraftServerInfo serverInfo = serverSign.getServerInfo();
                     if(serverInfo != null && !PeepoCloudPlugin.getInstance().getMinecraftGroup(serverInfo.getGroupName()).isMaintenance()) {

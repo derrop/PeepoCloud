@@ -2,25 +2,25 @@ package net.peepocloud.lib.signselector.sign;
 
 
 public class SignLocation {
-    private double x, y, z;
+    private int x, y, z;
     private String world;
 
-    public SignLocation(double x, double y, double z, String world) {
+    public SignLocation(int x, int y, int z, String world) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.world = world;
     }
 
-    public double getX() {
+    public int getX() {
         return x;
     }
 
-    public double getY() {
+    public int getY() {
         return y;
     }
 
-    public double getZ() {
+    public int getZ() {
         return z;
     }
 
@@ -40,6 +40,6 @@ public class SignLocation {
 
     @Override
     public int hashCode() {
-        return (int) (this.world.getBytes().length + this.x + this.y + this.y);
+        return this.world.getBytes().length + this.x + this.y + this.y;
     }
 }

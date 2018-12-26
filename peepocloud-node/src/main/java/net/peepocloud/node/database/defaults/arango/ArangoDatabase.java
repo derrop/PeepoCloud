@@ -7,6 +7,8 @@ import com.arangodb.ArangoCollection;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.model.AqlQueryOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,15 +22,18 @@ import java.util.function.Consumer;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class ArangoDatabase implements Database {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
     @Getter
     private String name;
     private ArangoCollection collection;
+
     @Override
     public void insert(String name, SimpleJsonObject jsonObject) {
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
             BaseDocument document = new BaseDocument();
             document.setKey(name);
-            document.addAttribute("val", jsonObject.toJson());
+            document.addAttribute("val", GSON.fromJson(GSON.toJson(jsonObject.asJsonObject()), Object.class));
             this.collection.insertDocument(document);
         });
     }
@@ -41,9 +46,8 @@ public class ArangoDatabase implements Database {
     @Override
     public void update(String name, SimpleJsonObject jsonObject) {
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            BaseDocument document = new BaseDocument();
-            document.setKey(name);
-            document.addAttribute("val", jsonObject.toJson());
+            BaseDocument document = this.collection.getDocument(name, BaseDocument.class);
+            document.updateAttribute("val", GSON.fromJson(GSON.toJson(jsonObject.asJsonObject()), Object.class));
             this.collection.updateDocument(name, document);
         });
     }
@@ -65,7 +69,7 @@ public class ArangoDatabase implements Database {
     @Override
     public void forEach(Consumer<SimpleJsonObject> consumer) {
         ArangoCursor<BaseDocument> cursor = this.collection.db().query(
-                "FOR i IN " + this.collection.name() + " RETURN i.val",
+                "FOR document IN " + this.collection.name() + " RETURN document",
                 new HashMap<>(),
                 new AqlQueryOptions(),
                 BaseDocument.class
@@ -86,6 +90,6 @@ public class ArangoDatabase implements Database {
         if (json == null) {
             return null;
         }
-        return new SimpleJsonObject(json.toString());
+        return new SimpleJsonObject(json);
     }
 }

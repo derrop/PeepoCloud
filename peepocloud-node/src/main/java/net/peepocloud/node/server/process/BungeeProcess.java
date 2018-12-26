@@ -260,7 +260,7 @@ public class BungeeProcess implements CloudProcessImpl {
 
         nodeInfo.append("auth", new Auth(PeepoCloudNode.getInstance().getNetworkAuthKey(), this.proxyInfo.getComponentName(),
                 NetworkComponentType.BUNGEECORD, PeepoCloudNode.getInstance().getCloudConfig().getNodeName(), new SimpleJsonObject()));
-        nodeInfo.append("networkAddress", PeepoCloudNode.getInstance().getCloudConfig().getHost().toInetSocketAddress());
+        nodeInfo.append("networkAddress", PeepoCloudNode.getInstance().getCloudConfig().getHost());
 
         nodeInfo.saveAsFile(Paths.get(this.directory.toString(), "nodeInfo.json"));
     }

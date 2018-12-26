@@ -55,7 +55,7 @@ public class DatabaseLoaderImpl extends DatabaseLoader {
                         .replace("%host%", config.getHost() + ":" + config.getPort()));
                 return true;
             } else {
-                System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.failedConnect")
+                System.err.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.failedConnect")
                         .replace("%name%", databaseManager.getName())
                         .replace("%host%", config.getHost() + ":" + config.getPort()));
             }

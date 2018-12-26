@@ -8,30 +8,29 @@ import net.peepocloud.lib.signselector.AnimatedSignLayout;
 import net.peepocloud.lib.signselector.SignLayout;
 import net.peepocloud.lib.signselector.SignSelectorConfig;
 import net.peepocloud.lib.signselector.sign.ServerSign;
-import net.peepocloud.lib.signselector.sign.SignLocation;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandlerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.material.MaterialData;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SignSelector extends NetworkAPIHandlerAdapter {
     private SignSelectorConfig config;
-    private Collection<ServerSign> serverSigns = new ArrayList<>();
+    private SignProvider signProvider;
     private Map<String, SignLayout> signLayouts = new HashMap<>();
     private AnimatedSignLayout loadingLayout;
     private AnimatedSignLayout maintenanceLayout;
 
-    private Collection<MinecraftServerInfo> waitingServers = new ArrayList<>();
+    private Map<String, MinecraftServerInfo> waitingServers = new ConcurrentHashMap<>();
 
     public SignSelector(SignSelectorConfig config, ServerSign[] serverSigns, SignLayout[] signLayouts, AnimatedSignLayout loadingLayout, AnimatedSignLayout maintenanceLayout) {
         this.config = config;
+        this.signProvider = new SignProvider();
 
         for(SignLayout signLayout : signLayouts)
             this.signLayouts.put(signLayout.getLayoutName().toLowerCase(), signLayout);
@@ -39,7 +38,7 @@ public class SignSelector extends NetworkAPIHandlerAdapter {
         for(ServerSign serverSign : serverSigns) {
             serverSign.setBasicLayout(this.signLayouts.get(PeepoCloudPlugin.getInstance()
                     .getMinecraftGroup(serverSign.getServerInfo().getGroupName()).getSignLayoutName()));
-            this.serverSigns.add(serverSign);
+            this.signProvider.getServerSigns().add(serverSign);
         }
 
         this.loadingLayout = loadingLayout;
@@ -51,11 +50,11 @@ public class SignSelector extends NetworkAPIHandlerAdapter {
             this.loadingLayout.nextStep();
             this.maintenanceLayout.nextStep();
 
-            Iterator<ServerSign> signIterator = this.serverSigns.iterator();
+            Iterator<ServerSign> signIterator = this.signProvider.getServerSigns().iterator();
             while (signIterator.hasNext()) {
                 ServerSign serverSign = signIterator.next();
 
-                if(this.getMinecraftSign(serverSign) == null) {
+                if(this.signProvider.getMinecraftSign(serverSign) == null) {
                     signIterator.remove();
                     continue;
                 }
@@ -67,13 +66,13 @@ public class SignSelector extends NetworkAPIHandlerAdapter {
                 this.updateSign(serverSign);
             }
 
-            this.waitingServers.forEach(this::handleServerAdd);
+            this.waitingServers.values().forEach(this::handleServerAdd);
 
         }, 0, this.config.getUpdateDelay(), true);
     }
 
     public void updateSign(ServerSign serverSign, MinecraftServerInfo serverInfo) {
-        Sign minecraftSign = this.getMinecraftSign(serverSign);
+        Sign minecraftSign = this.signProvider.getMinecraftSign(serverSign);
 
         if(minecraftSign == null)
             return;
@@ -124,24 +123,13 @@ public class SignSelector extends NetworkAPIHandlerAdapter {
             }
         }
 
-        Location location = this.toBukkitLocation(serverSign.getSignLocation());
+        Location location = this.signProvider.toBukkitLocation(serverSign.getSignLocation());
         MaterialData materialData = location.getBlock().getState().getData();
         if(materialData instanceof org.bukkit.material.Sign) {
             Block backBlock = location.getBlock().getRelative(((org.bukkit.material.Sign) materialData).getAttachedFace());
             if(backBlock != null)
                 backBlock.setTypeIdAndData(Material.getMaterial(this.config.getBackBlockMaterialName()).getId(), backBlockSubId, true);
         }
-    }
-
-    public ServerSign getByLocation(SignLocation signLocation) {
-        return this.serverSigns.stream().filter(serverSign -> serverSign.getSignLocation().equals(signLocation)).iterator().next();
-    }
-
-    public Sign getMinecraftSign(ServerSign serverSign) {
-        BlockState blockState = this.toBukkitLocation(serverSign.getSignLocation()).getBlock().getState();
-        if(blockState instanceof Sign)
-            return (Sign) blockState;
-        return null;
     }
 
     public SignLayout getServerSignLayout(ServerSign serverSign) {
@@ -155,37 +143,30 @@ public class SignSelector extends NetworkAPIHandlerAdapter {
         return signGroup.isMaintenance() ? this.maintenanceLayout.getCurrentLayout() : serverSign.getBasicLayout();
     }
 
-    public List<ServerSign> freeSigns(String group) {
-        return this.serverSigns.stream().filter(serverSign -> serverSign.getGroupName().equalsIgnoreCase(group)
-                && (serverSign.getServerInfo() == null || serverSign.getServerInfo().getState() != MinecraftState.LOBBY)).collect(Collectors.toList());
-    }
-
-    public Location toBukkitLocation(SignLocation signLocation) {
-        return new Location(Bukkit.getWorld(signLocation.getWorld()), signLocation.getX(), signLocation.getY(), signLocation.getZ());
-    }
-
     @Override
     public void handleServerAdd(MinecraftServerInfo serverInfo) {
-        List<ServerSign> freeSigns = this.freeSigns(serverInfo.getGroupName());
+        List<ServerSign> freeSigns = this.signProvider.freeSigns(serverInfo.getGroupName());
         if(freeSigns.size() > 0) {
-            this.waitingServers.remove(serverInfo);
+            this.waitingServers.remove(serverInfo.getComponentName().toLowerCase());
             this.updateSign(freeSigns.get(0), serverInfo);
-        } else if(this.waitingServers.contains(serverInfo))
-            this.waitingServers.add(serverInfo);
+        } else if(!this.waitingServers.containsKey(serverInfo.getComponentName().toLowerCase()))
+            this.waitingServers.put(serverInfo.getComponentName().toLowerCase(), serverInfo);
     }
 
     @Override
     public void handleServerStop(MinecraftServerInfo serverInfo) {
-        for(ServerSign serverSign : this.serverSigns) {
+        for(ServerSign serverSign : this.signProvider.getServerSigns()) {
             if(serverSign.getServerInfo() != null && serverSign.getServerInfo().getComponentName().equalsIgnoreCase(serverInfo.getComponentName()))
                 serverSign.setServerInfo(null);
         }
-
-        this.waitingServers.removeIf(current -> current.getComponentName().equalsIgnoreCase(serverInfo.getComponentName()));
+        for(MinecraftServerInfo current : this.waitingServers.values()) {
+            if(current.getComponentName().equalsIgnoreCase(serverInfo.getComponentName()))
+                this.waitingServers.remove(current.getComponentName().toLowerCase());
+        }
     }
 
-    public Collection<ServerSign> getServerSigns() {
-        return serverSigns;
+    public SignProvider getSignProvider() {
+        return signProvider;
     }
 
     public Map<String, SignLayout> getSignLayouts() {
