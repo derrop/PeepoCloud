@@ -25,7 +25,7 @@ public class NodeUserManager implements UserManager { //TODO send on user update
 
     public void getUsers(Consumer<Collection<User>> consumer) {
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("internal_configs");
-        database.get("users", simpleJsonObject -> {
+        database.get("users").thenAccept(simpleJsonObject -> {
             if (simpleJsonObject == null) {
                 database.insert("users", new SimpleJsonObject().append("users", Collections.emptyList()));
                 consumer.accept(new ArrayList<>());

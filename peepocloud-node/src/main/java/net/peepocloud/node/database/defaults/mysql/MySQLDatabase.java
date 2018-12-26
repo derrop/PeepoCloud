@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class MySQLDatabase implements Database {
@@ -94,7 +95,8 @@ public class MySQLDatabase implements Database {
     }
 
     @Override
-    public void get(String name, Consumer<SimpleJsonObject> consumer) {
+    public CompletableFuture<SimpleJsonObject> get(String name) {
+        CompletableFuture<SimpleJsonObject> future = new CompletableFuture<>();
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
             try {
                 PreparedStatement statement = databaseManager.getConnection().prepareStatement("SELECT `value` FROM `" + this.name + "` WHERE `name` = ?");
@@ -104,13 +106,13 @@ public class MySQLDatabase implements Database {
                     byte[] bytes = resultSet.getBytes("value");
                     if (bytes.length != 0) {
                         try (InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(bytes), "UTF-8")) {
-                            consumer.accept(new SimpleJsonObject(reader));
+                            future.complete(new SimpleJsonObject(reader));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                 } else {
-                    consumer.accept(null);
+                    future.complete(null);
                 }
                 statement.close();
                 resultSet.close();
@@ -118,6 +120,7 @@ public class MySQLDatabase implements Database {
                 e.printStackTrace();
             }
         });
+        return future;
     }
 
     @Override

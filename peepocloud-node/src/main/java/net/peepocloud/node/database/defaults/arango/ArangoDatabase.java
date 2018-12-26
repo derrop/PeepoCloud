@@ -15,6 +15,7 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.database.Database;
 
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -53,10 +54,12 @@ public class ArangoDatabase implements Database {
     }
 
     @Override
-    public void get(String name, Consumer<SimpleJsonObject> consumer) {
+    public CompletableFuture<SimpleJsonObject> get(String name) {
+        CompletableFuture<SimpleJsonObject> future = new CompletableFuture<>();
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            consumer.accept(this.documentToJson(this.collection.getDocument(name, BaseDocument.class)));
+            future.complete(this.documentToJson(this.collection.getDocument(name, BaseDocument.class)));
         });
+        return future;
     }
 
     @Override

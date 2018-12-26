@@ -11,6 +11,7 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.database.Database;
 import org.bson.Document;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -49,13 +50,17 @@ public class MongoDatabase implements Database {
     }
 
     @Override
-    public void get(String name, Consumer<SimpleJsonObject> consumer) {
+    public CompletableFuture<SimpleJsonObject> get(String name) {
+        CompletableFuture<SimpleJsonObject> future = new CompletableFuture<>();
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
             Document document = collection.find(Filters.eq("name", name)).first();
             if (document != null) {
-                consumer.accept(new SimpleJsonObject(document.getString("value")));
+                future.complete(new SimpleJsonObject(document.getString("value")));
+            } else {
+                future.complete(null);
             }
         });
+        return future;
     }
 
     @Override

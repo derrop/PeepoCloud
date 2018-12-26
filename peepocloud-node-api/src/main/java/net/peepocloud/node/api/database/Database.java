@@ -5,6 +5,7 @@ package net.peepocloud.node.api.database;
 
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public interface Database {
@@ -19,7 +20,7 @@ public interface Database {
 
     void contains(String name, Consumer<Boolean> consumer);
 
-    void get(String name, Consumer<SimpleJsonObject> consumer);
+    CompletableFuture<SimpleJsonObject> get(String name);
 
     void forEach(Consumer<SimpleJsonObject> consumer);
 }

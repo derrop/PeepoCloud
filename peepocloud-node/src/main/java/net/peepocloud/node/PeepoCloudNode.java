@@ -285,6 +285,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         this.commandManager = new CommandManagerImpl(this.logger);
 
         this.eventManager = new DefaultEventManager();
+        this.eventManager.registerListener(this.statisticsManager);
 
         this.loadConfigs();
 

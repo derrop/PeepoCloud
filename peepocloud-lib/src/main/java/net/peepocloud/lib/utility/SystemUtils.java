@@ -224,7 +224,7 @@ public class SystemUtils {
     }
 
     public static boolean isServerOffline(Exception e) {
-        return e instanceof ConnectException && e.getMessage().equalsIgnoreCase("Connection refused: connect");
+        return e instanceof ConnectException && (e.getMessage().equals("Connection refused: connect") || e.getMessage().equals("Connection timed out: connect"));
     }
 
     public static String getOperatingSystem() {

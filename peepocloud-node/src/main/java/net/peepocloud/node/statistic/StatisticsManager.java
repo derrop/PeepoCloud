@@ -83,18 +83,18 @@ public class StatisticsManager {
 
     private void update(String key, long add) {
         Database database = this.getDatabase();
-        database.get("statistic", jsonObject -> {
+        database.get("statistic").thenAccept(jsonObject -> {
             if (jsonObject == null) {
                 jsonObject = new SimpleJsonObject();
                 long oldValue = jsonObject.contains(key) ? jsonObject.getLong(key) : 0;
                 long newValue = oldValue + add;
-                jsonObject.append(key, add);
+                jsonObject.append(key, newValue);
                 database.insert("statistic", jsonObject);
                 this.listeners.forEach(listener -> listener.call(key, oldValue, newValue));
             } else {
                 long oldValue = jsonObject.contains(key) ? jsonObject.getLong(key) : 0;
                 long newValue = oldValue + add;
-                jsonObject.append(key, add);
+                jsonObject.append(key, newValue);
                 database.update("statistic", jsonObject);
                 this.listeners.forEach(listener -> listener.call(key, oldValue, newValue));
             }
