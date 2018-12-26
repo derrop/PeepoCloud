@@ -265,4 +265,17 @@ public class SystemUtils {
         }
     }
 
+    public static void createParent(Path path) {
+        if (!Files.exists(path)) {
+            Path parent = path.getParent();
+            if (parent != null && !Files.exists(parent)) {
+                try {
+                    Files.createDirectories(parent);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 }

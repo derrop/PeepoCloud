@@ -16,17 +16,16 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.lib.utility.ZipUtils;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.api.event.process.server.MinecraftServerConfigFillEvent;
-import net.peepocloud.node.api.event.process.server.MinecraftServerPostConfigFillEvent;
-import net.peepocloud.node.api.event.process.server.MinecraftServerPostTemplateCopyEvent;
-import net.peepocloud.node.api.event.process.server.MinecraftServerTemplateCopyEvent;
+import net.peepocloud.node.api.event.process.server.*;
 import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.server.ServerFilesLoader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -120,6 +119,7 @@ public class ServerProcess implements CloudProcessImpl {
 
         this.loadTemplate();
         this.loadSpigot();
+        this.loadPlugin();
         this.loadServerConfig();
         this.createNodeInfo();
         this.doStart();
@@ -140,6 +140,32 @@ public class ServerProcess implements CloudProcessImpl {
             wasRunning = true;
 
             PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerStartEvent(this.serverInfo));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadPlugin() {
+        InputStream inputStream = PeepoCloudNode.class.getClassLoader().getResourceAsStream("files/PeepoCloudPlugin.jar");
+        Path path = Paths.get(this.directory.toString(), "plugins/PeepoCloud.jar");
+        MinecraftServerPluginCopyEvent event = new MinecraftServerPluginCopyEvent(this, inputStream, path);
+        PeepoCloudNode.getInstance().getEventManager().callEvent(event);
+        if (event.getInputStream() != inputStream && event.getInputStream() != null) {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            inputStream = event.getInputStream();
+        }
+        if (event.getTarget() != null && event.getTarget() != path) {
+            path = event.getTarget();
+        }
+
+        SystemUtils.createParent(path);
+
+        try {
+            Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }
