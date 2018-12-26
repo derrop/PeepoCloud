@@ -691,6 +691,32 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         return this.bungeeGroups.get(name);
     }
 
+    //TODO
+    @Override
+    public void sendPlayerMessage(UUID uniqueId, String message) {
+
+    }
+
+    @Override
+    public void sendPlayer(UUID uniqueId, String server) {
+
+    }
+
+    @Override
+    public void sendPlayerTitle(UUID uniqueId, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+
+    }
+
+    @Override
+    public void kickPlayer(UUID uniqueId, String reason) {
+
+    }
+
+    @Override
+    public void sendPlayerActionBar(UUID uniqueId, String message) {
+
+    }
+
     public MinecraftGroup getMinecraftGroup(String name) {
         return this.minecraftGroups.get(name);
     }

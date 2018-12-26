@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import net.peepocloud.lib.network.packet.serialization.ReflectivePacketSerializable;
 import net.peepocloud.lib.server.GroupMode;
 import net.peepocloud.lib.server.Template;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class MinecraftGroup {
+public class MinecraftGroup implements ReflectivePacketSerializable {
     private String name;
     private GroupMode groupMode;
     private List<Template> templates;

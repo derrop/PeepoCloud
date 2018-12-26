@@ -6,7 +6,9 @@ package net.peepocloud.lib.server;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 
-public enum GroupMode {
+import java.io.Serializable;
+
+public enum GroupMode implements Serializable {
     /**
      * If SAVE is selected in a {@link MinecraftGroup}/{@link BungeeGroup}, it won't be deleted by the Node after a shutdown
      */

@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     private static PeepoCloudPlugin instance;
@@ -116,6 +117,31 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     @Override
     public PacketManager getPacketManager() {
         return packetManager;
+    }
+
+    @Override
+    public void sendPlayer(UUID uniqueId, String server) {
+
+    }
+
+    @Override
+    public void sendPlayerActionBar(UUID uniqueId, String message) {
+
+    }
+
+    @Override
+    public void sendPlayerMessage(UUID uniqueId, String message) {
+
+    }
+
+    @Override
+    public void sendPlayerTitle(UUID uniqueId, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+
+    }
+
+    @Override
+    public void kickPlayer(UUID uniqueId, String reason) {
+
     }
 
     @Override

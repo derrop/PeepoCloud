@@ -4,6 +4,8 @@ package net.peepocloud.lib.server.bungee;
  */
 
 import lombok.*;
+import net.peepocloud.lib.AbstractPeepoCloudAPI;
+import net.peepocloud.lib.network.packet.serialization.ReflectivePacketSerializable;
 import net.peepocloud.lib.server.Template;
 
 import java.util.Map;
@@ -13,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class BungeeCordProxyInfo {
+public class BungeeCordProxyInfo implements ReflectivePacketSerializable {
 
     private String componentName;
     private String groupName;
@@ -30,5 +32,8 @@ public class BungeeCordProxyInfo {
     @Setter
     private long startup;
 
+    public BungeeGroup getGroup() {
+        return AbstractPeepoCloudAPI.getInstance().getBungeeGroup(this.groupName);
+    }
 
 }

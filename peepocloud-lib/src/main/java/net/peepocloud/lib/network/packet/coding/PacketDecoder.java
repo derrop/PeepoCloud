@@ -37,17 +37,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 return;
 
             Class<? extends Packet> packetClass = packetInfo.getPacketClass();
-            try {
-                Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
+            Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
 
-                if(isQuery)
-                    this.packetManager.convertToQueryPacket(packet, PacketUtils.readUUID(byteArrayDataInput));
+            if(isQuery)
+                this.packetManager.convertToQueryPacket(packet, PacketUtils.readUUID(byteArrayDataInput));
 
-                packet.read(byteArrayDataInput);
-                list.add(packet);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
+            packet.read(byteArrayDataInput);
+            list.add(packet);
         }
     }
 }

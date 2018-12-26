@@ -2,14 +2,44 @@ package net.peepocloud.lib.utility.network;
 
 
 import io.netty.buffer.ByteBuf;
+import net.peepocloud.lib.network.packet.serialization.PacketSerializable;
+import sun.reflect.ReflectionFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class PacketUtils {
+
+    public static <T extends PacketSerializable> T deserializeObject(DataInput dataInput, Class<? extends T> clazz) {
+        if (!PacketSerializable.class.isAssignableFrom(clazz)) {
+            return null;
+        }
+        try {
+            Constructor constructor = ReflectionFactory.getReflectionFactory().newConstructorForSerialization(clazz, Object.class.getDeclaredConstructor());
+            Object obj = constructor.newInstance();
+            if (!(obj instanceof PacketSerializable)) {
+                return null;
+            }
+            T t = (T) obj;
+            t.deserialize(dataInput);
+            return t;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void serializeObject(DataOutput dataOutput, PacketSerializable serializable) {
+        try {
+            serializable.serialize(dataOutput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void writeString(ByteBuf byteBuf, String string) {
         byte[] bytes = string.getBytes(StandardCharsets.UTF_8);

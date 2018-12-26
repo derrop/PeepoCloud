@@ -4,6 +4,7 @@ package net.peepocloud.node.api;
  */
 
 import com.google.common.base.Preconditions;
+import net.peepocloud.lib.AbstractPeepoCloudAPI;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.node.NodeInfo;
@@ -34,13 +35,14 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
-public abstract class PeepoCloudNodeAPI {
+public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
 
     private static PeepoCloudNodeAPI instance;
 
     public static void setInstance(PeepoCloudNodeAPI instance) {
         Preconditions.checkArgument(PeepoCloudNodeAPI.instance == null, "instance already set");
         PeepoCloudNodeAPI.instance = instance;
+        AbstractPeepoCloudAPI.setInstance(instance);
     }
 
     public static PeepoCloudNodeAPI getInstance() {

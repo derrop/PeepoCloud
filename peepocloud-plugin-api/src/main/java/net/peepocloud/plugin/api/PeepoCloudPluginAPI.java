@@ -2,6 +2,7 @@ package net.peepocloud.plugin.api;
 
 
 import com.google.common.base.Preconditions;
+import net.peepocloud.lib.AbstractPeepoCloudAPI;
 import net.peepocloud.lib.network.NetworkClient;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.scheduler.Scheduler;
@@ -13,12 +14,13 @@ import net.peepocloud.plugin.api.network.handler.NetworkAPIHandler;
 
 import java.util.Collection;
 
-public abstract class PeepoCloudPluginAPI {
+public abstract class PeepoCloudPluginAPI extends AbstractPeepoCloudAPI {
     private static PeepoCloudPluginAPI instance;
 
     public static void setInstance(PeepoCloudPluginAPI instance) {
         Preconditions.checkArgument(PeepoCloudPluginAPI.instance == null, "Instance already set");
         PeepoCloudPluginAPI.instance = instance;
+        AbstractPeepoCloudAPI.setInstance(instance);
     }
 
     public static PeepoCloudPluginAPI getInstance() {

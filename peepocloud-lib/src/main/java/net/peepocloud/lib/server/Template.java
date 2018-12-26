@@ -7,10 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class Template {
+public class Template implements Serializable {
     private String name;
     private String storage;
 

@@ -6,9 +6,11 @@ package net.peepocloud.lib.server.minecraft;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @Getter
-public enum MinecraftState {
+public enum MinecraftState implements Serializable {
 
     LOBBY("Lobby"),
     IN_GAME("Ingame"),
