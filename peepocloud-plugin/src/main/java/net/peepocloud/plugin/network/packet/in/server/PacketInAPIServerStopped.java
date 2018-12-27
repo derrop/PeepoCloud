@@ -1,21 +1,20 @@
-package net.peepocloud.plugin.network.packet.in;
+package net.peepocloud.plugin.network.packet.in.server;
 
 
-import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.lib.network.NetworkPacketSender;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
+import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.plugin.PeepoCloudPlugin;
 
 import java.util.function.Consumer;
 
-public class PacketInAPIServerStarted extends JsonPacketHandler {
-
+public class PacketInAPIServerStopped extends JsonPacketHandler {
 
     @Override
     public int getId() {
-        return 100;
+        return 101;
     }
 
     @Override
@@ -23,6 +22,8 @@ public class PacketInAPIServerStarted extends JsonPacketHandler {
         if(packet.getSimpleJsonObject() == null || !packet.getSimpleJsonObject().contains("serverInfo"))
             return;
         MinecraftServerInfo serverInfo = packet.getSimpleJsonObject().getObject("serverInfo", MinecraftServerInfo.class);
-        PeepoCloudPlugin.getInstance().getNetworkHandlers().forEach(handler -> handler.handleServerAdd(serverInfo));
+        PeepoCloudPlugin.getInstance().getNetworkHandlers().forEach(handler -> handler.handleServerStop(serverInfo));
     }
+
+
 }

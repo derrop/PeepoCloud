@@ -150,7 +150,7 @@ public class ServerProcess implements CloudProcessImpl {
         Path path = Paths.get(this.directory.toString(), "plugins/PeepoCloud.jar");
         MinecraftServerPluginCopyEvent event = new MinecraftServerPluginCopyEvent(this, inputStream, path);
         PeepoCloudNode.getInstance().getEventManager().callEvent(event);
-        if (event.getInputStream() != inputStream && event.getInputStream() != null) {
+        if (event.getInputStream() != inputStream && event.getInputStream() != null ) {
             try {
                 inputStream.close();
             } catch (IOException e) {

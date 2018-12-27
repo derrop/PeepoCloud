@@ -3,6 +3,7 @@ package net.peepocloud.lib.network.packet;
 
 import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
+import net.peepocloud.lib.utility.network.QueryRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeoutException;
 
 public class PacketManager {
     private Map<Integer, PacketInfo> registeredPackets = new HashMap<>();
-    private Map<UUID, CompletableFuture<Packet>> pendingQueries = new HashMap<>();
+    private Map<UUID, QueryRequest<Packet>> pendingQueries = new HashMap<>();
 
     public void registerPacket(PacketInfo packetInfo) {
         this.registeredPackets.put(packetInfo.getId(), packetInfo);
@@ -49,12 +50,12 @@ public class PacketManager {
      * @return future for the packet
      */
 
-    public CompletableFuture<Packet> packetQueryAsync(NetworkPacketSender networkParticipant, Packet packet) {
+    public QueryRequest<Packet> packetQueryAsync(NetworkPacketSender networkParticipant, Packet packet) {
         this.convertToQueryPacket(packet, UUID.randomUUID());
         networkParticipant.sendPacket(packet);
-        CompletableFuture<Packet> future = new CompletableFuture<>();
-        this.pendingQueries.put(packet.getQueryUUID(), future);
-        return future;
+        QueryRequest<Packet> request = new QueryRequest<>();
+        this.pendingQueries.put(packet.getQueryUUID(), request);
+        return request;
     }
 
     /**
@@ -66,15 +67,10 @@ public class PacketManager {
      */
 
     public Packet packetQuery(NetworkPacketSender networkParticipant, Packet packet) {
-        try {
-            return this.packetQueryAsync(networkParticipant, packet).get(6, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return this.packetQueryAsync(networkParticipant, packet).complete(6, TimeUnit.SECONDS);
     }
 
-    public CompletableFuture<Packet> getQueryAndRemove(UUID uuid) {
+    public QueryRequest<Packet> getQueryAndRemove(UUID uuid) {
         return this.pendingQueries.remove(uuid);
     }
 

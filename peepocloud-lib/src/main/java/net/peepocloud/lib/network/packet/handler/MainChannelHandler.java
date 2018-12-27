@@ -6,6 +6,7 @@ import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketInfo;
 import net.peepocloud.lib.network.packet.PacketManager;
+import net.peepocloud.lib.utility.network.QueryRequest;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -49,9 +50,9 @@ public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
         if(this.channelHandler.packet(this.participant, packet))
             return;
 
-        CompletableFuture<Packet> query = this.packetManager.getQueryAndRemove(packet.getQueryUUID());
+        QueryRequest<Packet> query = this.packetManager.getQueryAndRemove(packet.getQueryUUID());
         if(query != null)
-            query.complete(packet);
+            query.setResponse(packet);
 
         PacketInfo packetInfo = this.packetManager.getPacketInfo(packet.getId());
         if(packetInfo != null) {
