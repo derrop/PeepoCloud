@@ -34,10 +34,12 @@ import net.peepocloud.node.api.event.network.bungeecord.BungeeConnectEvent;
 import net.peepocloud.node.api.event.network.minecraftserver.ServerConnectEvent;
 import net.peepocloud.node.api.event.network.node.NodeConnectEvent;
 import net.peepocloud.node.api.network.NodeParticipant;
+import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.network.packet.auth.PacketInAuth;
 import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
 import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
 import net.peepocloud.node.network.participant.NodeParticipantImpl;
+import net.peepocloud.node.server.process.BungeeProcess;
 import net.peepocloud.node.utility.NodeUtils;
 
 import java.net.InetSocketAddress;
@@ -241,10 +243,14 @@ public class NetworkServer implements Runnable {
                     if (!auth.getParentComponentName().equals(PeepoCloudNode.getInstance().getNodeInfo().getName()))
                         break;
 
-                    if (!PeepoCloudNode.getInstance().getProcessManager().getProcesses().containsKey(auth.getComponentName()))
+                    CloudProcess process = PeepoCloudNode.getInstance().getProcessManager().getProcesses().get(auth.getComponentName());
+
+                    if (process == null || !process.isServer())
                         break;
 
                     networkParticipant = new MinecraftServerParticipantImpl(networkParticipant.getChannel(), auth);
+
+                    ((MinecraftServerParticipantImpl) networkParticipant).setServerInfo(process.getServerInfo());
 
                     PeepoCloudNode.getInstance().getServersOnThisNode().put(auth.getComponentName(), (MinecraftServerParticipantImpl) networkParticipant);
                     successful = true;
@@ -260,10 +266,14 @@ public class NetworkServer implements Runnable {
                     if (!auth.getParentComponentName().equals(PeepoCloudNode.getInstance().getNodeInfo().getName()))
                         break;
 
-                    if (!PeepoCloudNode.getInstance().getProcessManager().getProcesses().containsKey(auth.getComponentName()))
+                    CloudProcess process = PeepoCloudNode.getInstance().getProcessManager().getProcesses().get(auth.getComponentName());
+
+                    if (process == null || !process.isProxy())
                         break;
 
                     networkParticipant = new BungeeCordParticipantImpl(networkParticipant.getChannel(), auth);
+
+                    ((BungeeCordParticipantImpl) networkParticipant).setProxyInfo(process.getProxyInfo());
 
                     PeepoCloudNode.getInstance().getProxiesOnThisNode().put(auth.getComponentName(), (BungeeCordParticipantImpl) networkParticipant);
 

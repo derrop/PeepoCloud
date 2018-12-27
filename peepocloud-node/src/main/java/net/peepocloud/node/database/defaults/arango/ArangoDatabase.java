@@ -30,31 +30,29 @@ public class ArangoDatabase implements Database {
 
     @Override
     public void insert(String name, SimpleJsonObject jsonObject) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            BaseDocument document = new BaseDocument();
-            document.setKey(name);
-            document.addAttribute("val", GSON.fromJson(GSON.toJson(jsonObject.asJsonObject()), Object.class));
-            this.collection.insertDocument(document);
-        });
+        BaseDocument document = new BaseDocument();
+        document.setKey(name);
+        document.addAttribute("val", GSON.fromJson(GSON.toJson(jsonObject.asJsonObject()), Object.class));
+        this.collection.insertDocument(document);
     }
 
     @Override
     public void delete(String name) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> this.collection.deleteDocument(name));
+        this.collection.deleteDocument(name);
     }
 
     @Override
     public void update(String name, SimpleJsonObject jsonObject) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            BaseDocument document = this.collection.getDocument(name, BaseDocument.class);
-            document.updateAttribute("val", GSON.fromJson(GSON.toJson(jsonObject.asJsonObject()), Object.class));
-            this.collection.updateDocument(name, document);
-        });
+        BaseDocument document = this.collection.getDocument(name, BaseDocument.class);
+        document.updateAttribute("val", GSON.fromJson(GSON.toJson(jsonObject.asJsonObject()), Object.class));
+        this.collection.updateDocument(name, document);
     }
 
     @Override
-    public void contains(String name, Consumer<Boolean> consumer) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> consumer.accept(this.collection.documentExists(name)));
+    public CompletableFuture<Boolean> contains(String name) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        PeepoCloudNode.getInstance().getExecutorService().execute(() -> future.complete(this.collection.documentExists(name)));
+        return future;
     }
 
     @Override

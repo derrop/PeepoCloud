@@ -89,13 +89,13 @@ public class StatisticsManager {
                 long oldValue = jsonObject.contains(key) ? jsonObject.getLong(key) : 0;
                 long newValue = oldValue + add;
                 jsonObject.append(key, newValue);
-                database.insert("statistic", jsonObject);
+                database.insertAsync("statistic", jsonObject);
                 this.listeners.forEach(listener -> listener.call(key, oldValue, newValue));
             } else {
                 long oldValue = jsonObject.contains(key) ? jsonObject.getLong(key) : 0;
                 long newValue = oldValue + add;
                 jsonObject.append(key, newValue);
-                database.update("statistic", jsonObject);
+                database.updateAsync("statistic", jsonObject);
                 this.listeners.forEach(listener -> listener.call(key, oldValue, newValue));
             }
             this.statistics = jsonObject;
@@ -109,7 +109,7 @@ public class StatisticsManager {
             if (this.webSocketClient != null) {
                 this.webSocketClient.send(new SimpleJsonObject().append("update", key).append("val", val).toJson());
             }
-        } else if (this.webSocketClient != null) {
+        } else if (this.webSocketClient != null && this.webSocketClient.isConnected()) {
             this.webSocketClient.close();
         }
     }

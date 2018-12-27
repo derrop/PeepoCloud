@@ -34,6 +34,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
 
@@ -48,6 +50,14 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
     public static PeepoCloudNodeAPI getInstance() {
         return instance;
     }
+
+    /**
+     * Gets the {@link ExecutorService} (cached thread pool) of this instance.
+     *
+     * @return the {@link ExecutorService} instance in this node
+     * @see Executors#newCachedThreadPool()
+     */
+    public abstract ExecutorService getExecutorService();
 
     /**
      * Gets the {@link LanguagesManager} instance of this Node

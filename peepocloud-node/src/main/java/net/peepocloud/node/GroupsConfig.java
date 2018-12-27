@@ -62,20 +62,20 @@ public class GroupsConfig {
 
     public void update(MinecraftGroup group) {
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups");
-        database.update(group.getName(), new SimpleJsonObject(group));
+        database.updateAsync(group.getName(), new SimpleJsonObject(group));
     }
 
     public void update(BungeeGroup group) {
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("bungeeGroups");
-        database.update(group.getName(), new SimpleJsonObject(group));
+        database.updateAsync(group.getName(), new SimpleJsonObject(group));
     }
 
     private void doCreate(Consumer<Boolean> success, Database database, String name, JsonElement jsonElement) {
-        database.contains(name, aBoolean -> {
+        database.contains(name).thenAccept(aBoolean -> {
             if (aBoolean) {
                 success.accept(false);
             } else {
-                database.insert(name, new SimpleJsonObject(jsonElement.getAsJsonObject()));
+                database.insertAsync(name, new SimpleJsonObject(jsonElement.getAsJsonObject()));
                 success.accept(true);
             }
         });

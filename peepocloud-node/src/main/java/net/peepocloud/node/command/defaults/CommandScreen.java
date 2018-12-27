@@ -146,7 +146,7 @@ public class CommandScreen extends Command implements TabCompletable {
 
     private Collection<String> findServers() {
         Collection<String> a = new ArrayList<>(PeepoCloudNode.getInstance().getServersOnThisNode().keySet());
-        a.addAll(PeepoCloudNode.getInstance().getProcessManager().getProcesses().values().stream().filter(process -> process instanceof ServerProcess).map(CloudProcess::getName).collect(Collectors.toList()));
+        a.addAll(PeepoCloudNode.getInstance().getProcessManager().getProcesses().values().stream().filter(process -> process.isServer()).map(CloudProcess::getName).collect(Collectors.toList()));
         for (NodeParticipant value : PeepoCloudNode.getInstance().getServerNodes().values()) {
             a.addAll(value.getServers().keySet());
             a.addAll(value.getStartingServers().keySet());
@@ -156,7 +156,7 @@ public class CommandScreen extends Command implements TabCompletable {
 
     private Collection<String> findProxies() {
         Collection<String> a = new ArrayList<>(PeepoCloudNode.getInstance().getProxiesOnThisNode().keySet());
-        a.addAll(PeepoCloudNode.getInstance().getProcessManager().getProcesses().values().stream().filter(process -> process instanceof BungeeProcess).map(CloudProcess::getName).collect(Collectors.toList()));
+        a.addAll(PeepoCloudNode.getInstance().getProcessManager().getProcesses().values().stream().filter(process -> process.isProxy()).map(CloudProcess::getName).collect(Collectors.toList()));
         for (NodeParticipant value : PeepoCloudNode.getInstance().getServerNodes().values()) {
             a.addAll(value.getProxies().keySet());
             a.addAll(value.getStartingProxies().keySet());

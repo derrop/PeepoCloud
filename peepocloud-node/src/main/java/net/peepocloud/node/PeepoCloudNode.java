@@ -499,9 +499,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         SimpleJsonObject authData = new SimpleJsonObject().append("nodeInfo", this.nodeInfo);
         if (this.processManager != null && !this.processManager.getProcesses().isEmpty()) {
             authData.append("startingProxies", this.processManager.getProcesses().values().stream()
-                    .filter(process -> process instanceof BungeeProcess && !this.proxiesOnThisNode.containsKey(process.getName())).map(CloudProcess::getProxyInfo).collect(Collectors.toList()));
+                    .filter(process -> process.isProxy() && !this.proxiesOnThisNode.containsKey(process.getName())).map(CloudProcess::getProxyInfo).collect(Collectors.toList()));
             authData.append("startingServers", this.processManager.getProcesses().values().stream()
-                    .filter(process -> process instanceof ServerProcess && process.getServerInfo().getState() == MinecraftState.OFFLINE)
+                    .filter(process -> process.isServer() && process.getServerInfo().getState() == MinecraftState.OFFLINE)
                     .map(CloudProcess::getServerInfo).collect(Collectors.toList()));
         }
         if (!this.proxiesOnThisNode.isEmpty()) {
@@ -512,9 +512,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         }
         if (this.processManager != null && !this.processManager.getServerQueue().getServerProcesses().isEmpty()) {
             authData.append("queuedProxies", this.processManager.getServerQueue().getServerProcesses().stream()
-                    .filter(process -> process instanceof BungeeProcess).map(CloudProcess::getProxyInfo).collect(Collectors.toList()));
+                    .filter(CloudProcess::isProxy).map(CloudProcess::getProxyInfo).collect(Collectors.toList()));
             authData.append("queuedServers", this.processManager.getServerQueue().getServerProcesses().stream()
-                    .filter(process -> process instanceof ServerProcess).map(CloudProcess::getServerInfo).collect(Collectors.toList()));
+                    .filter(CloudProcess::isServer).map(CloudProcess::getServerInfo).collect(Collectors.toList()));
         }
         ClientNodeImpl client = new ClientNodeImpl(
                 new InetSocketAddress(node.getAddress().getHost(), node.getAddress().getPort()),
@@ -742,7 +742,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         boolean a = false;
         if (this.processManager.getProcesses().containsKey(serverInfo.getComponentName())) {
             CloudProcess process = this.processManager.getProcesses().get(serverInfo.getComponentName());
-            if (process instanceof ServerProcess) {
+            if (process.isServer()) {
                 ((ServerProcess) process).setServerInfo(serverInfo);
                 a = true;
             }
@@ -766,7 +766,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         boolean a = false;
         if (this.processManager.getProcesses().containsKey(proxyInfo.getComponentName())) {
             CloudProcess process = this.processManager.getProcesses().get(proxyInfo.getComponentName());
-            if (process instanceof BungeeProcess) {
+            if (process.isProxy()) {
                 ((BungeeProcess) process).setProxyInfo(proxyInfo);
                 a = true;
             }
@@ -812,7 +812,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     public Collection<MinecraftServerInfo> getMinecraftServers() {
         Collection<MinecraftServerInfo> serverInfos = new ArrayList<>();
         this.processManager.getProcesses().values().forEach(process -> {
-            if (process instanceof ServerProcess) {
+            if (process.isServer()) {
                 serverInfos.add(process.getServerInfo());
             }
         });
@@ -826,7 +826,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     public Collection<MinecraftServerInfo> getMinecraftServers(String group) {
         Collection<MinecraftServerInfo> serverInfos = new ArrayList<>();
         this.processManager.getProcesses().values().forEach(process -> {
-            if (process instanceof ServerProcess && process.getGroupName().equalsIgnoreCase(group)) {
+            if (process.isServer() && process.getGroupName().equalsIgnoreCase(group)) {
                 serverInfos.add(process.getServerInfo());
             }
         });
@@ -882,7 +882,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     public Collection<BungeeCordProxyInfo> getBungeeProxies() {
         Collection<BungeeCordProxyInfo> serverInfos = new ArrayList<>();
         this.processManager.getProcesses().values().forEach(process -> {
-            if (process instanceof BungeeProcess) {
+            if (process.isProxy()) {
                 serverInfos.add(process.getProxyInfo());
             }
         });
@@ -896,7 +896,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     public Collection<BungeeCordProxyInfo> getBungeeProxies(String group) {
         Collection<BungeeCordProxyInfo> serverInfos = new ArrayList<>();
         this.processManager.getProcesses().values().forEach(process -> {
-            if (process instanceof BungeeProcess && process.getGroupName().equalsIgnoreCase(group)) {
+            if (process.isProxy() && process.getGroupName().equalsIgnoreCase(group)) {
                 serverInfos.add(process.getProxyInfo());
             }
         });
@@ -963,7 +963,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                 return true;
             }
         }
-        if ((this.processManager.getProcesses().containsKey(name) && this.processManager.getProcesses().get(name) instanceof ServerProcess)
+        if ((this.processManager.getProcesses().containsKey(name) && this.processManager.getProcesses().get(name).isServer())
                 || this.processManager.getServerQueue().getServerProcesses().stream().anyMatch(process -> process.getName().equals(name)))
             return true;
         return false;
@@ -977,7 +977,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                 return true;
             }
         }
-        if ((this.processManager.getProcesses().containsKey(name) && this.processManager.getProcesses().get(name) instanceof BungeeProcess) ||
+        if ((this.processManager.getProcesses().containsKey(name) && this.processManager.getProcesses().get(name).isProxy()) ||
                 this.processManager.getServerQueue().getServerProcesses().stream().anyMatch(process -> process.getName().equals(name))) {
             return true;
         }
@@ -987,7 +987,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     public MinecraftServerInfo getMinecraftServerInfo(String name) {
         if (this.processManager.getProcesses().containsKey(name)) {
             CloudProcess process = this.processManager.getProcesses().get(name);
-            if (process instanceof ServerProcess)
+            if (process.isServer())
                 return process.getServerInfo();
         }
         for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {
@@ -1004,7 +1004,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     public BungeeCordProxyInfo getBungeeProxyInfo(String name) {
         if (this.processManager.getProcesses().containsKey(name)) {
             CloudProcess process = this.processManager.getProcesses().get(name);
-            if (process instanceof BungeeProcess)
+            if (process.isProxy())
                 return ((BungeeProcess) process).getProxyInfo();
         }
         for (NodeParticipant value : this.networkServer.getConnectedNodes().values()) {

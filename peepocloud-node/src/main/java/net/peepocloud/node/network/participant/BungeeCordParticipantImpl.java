@@ -15,8 +15,8 @@ import net.peepocloud.node.api.network.BungeeCordParticipant;
 @Getter
 public class BungeeCordParticipantImpl extends NetworkParticipant implements BungeeCordParticipant {
     private Auth auth;
-    @Setter
     private BungeeCordProxyInfo proxyInfo;
+    private BungeeCordProxyInfo lastProxyInfo;
 
     public BungeeCordParticipantImpl(Channel channel, Auth auth) {
         super(auth.getComponentName(), channel);
@@ -24,6 +24,8 @@ public class BungeeCordParticipantImpl extends NetworkParticipant implements Bun
         this.proxyInfo = auth.getExtraData().getObject("proxyInfo", BungeeCordProxyInfo.class);
     }
 
-
-
+    public void setProxyInfo(BungeeCordProxyInfo proxyInfo) {
+        this.lastProxyInfo = this.proxyInfo;
+        this.proxyInfo = proxyInfo;
+    }
 }

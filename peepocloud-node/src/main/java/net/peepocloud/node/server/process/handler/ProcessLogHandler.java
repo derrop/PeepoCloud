@@ -44,7 +44,7 @@ public class ProcessLogHandler implements Runnable {
 
             for (String b : stringBuffer.toString().split("\n")) {
                 for (String line : b.split("\r")) {
-                    if (process instanceof BungeeProcess) {
+                    if (process.isProxy()) {
                         if (line.startsWith(">"))
                             line = line.substring(1);
                     }

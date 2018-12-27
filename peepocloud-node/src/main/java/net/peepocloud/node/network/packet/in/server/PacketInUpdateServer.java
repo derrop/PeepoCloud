@@ -26,7 +26,7 @@ public class PacketInUpdateServer extends JsonPacketHandler {
         }
         if (PeepoCloudNode.getInstance().getProcessManager().getProcesses().containsKey(serverInfo.getComponentName())) {
             CloudProcess process = PeepoCloudNode.getInstance().getProcessManager().getProcesses().get(serverInfo.getComponentName());
-            if (process instanceof ServerProcess) {
+            if (process.isServer()) {
                 ((ServerProcess) process).setServerInfo(serverInfo);
                 a = true;
             }

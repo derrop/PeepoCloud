@@ -72,27 +72,27 @@ public class ProcessManager {
     }
 
     public Collection<CloudProcess> getProcessesOfMinecraftGroup(String group) {
-        return this.processes.values().stream().filter(process -> process instanceof ServerProcess && ((ServerProcess) process).getServerInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
+        return this.processes.values().stream().filter(process -> process.isServer() && ((ServerProcess) process).getServerInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
     }
 
     public Collection<CloudProcess> getProcessesOfBungeeGroup(String group) {
-        return this.processes.values().stream().filter(process -> process instanceof BungeeProcess && ((BungeeProcess) process).getProxyInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
+        return this.processes.values().stream().filter(process -> process.isProxy() && ((BungeeProcess) process).getProxyInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
     }
 
     public Collection<CloudProcess> getProcessesOfMinecraftGroupQueued(String group) {
-        return this.serverQueue.getServerProcesses().stream().filter(process -> process instanceof ServerProcess && ((ServerProcess) process).getServerInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
+        return this.serverQueue.getServerProcesses().stream().filter(process -> process.isServer() && ((ServerProcess) process).getServerInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
     }
 
     public Collection<CloudProcess> getProcessesOfBungeeGroupQueued(String group) {
-        return this.serverQueue.getServerProcesses().stream().filter(process -> process instanceof BungeeProcess && ((BungeeProcess) process).getProxyInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
+        return this.serverQueue.getServerProcesses().stream().filter(process -> process.isProxy() && ((BungeeProcess) process).getProxyInfo().getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
 }
 
     void handleProcessStop(CloudProcess process) {
         this.processes.remove(process.getName());
-        if (process instanceof BungeeProcess) {
+        if (process.isProxy()) {
             this.bungeeMemoryAdd.accept(-process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.bungee.stopped").replace("%name%", process.toString()));
-        } else if (process instanceof ServerProcess) {
+        } else if (process.isServer()) {
             this.serverMemoryAdd.accept(-process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.server.stopped").replace("%name%", process.toString()));
         }
@@ -101,11 +101,11 @@ public class ProcessManager {
 
     void handleProcessStart(CloudProcessImpl process) {
         this.processes.put(process.getName(), process);
-        if (process instanceof BungeeProcess) {
+        if (process.isProxy()) {
             PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeProcessStarted(((BungeeProcess) process).getProxyInfo()));
             this.bungeeMemoryAdd.accept(process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.bungee.started").replace("%name%", process.toString()));
-        } else if (process instanceof ServerProcess) {
+        } else if (process.isServer()) {
             PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerProcessStarted(((ServerProcess) process).getServerInfo()));
             this.serverMemoryAdd.accept(process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.server.started").replace("%name%", process.toString()));

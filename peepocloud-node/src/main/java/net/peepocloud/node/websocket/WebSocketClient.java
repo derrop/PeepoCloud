@@ -4,6 +4,7 @@ package net.peepocloud.node.websocket;
  */
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -16,10 +17,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import io.netty.handler.codec.http.websocketx.*;
 import lombok.Getter;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
@@ -155,6 +153,11 @@ public class WebSocketClient {
     public void close() {
         if (this.channel != null)
             this.channel.close().syncUninterruptibly();
+        this.reconnect = false;
+    }
+
+    public ChannelFuture send(byte[] bytes) {
+        return this.send(new BinaryWebSocketFrame(Unpooled.wrappedBuffer(bytes)));
     }
 
     public ChannelFuture send(String message) {

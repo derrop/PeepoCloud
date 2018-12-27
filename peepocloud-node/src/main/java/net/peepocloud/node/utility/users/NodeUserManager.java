@@ -27,7 +27,7 @@ public class NodeUserManager implements UserManager { //TODO send on user update
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("internal_configs");
         database.get("users").thenAccept(simpleJsonObject -> {
             if (simpleJsonObject == null) {
-                database.insert("users", new SimpleJsonObject().append("users", Collections.emptyList()));
+                database.insertAsync("users", new SimpleJsonObject().append("users", Collections.emptyList()));
                 consumer.accept(new ArrayList<>());
                 return;
             }
@@ -54,7 +54,7 @@ public class NodeUserManager implements UserManager { //TODO send on user update
 
     private void save(Collection<User> users) {
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("internal_configs");
-        database.update("users", new SimpleJsonObject().append("users", users));
+        database.updateAsync("users", new SimpleJsonObject().append("users", users));
     }
 
     public void addUser(User user) {

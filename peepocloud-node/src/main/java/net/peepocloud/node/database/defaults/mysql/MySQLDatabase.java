@@ -36,62 +36,58 @@ public class MySQLDatabase implements Database {
 
     @Override
     public void insert(String name, SimpleJsonObject jsonObject) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            try {
-                PreparedStatement statement = databaseManager.getConnection().prepareStatement("INSERT INTO `" + this.name + "` (`name`, `value`) VALUES (?, ?)");
-                statement.setString(1, name);
-                statement.setBytes(2, jsonObject.toBytes());
-                statement.executeUpdate();
-                statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            PreparedStatement statement = databaseManager.getConnection().prepareStatement("INSERT INTO `" + this.name + "` (`name`, `value`) VALUES (?, ?)");
+            statement.setString(1, name);
+            statement.setBytes(2, jsonObject.toBytes());
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void delete(String name) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            try {
-                PreparedStatement statement = databaseManager.getConnection().prepareStatement("DELETE FROM `" + this.name + "` WHERE `name` = ?");
-                statement.setString(1, name);
-                statement.executeUpdate();
-                statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            PreparedStatement statement = databaseManager.getConnection().prepareStatement("DELETE FROM `" + this.name + "` WHERE `name` = ?");
+            statement.setString(1, name);
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void update(String name, SimpleJsonObject jsonObject) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            try {
-                PreparedStatement statement = databaseManager.getConnection().prepareStatement("UPDATE `" + this.name + "` SET `value` = ? WHERE `name` = ?");
-                statement.setBytes(1, jsonObject.toBytes());
-                statement.setString(2, name);
-                statement.executeUpdate();
-                statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        try {
+            PreparedStatement statement = databaseManager.getConnection().prepareStatement("UPDATE `" + this.name + "` SET `value` = ? WHERE `name` = ?");
+            statement.setBytes(1, jsonObject.toBytes());
+            statement.setString(2, name);
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void contains(String name, Consumer<Boolean> consumer) {
+    public CompletableFuture<Boolean> contains(String name) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
             try {
                 PreparedStatement statement = databaseManager.getConnection().prepareStatement("SELECT `name` FROM `" + this.name + "` WHERE `name` = ?");
                 statement.setString(1, name);
                 ResultSet resultSet = statement.executeQuery();
-                consumer.accept(resultSet.next());
+                future.complete(resultSet.next());
                 statement.close();
                 resultSet.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         });
+        return future;
     }
 
     @Override

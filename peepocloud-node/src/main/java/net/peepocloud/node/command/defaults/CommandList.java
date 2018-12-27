@@ -78,19 +78,19 @@ public class CommandList extends Command {
 
     private void sendNodeInfo(CommandSender sender, ProcessManager processManager) {
         Collection<ServerProcess> servers = processManager.getProcesses().values()
-                .stream().filter(cloudProcess -> cloudProcess instanceof ServerProcess && ((ServerProcess) cloudProcess).getServerInfo().getState() != MinecraftState.OFFLINE).map(cloudProcess -> (ServerProcess) cloudProcess).collect(Collectors.toList());
+                .stream().filter(cloudProcess -> cloudProcess.isServer() && ((ServerProcess) cloudProcess).getServerInfo().getState() != MinecraftState.OFFLINE).map(cloudProcess -> (ServerProcess) cloudProcess).collect(Collectors.toList());
         Collection<BungeeProcess> proxies = processManager.getProcesses().values()
-                .stream().filter(cloudProcess -> cloudProcess instanceof BungeeProcess && cloudProcess.isRunning()).map(cloudProcess -> (BungeeProcess) cloudProcess).collect(Collectors.toList());
+                .stream().filter(cloudProcess -> cloudProcess.isProxy() && cloudProcess.isRunning()).map(cloudProcess -> (BungeeProcess) cloudProcess).collect(Collectors.toList());
 
         Collection<ServerProcess> startingServers = processManager.getProcesses().values()
-                .stream().filter(cloudProcess -> cloudProcess instanceof ServerProcess && ((ServerProcess) cloudProcess).getServerInfo().getState() == MinecraftState.OFFLINE).map(cloudProcess -> (ServerProcess) cloudProcess).collect(Collectors.toList());
+                .stream().filter(cloudProcess -> cloudProcess.isServer() && ((ServerProcess) cloudProcess).getServerInfo().getState() == MinecraftState.OFFLINE).map(cloudProcess -> (ServerProcess) cloudProcess).collect(Collectors.toList());
         Collection<BungeeProcess> startingProxies = processManager.getProcesses().values()
-                .stream().filter(cloudProcess -> cloudProcess instanceof BungeeProcess && !cloudProcess.isRunning()).map(cloudProcess -> (BungeeProcess) cloudProcess).collect(Collectors.toList());
+                .stream().filter(cloudProcess -> cloudProcess.isProxy() && !cloudProcess.isRunning()).map(cloudProcess -> (BungeeProcess) cloudProcess).collect(Collectors.toList());
 
         Collection<ServerProcess> waitingServers = processManager.getServerQueue().getServerProcesses()
-                .stream().filter(cloudProcess -> cloudProcess instanceof ServerProcess).map(cloudProcess -> (ServerProcess) cloudProcess).collect(Collectors.toList());
+                .stream().filter(cloudProcess -> cloudProcess.isServer()).map(cloudProcess -> (ServerProcess) cloudProcess).collect(Collectors.toList());
         Collection<BungeeProcess> waitingProxies = processManager.getServerQueue().getServerProcesses()
-                .stream().filter(cloudProcess -> cloudProcess instanceof BungeeProcess).map(cloudProcess -> (BungeeProcess) cloudProcess).collect(Collectors.toList());
+                .stream().filter(cloudProcess -> cloudProcess.isProxy()).map(cloudProcess -> (BungeeProcess) cloudProcess).collect(Collectors.toList());
 
         if (!servers.isEmpty() || !startingServers.isEmpty() || !waitingServers.isEmpty()) {
             sender.sendMessage("  Servers:");

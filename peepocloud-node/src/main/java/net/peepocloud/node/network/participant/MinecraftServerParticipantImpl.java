@@ -14,8 +14,8 @@ import net.peepocloud.node.api.network.MinecraftServerParticipant;
 @Getter
 public class MinecraftServerParticipantImpl extends NetworkParticipant implements MinecraftServerParticipant {
     private Auth auth;
-    @Setter
     private MinecraftServerInfo serverInfo;
+    private MinecraftServerInfo lastServerInfo;
 
     public MinecraftServerParticipantImpl(Channel channel, Auth auth) {
         super(auth.getComponentName(), channel);
@@ -23,5 +23,8 @@ public class MinecraftServerParticipantImpl extends NetworkParticipant implement
         this.serverInfo = auth.getExtraData().getObject("serverInfo", MinecraftServerInfo.class);
     }
 
-
+    public void setServerInfo(MinecraftServerInfo serverInfo) {
+        this.lastServerInfo = this.serverInfo;
+        this.serverInfo = serverInfo;
+    }
 }

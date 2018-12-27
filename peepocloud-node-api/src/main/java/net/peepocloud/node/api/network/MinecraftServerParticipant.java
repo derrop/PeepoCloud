@@ -13,4 +13,6 @@ public interface MinecraftServerParticipant extends NetworkPacketSender {
 
     MinecraftServerInfo getServerInfo();
 
+    MinecraftServerInfo getLastServerInfo();
+
 }

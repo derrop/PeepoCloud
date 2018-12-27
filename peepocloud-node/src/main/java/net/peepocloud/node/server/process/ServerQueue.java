@@ -52,9 +52,9 @@ public class ServerQueue implements Runnable {
 
         System.out.println("&aServer process queued [" + process + "]");
 
-        if (process instanceof BungeeProcess) {
+        if (process.isProxy()) {
             PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeQueuedEvent((BungeeProcess) process, ((BungeeProcess) process).getProxyInfo()));
-        } else if (process instanceof ServerProcess){
+        } else if (process.isServer()){
             PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerQueuedEvent((ServerProcess) process, ((ServerProcess) process).getServerInfo()));
         }
     }

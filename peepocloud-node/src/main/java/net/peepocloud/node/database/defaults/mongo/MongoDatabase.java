@@ -19,34 +19,29 @@ public class MongoDatabase implements Database {
     @Getter
     private String name;
     private MongoCollection<Document> collection;
+
     @Override
     public void insert(String name, SimpleJsonObject jsonObject) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            collection.insertOne(
-                    new Document("name", name).append("value", jsonObject.toString())
-            );
-        });
+        collection.insertOne(new Document("name", name).append("value", jsonObject.toString()));
     }
 
     @Override
     public void delete(String name) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            collection.deleteOne(Filters.eq("name", name));
-        });
+        collection.deleteOne(Filters.eq("name", name));
     }
 
     @Override
     public void update(String name, SimpleJsonObject jsonObject) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            collection.updateOne(Filters.eq("name", name), new Document("$set", new Document("value", jsonObject.toString())));
-        });
+        collection.updateOne(Filters.eq("name", name), new Document("$set", new Document("value", jsonObject.toString())));
     }
 
     @Override
-    public void contains(String name, Consumer<Boolean> consumer) {
+    public CompletableFuture<Boolean> contains(String name) {
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            consumer.accept(collection.find(Filters.eq("name", name)).first() != null);
+            future.complete(collection.find(Filters.eq("name", name)).first() != null);
         });
+        return future;
     }
 
     @Override

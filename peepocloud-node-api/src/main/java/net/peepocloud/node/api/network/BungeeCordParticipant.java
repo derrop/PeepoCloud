@@ -13,4 +13,6 @@ public interface BungeeCordParticipant extends NetworkPacketSender {
 
     BungeeCordProxyInfo getProxyInfo();
 
+    BungeeCordProxyInfo getLastProxyInfo();
+
 }

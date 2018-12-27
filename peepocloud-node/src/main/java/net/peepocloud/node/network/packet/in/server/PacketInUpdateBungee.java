@@ -26,7 +26,7 @@ public class PacketInUpdateBungee extends JsonPacketHandler {
         }
         if (PeepoCloudNode.getInstance().getProcessManager().getProcesses().containsKey(serverInfo.getComponentName())) {
             CloudProcess process = PeepoCloudNode.getInstance().getProcessManager().getProcesses().get(serverInfo.getComponentName());
-            if (process instanceof BungeeProcess) {
+            if (process.isProxy()) {
                 ((BungeeProcess) process).setProxyInfo(serverInfo);
                 a = true;
             }
