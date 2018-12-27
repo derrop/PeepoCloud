@@ -4,6 +4,19 @@
     "Node": "peepocloud-node-api/target/apidocs",
     "ServerAPI": "peepocloud-plugin-api/target/apidocs"
   },
+  "addons": [
+    {
+      "name": "ServerSelector",
+      "version": "1.0",
+      "versions": [
+        "1.0"
+      ],
+      "authors": [
+        "Panamo"
+      ],
+      "path": "peepocloud-addons/peepocloud-serverselector/target/PeepoCloud-ServerSelector.jar"
+    }
+  ],
   "build": {
     "goals": [
       {
