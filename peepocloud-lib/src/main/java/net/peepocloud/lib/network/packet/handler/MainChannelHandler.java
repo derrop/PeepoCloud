@@ -24,13 +24,11 @@ public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
     @Override
     public void channelActive(ChannelHandlerContext channelHandlerContext) {
         this.participant = new NetworkParticipant(null, channelHandlerContext.channel());
-        System.out.println("Participant connected (" + channelHandlerContext.channel().remoteAddress() + ")");
         this.channelHandler.connected(this.participant);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext channelHandlerContext) {
-        System.out.println("Participant disconnected (" + channelHandlerContext.channel().remoteAddress() + ")");
         this.channelHandler.disconnected(this.participant);
         this.participant = null;
     }

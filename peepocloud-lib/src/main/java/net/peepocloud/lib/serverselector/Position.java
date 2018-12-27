@@ -1,11 +1,11 @@
-package net.peepocloud.lib.signselector.sign;
+package net.peepocloud.lib.serverselector;
 
 
-public class SignLocation {
+public class Position {
     private int x, y, z;
     private String world;
 
-    public SignLocation(int x, int y, int z, String world) {
+    public Position(int x, int y, int z, String world) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -30,10 +30,10 @@ public class SignLocation {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof SignLocation) {
-            SignLocation signLocation = (SignLocation) obj;
-            return signLocation.world.equalsIgnoreCase(this.world)
-                    && signLocation.x == this.x && signLocation.y == this.y && signLocation.z == this.z;
+        if(obj instanceof Position) {
+            Position position = (Position) obj;
+            return position.world.equalsIgnoreCase(this.world)
+                    && position.x == this.x && position.y == this.y && position.z == this.z;
         }
         return false;
     }

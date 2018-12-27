@@ -1,4 +1,4 @@
-package net.peepocloud.lib.signselector;
+package net.peepocloud.lib.serverselector.signselector;
 
 
 import com.google.common.base.Preconditions;

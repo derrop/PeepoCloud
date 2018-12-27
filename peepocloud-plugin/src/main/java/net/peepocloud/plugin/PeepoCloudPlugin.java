@@ -4,6 +4,7 @@ import net.peepocloud.lib.scheduler.Scheduler;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.plugin.api.PeepoCloudPluginAPI;
+import net.peepocloud.plugin.bukkit.serverselector.signselector.SignSelector;
 import net.peepocloud.plugin.bungee.PeepoBungeePlugin;
 import net.peepocloud.plugin.bukkit.PeepoBukkitPlugin;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandler;
@@ -13,6 +14,9 @@ import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.lib.utility.network.NetworkAddress;
+import net.peepocloud.plugin.network.packet.in.PacketInAPIServerStarted;
+import net.peepocloud.plugin.network.packet.in.PacketInAPISignSelector;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +31,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     private NetworkClient nodeConnector;
     private Collection<NetworkAPIHandler> networkHandlers = new ArrayList<>();
     private Scheduler scheduler = new Scheduler();
+
+    private SignSelector signSelector;
 
     public PeepoCloudPlugin(Path nodeInfoFile) {
         instance = this;
@@ -52,11 +58,10 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public void bootstrap() {
         scheduler.getThreadPool().execute(scheduler);
 
-        this.nodeConnector.run();
-        if (!this.nodeConnector.isConnected()) {
-            this.shutdown();
-            return;
-        }
+        this.packetManager.registerPacket(new PacketInAPIServerStarted());
+        this.packetManager.registerPacket(new PacketInAPISignSelector());
+
+        scheduler.execute(this.nodeConnector, true);
     }
 
     @Override
@@ -82,6 +87,14 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         if (this.isBungee())
             return (PeepoBungeePlugin) this;
         throw new UnsupportedOperationException("This instance does not support bungeecord");
+    }
+
+    public void enableSignSelector(SignSelector signSelector) {
+        if(this.signSelector == null) {
+            this.signSelector = signSelector;
+            this.registerNetworkHandler(signSelector);
+            signSelector.start(this.scheduler);
+        }
     }
 
     @Override

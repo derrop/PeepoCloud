@@ -69,7 +69,7 @@ public class Scheduler implements Runnable {
      */
 
     public SchedulerTask repeat(Runnable runner, long startDelay, long repeatDelay, boolean async) {
-        Preconditions.checkArgument(startDelay > 0 && repeatDelay > 0, "startDelay and repeatDelay have to be at least 1");
+        Preconditions.checkArgument(repeatDelay > 0, "repeatDelay has to be at least 1");
         SchedulerTask task = new SchedulerTask(this.threadPool, runner, startDelay, repeatDelay, async);
         this.tasks.add(task);
         return task;

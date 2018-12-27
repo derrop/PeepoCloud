@@ -52,7 +52,6 @@ public class SchedulerTask implements Runnable {
 
     @Override
     public void run() {
-        this.runCounter++;
         if(this.hasBeenExecuted() && this.isRepeating()) {
             if(this.runCounter == this.repeatDelay) { // runCounter reached the number of the repeatDelay
                 this.executeRunner();
@@ -65,6 +64,7 @@ public class SchedulerTask implements Runnable {
                 this.startDelay = -1; // symbolises that the task has been executed
             }
         }
+        this.runCounter++;
     }
 
     private void executeRunner() {

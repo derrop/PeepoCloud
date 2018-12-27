@@ -22,10 +22,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>net.peepocloud</groupId>
     <artifactId>peepocloud-acp</artifactId>
     <version>1.0-SNAPSHOT</version>
-
 
     <dependencies>
         <dependency>

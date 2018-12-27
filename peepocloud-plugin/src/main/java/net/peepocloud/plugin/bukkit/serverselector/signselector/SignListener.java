@@ -1,10 +1,10 @@
-package net.peepocloud.plugin.bukkit.signselector;
+package net.peepocloud.plugin.bukkit.serverselector.signselector;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.lib.signselector.sign.ServerSign;
-import net.peepocloud.lib.signselector.sign.SignLocation;
+import net.peepocloud.lib.serverselector.signselector.sign.ServerSign;
+import net.peepocloud.lib.serverselector.Position;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -28,7 +28,7 @@ public class SignListener implements Listener {
             if(block.getState() instanceof Sign) {
                 Location location = block.getLocation();
                 ServerSign serverSign = this.signSelector.getSignProvider().getByLocation(
-                        new SignLocation((int) location.getX(), (int) location.getY(), (int) location.getZ(), location.getWorld().getName()));
+                        new Position((int) location.getX(), (int) location.getY(), (int) location.getZ(), location.getWorld().getName()));
                 if(serverSign != null) {
                     MinecraftServerInfo serverInfo = serverSign.getServerInfo();
                     if(serverInfo != null && !PeepoCloudPlugin.getInstance().getMinecraftGroup(serverInfo.getGroupName()).isMaintenance()) {

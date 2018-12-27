@@ -1,4 +1,4 @@
-package net.peepocloud.node.acp.websocket.auth;
+package net.peepocloud.addons.acp.websocket.auth;
 /*
  * Created by Mc_Ruben on 09.12.2018
  */
