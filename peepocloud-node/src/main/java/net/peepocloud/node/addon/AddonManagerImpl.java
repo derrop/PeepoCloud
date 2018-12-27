@@ -155,6 +155,8 @@ public class AddonManagerImpl<Addon extends net.peepocloud.node.api.addon.Addon>
                 .replace("%version%", addon.getAddonConfig().getVersion()));
         addon.setEnabled(false);
         addon.onDisable();
+        PeepoCloudNode.getInstance().getEventManager().unregisterAll(addon);
+        PeepoCloudNode.getInstance().getCommandManager().unregisterCommands(addon);
         System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("addons.disabledAddon")
                 .replace("%name%", addon.getAddonConfig().getName()).replace("%author%", addon.getAddonConfig().getAuthor())
                 .replace("%version%", addon.getAddonConfig().getVersion())

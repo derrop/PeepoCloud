@@ -41,7 +41,7 @@ public class PeepoACP extends NodeAddon {
 
         this.webSocketServer.registerHandler(new ACPWebSocketDefaultHandler());
 
-        this.getNode().getEventManager().registerListener(new ACPDashboardListener(this.webSocketServer));
+        this.getNode().getEventManager().registerListener(this, new ACPDashboardListener(this.webSocketServer));
 
     }
 

@@ -4,6 +4,7 @@ package net.peepocloud.node.api.event;
  */
 
 import com.google.common.base.Preconditions;
+import net.peepocloud.node.api.addon.Addon;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -27,14 +28,43 @@ public class DefaultEventManager implements EventManager {
         for (Method method : listener.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(EventHandler.class)) {
                 Parameter[] parameters = method.getParameters();
-                Preconditions.checkArgument(parameters.length == 1, "length of parameters in event must be exactly 1");
+                Preconditions.checkArgument(parameters.length == 1, "length of parameters in an EventHandler must be exactly 1");
                 Parameter parameter = parameters[0];
                 if (Event.class.isAssignableFrom(parameter.getType())) {
                     method.setAccessible(true);
                     Class<? extends Event> eventClass = (Class<? extends Event>) parameter.getType();
                     if (!this.eventMethods.containsKey(eventClass))
                         this.eventMethods.put(eventClass, new ArrayList<>());
-                    this.eventMethods.get(eventClass).add(new ListenerMethod(listener, method));
+                    this.eventMethods.get(eventClass).add(new ListenerMethod(listener, method, null));
+                }
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public EventManager registerListeners(Addon addon, Object... listeners) {
+        Preconditions.checkNotNull(addon, "addon");
+        for (Object listener : listeners) {
+            this.registerListener(addon, listener);
+        }
+        return this;
+    }
+
+    @Override
+    public EventManager registerListener(Addon addon, Object listener) {
+        Preconditions.checkNotNull(addon, "addon");
+        for (Method method : listener.getClass().getDeclaredMethods()) {
+            if (method.isAnnotationPresent(EventHandler.class)) {
+                Parameter[] parameters = method.getParameters();
+                Preconditions.checkArgument(parameters.length == 1, "length of parameters in an EventHandler must be exactly 1");
+                Parameter parameter = parameters[0];
+                if (Event.class.isAssignableFrom(parameter.getType())) {
+                    method.setAccessible(true);
+                    Class<? extends Event> eventClass = (Class<? extends Event>) parameter.getType();
+                    if (!this.eventMethods.containsKey(eventClass))
+                        this.eventMethods.put(eventClass, new ArrayList<>());
+                    this.eventMethods.get(eventClass).add(new ListenerMethod(listener, method, addon));
                 }
             }
         }
@@ -55,6 +85,11 @@ public class DefaultEventManager implements EventManager {
             }
             value.removeAll(remove);
         }
+    }
+
+    @Override
+    public void unregisterAll(Addon addon) {
+
     }
 
     public <T extends Event> T callEvent(T event) {

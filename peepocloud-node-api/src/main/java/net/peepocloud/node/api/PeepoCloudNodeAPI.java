@@ -137,6 +137,34 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
     public abstract long getStartupTime();
 
     /**
+     * Sends the given {@link Packet} to all Nodes which are connected to this Node
+     *
+     * @param packet the packet to send
+     */
+    public abstract void sendPacketToNodes(Packet packet);
+
+    /**
+     * Sends the given {@link Packet} to all servers and proxies that are CONNECTED TO THIS NODE
+     *
+     * @param packet the packet to send
+     */
+    public abstract void sendPacketToServersAndProxies(Packet packet);
+
+    /**
+     * Sends the given {@link Packet} to all servers, proxies and nodes that are CONNECTED TO THIS NODE
+     *
+     * @param packet the packet to send
+     */
+    public abstract void sendPacketToAllOnThisNode(Packet packet);
+
+    /**
+     * Sends the given {@link Packet} to all servers, proxies and nodes IN THE NETWORK
+     *
+     * @param packet the packet to send
+     */
+    public abstract void sendPacketToAll(Packet packet);
+
+    /**
      * Gets all {@link TemplateStorage}s registered in this Node
      *
      * @return a {@link Collection} containing all {@link TemplateStorage}s in this Node

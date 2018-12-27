@@ -17,13 +17,9 @@ public class CommandHelp extends Command {
 
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
-        Collection<String> sent = new HashSet<>();
         for (Command command : PeepoCloudNode.getInstance().getCommandManager().getCommands().values()) {
             if (command.getClass().equals(CommandHelp.class))
                 continue;
-            if (sent.contains(command.getName()))
-                continue;
-            sent.add(command.getName());
             sender.sendMessage(command.getName());
             if (command.getPermission() != null) {
                 sender.createLanguageMessage("command.help.permission").replace("%permission%", command.getPermission()).send();

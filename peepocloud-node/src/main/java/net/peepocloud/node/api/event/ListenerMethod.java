@@ -5,6 +5,7 @@ package net.peepocloud.node.api.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.peepocloud.node.api.addon.Addon;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,6 +15,7 @@ import java.lang.reflect.Method;
 class ListenerMethod {
     private Object listener;
     private Method method;
+    private Addon addon;
 
     void invoke(Event event) {
         try {

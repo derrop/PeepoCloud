@@ -59,7 +59,7 @@ public class ServerSelectorAddon extends NodeAddon {
             }
         });
 
-        super.getNode().getEventManager().registerListener(new ServerStartListener(this));
+        super.getNode().getEventManager().registerListener(this, new ServerStartListener(this));
     }
 
     public SignSelectorConfig getSignSelectorConfig() {

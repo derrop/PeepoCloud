@@ -4,12 +4,14 @@ package net.peepocloud.lib.utility;
  */
 
 import com.sun.management.OperatingSystemMXBean;
+import sun.reflect.ReflectionFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Constructor;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -276,6 +278,10 @@ public class SystemUtils {
                 }
             }
         }
+    }
+
+    public static Constructor createConstructorForSerialization(Class<?> clazz) throws NoSuchMethodException {
+        return ReflectionFactory.getReflectionFactory().newConstructorForSerialization(clazz, Object.class.getDeclaredConstructor());
     }
 
 }

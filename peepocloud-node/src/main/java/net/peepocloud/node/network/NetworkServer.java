@@ -39,7 +39,6 @@ import net.peepocloud.node.network.packet.auth.PacketInAuth;
 import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
 import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
 import net.peepocloud.node.network.participant.NodeParticipantImpl;
-import net.peepocloud.node.server.process.BungeeProcess;
 import net.peepocloud.node.utility.NodeUtils;
 
 import java.net.InetSocketAddress;

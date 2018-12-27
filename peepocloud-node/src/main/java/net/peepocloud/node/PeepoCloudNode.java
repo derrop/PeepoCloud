@@ -48,6 +48,7 @@ import net.peepocloud.node.api.logging.ConsoleColor;
 import net.peepocloud.node.network.ClientNodeImpl;
 import net.peepocloud.node.network.ConnectableNode;
 import net.peepocloud.node.network.NetworkServer;
+import net.peepocloud.node.network.packet.out.PacketOutSendPacket;
 import net.peepocloud.node.network.packet.out.PacketOutUpdateNodeInfo;
 import net.peepocloud.lib.network.packet.out.group.PacketOutCreateBungeeGroup;
 import net.peepocloud.lib.network.packet.out.group.PacketOutCreateMinecraftGroup;
@@ -120,7 +121,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     private ScreenManagerImpl screenManager = new ScreenManagerImpl();
 
-    private EventManager eventManager;
+    private DefaultEventManager eventManager;
 
     private StatisticsManager statisticsManager = new StatisticsManager();
 
@@ -639,7 +640,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     public void reloadAddons() {
         this.nodeAddonManager.disableAndUnloadAddons();
-        this.commandManager.getCommands().clear();
+        this.commandManager.unregisterAll();
         this.eventManager.unregisterAll();
         this.initCommands(this.commandManager);
         this.eventManager.registerListener(this.statisticsManager);
@@ -724,6 +725,21 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     public void sendPacketToNodes(Packet packet) {
         this.connectedNodes.values().forEach(networkClient -> networkClient.sendPacket(packet));
+    }
+
+    public void sendPacketToServersAndProxies(Packet packet) {
+        this.serversOnThisNode.values().forEach(minecraftServerParticipant -> minecraftServerParticipant.sendPacket(packet));
+        this.proxiesOnThisNode.values().forEach(bungeeCordParticipant -> bungeeCordParticipant.sendPacket(packet));
+    }
+
+    public void sendPacketToAllOnThisNode(Packet packet) {
+        this.sendPacketToNodes(packet);
+        this.sendPacketToServersAndProxies(packet);
+    }
+
+    public void sendPacketToAll(Packet packet) {
+        this.sendPacketToAllOnThisNode(packet);
+        this.sendPacketToNodes(new PacketOutSendPacket(packet));
     }
 
     public void updateMinecraftGroup(MinecraftGroup group) {

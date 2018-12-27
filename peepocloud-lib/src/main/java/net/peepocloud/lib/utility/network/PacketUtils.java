@@ -3,7 +3,7 @@ package net.peepocloud.lib.utility.network;
 
 import io.netty.buffer.ByteBuf;
 import net.peepocloud.lib.network.packet.serialization.PacketSerializable;
-import sun.reflect.ReflectionFactory;
+import net.peepocloud.lib.utility.SystemUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -19,7 +19,7 @@ public class PacketUtils {
             return null;
         }
         try {
-            Constructor constructor = ReflectionFactory.getReflectionFactory().newConstructorForSerialization(clazz, Object.class.getDeclaredConstructor());
+            Constructor constructor = SystemUtils.createConstructorForSerialization(clazz);
             Object obj = constructor.newInstance();
             if (!(obj instanceof PacketSerializable)) {
                 return null;

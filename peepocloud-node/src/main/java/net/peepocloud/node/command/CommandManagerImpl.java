@@ -3,7 +3,9 @@ package net.peepocloud.node.command;
  * Created by Mc_Ruben on 04.11.2018
  */
 
+import com.google.common.base.Preconditions;
 import net.peepocloud.node.PeepoCloudNode;
+import net.peepocloud.node.api.addon.Addon;
 import net.peepocloud.node.api.command.Command;
 import net.peepocloud.node.api.command.CommandManager;
 import net.peepocloud.node.api.command.CommandSender;
@@ -12,12 +14,13 @@ import net.peepocloud.node.logging.ColoredLogger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CommandManagerImpl implements CommandManager {
 
     private final CommandSender console = new ConsoleCommandSender();
 
-    private Map<String, Command> commands = new HashMap<>();
+    private Map<String, CommandInfo> commands = new HashMap<>();
     private Thread commandReaderThread;
 
     public CommandManagerImpl(ColoredLogger logger) {
@@ -55,11 +58,40 @@ public class CommandManagerImpl implements CommandManager {
      */
     public CommandManagerImpl registerCommands(Command... commands) {
         for (Command command : commands) {
-            this.commands.put(command.getName().toLowerCase(), command);
+            CommandInfo info = new CommandInfo(command, null);
+            this.commands.put(command.getName().toLowerCase(), info);
             if (command.getAliases() != null && command.getAliases().length != 0) {
                 for (String alias : command.getAliases()) {
-                    this.commands.put(alias.toLowerCase(), command);
+                    this.commands.put(alias.toLowerCase(), info);
                 }
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public CommandManager registerCommands(Addon addon, Command... commands) {
+        Preconditions.checkNotNull(addon, "addon");
+        for (Command command : commands) {
+            CommandInfo info = new CommandInfo(command, addon);
+            this.commands.put(command.getName().toLowerCase(), info);
+            if (command.getAliases() != null && command.getAliases().length != 0) {
+                for (String alias : command.getAliases()) {
+                    this.commands.put(alias.toLowerCase(), info);
+                }
+            }
+        }
+        return this;
+    }
+
+    @Override
+    public CommandManager registerCommand(Addon addon, Command command) {
+        Preconditions.checkNotNull(addon, "addon");
+        CommandInfo info = new CommandInfo(command, addon);
+        this.commands.put(command.getName().toLowerCase(), info);
+        if (command.getAliases() != null && command.getAliases().length != 0) {
+            for (String alias : command.getAliases()) {
+                this.commands.put(alias.toLowerCase(), info);
             }
         }
         return this;
@@ -72,8 +104,16 @@ public class CommandManagerImpl implements CommandManager {
      */
     public CommandManagerImpl unregisterCommands(Command... commands) {
         for (Command command : commands) {
-            this.commands.values().remove(command);
+            this.commands.values().stream().filter(commandInfo -> commandInfo.getCommand().getName().equals(command.getName()))
+                    .collect(Collectors.toList()).forEach(commandInfo -> this.commands.values().remove(commandInfo));
         }
+        return this;
+    }
+
+    @Override
+    public CommandManager unregisterCommands(Addon addon) {
+        this.commands.values().stream().filter(commandInfo -> commandInfo.getAddon() != null && commandInfo.getAddon().getAddonConfig().equals(addon.getAddonConfig())).collect(Collectors.toList())
+                .forEach(commandInfo -> this.commands.values().remove(commandInfo));
         return this;
     }
 
@@ -84,8 +124,11 @@ public class CommandManagerImpl implements CommandManager {
      */
     public CommandManagerImpl unregisterCommands(String... names) {
         for (String name : names) {
-            Command command = this.commands.remove(name.toLowerCase());
-            if (command != null && command.getAliases() != null && command.getAliases().length != 0) {
+            CommandInfo info = this.commands.remove(name.toLowerCase());
+            if (info == null)
+                continue;
+            Command command = info.getCommand();
+            if (command.getAliases() != null && command.getAliases().length != 0) {
                 for (String alias : command.getAliases()) {
                     this.commands.remove(alias.toLowerCase());
                 }
@@ -105,48 +148,38 @@ public class CommandManagerImpl implements CommandManager {
         if (a.length == 0)
             return false;
         String commandName = a[0].toLowerCase();
-        Command command = this.commands.get(commandName);
+        CommandInfo command = this.commands.get(commandName);
         if (command == null)
             return false;
 
-        command.execute(commandSender, commandLine, Arrays.copyOfRange(a, 1, a.length));
+        command.getCommand().execute(commandSender, commandLine, Arrays.copyOfRange(a, 1, a.length));
         return true;
     }
 
-    /**
-     * Gets the command by the given name
-     * @param name the name of the command
-     * @return the command or null if no command with this name exists
-     */
     public Command getCommand(String name) {
-        return this.commands.get(name.toLowerCase());
+        CommandInfo info = this.commands.get(name.toLowerCase());
+        return info == null ? null : info.getCommand();
     }
 
-    /**
-     * Gets the command by the given commandLine
-     * @param commandLine the commandLine from which we get the name of the command
-     * @return the command or null if no command with this name exists
-     */
     public Command getCommandByLine(String commandLine) {
         String[] a = commandLine.split(" ");
         if (a.length == 0)
             return null;
-        String commandName = a[0].toLowerCase();
-        return this.commands.get(commandName);
+        return this.getCommand(a[0]);
     }
 
-    /**
-     * Gets all registered commands with the key as their name/alias
-     * @return the commands registered in this {@link CommandManagerImpl}
-     */
     public Map<String, Command> getCommands() {
-        return commands;
+        Map<String, Command> commandMap = new HashMap<>();
+        for (CommandInfo value : this.commands.values()) {
+            commandMap.put(value.getCommand().getName(), value.getCommand());
+        }
+        return commandMap;
     }
 
-    /**
-     * Gets the default {@link ConsoleCommandSender}
-     * @return the {@link ConsoleCommandSender} for this {@link CommandManagerImpl}
-     */
+    public void unregisterAll() {
+        this.commands.clear();
+    }
+
     public CommandSender getConsole() {
         return console;
     }
