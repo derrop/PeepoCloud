@@ -3,5 +3,33 @@
   "docs": {
     "Node": "peepocloud-node-api/target/apidocs",
     "ServerAPI": "peepocloud-plugin-api/target/apidocs"
+  },
+  "build": {
+    "goals": [
+      {
+        "goals": [
+          "package"
+        ],
+        "doAfter": {
+          "module": "file-copy",
+          "options": {
+            "from": "peepocloud-plugin/target/PeepoCloudPlugin.jar",
+            "to": "peepocloud-node/target/classes/files/PeepoCloudPlugin.jar"
+          }
+        }
+      },
+      {
+        "goals": [
+          "package"
+        ]
+      }
+    ],
+    "removablePlugins": [
+      {
+        "pom": "peepocloud-node/pom.xml",
+        "groupId": "org.apache.maven.plugins",
+        "artifactId": "maven-antrun-plugin"
+      }
+    ]
   }
 }
