@@ -3,6 +3,7 @@ package net.peepocloud.lib.network.packet;
 
 import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
+import net.peepocloud.lib.network.packet.serialization.SerializationPacket;
 import net.peepocloud.lib.utility.network.QueryRequest;
 
 import java.util.HashMap;
@@ -16,6 +17,13 @@ import java.util.concurrent.TimeoutException;
 public class PacketManager {
     private Map<Integer, PacketInfo> registeredPackets = new HashMap<>();
     private Map<UUID, QueryRequest<Packet>> pendingQueries = new HashMap<>();
+    private Map<Class<? extends Packet>, Integer> queryResponses = new HashMap<>();
+
+    {
+        queryResponses.put(FilePacket.class, -1);
+        queryResponses.put(JsonPacket.class, -2);
+        queryResponses.put(SerializationPacket.class, -3);
+    }
 
     public void registerPacket(PacketInfo packetInfo) {
         this.registeredPackets.put(packetInfo.getId(), packetInfo);
@@ -35,6 +43,14 @@ public class PacketManager {
 
     public PacketInfo getPacketInfo(int id) {
         return this.registeredPackets.get(id);
+    }
+
+    public Map<Class<? extends Packet>, Integer> getQueryResponses() {
+        return queryResponses;
+    }
+
+    public void registerQueryResponsePacket(int id, Class<? extends Packet> packetClass) {
+        this.queryResponses.put(packetClass, id);
     }
 
     public Packet convertToQueryPacket(Packet packet, UUID uuid) {

@@ -13,6 +13,7 @@ import net.peepocloud.lib.utility.network.PacketUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 
 public class PacketDecoder extends ByteToMessageDecoder {
     private PacketManager packetManager;
@@ -32,11 +33,23 @@ public class PacketDecoder extends ByteToMessageDecoder {
             int id = byteArrayDataInput.readInt();
             boolean isQuery = byteArrayDataInput.readBoolean();
 
-            PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
-            if (packetInfo == null)
+            Class<? extends Packet> packetClass = null;
+            if (!isQuery) {
+                PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
+                if (packetInfo == null)
+                    return;
+                packetClass = packetInfo.getPacketClass();
+            } else {
+                Map.Entry<Class<? extends Packet>, Integer> entry =
+                        this.packetManager.getQueryResponses().entrySet().stream().filter(entry1 -> entry1.getValue().equals(id)).findFirst().orElse(null);
+                if (entry == null)
+                    return;
+                packetClass = entry.getKey();
+            }
+
+            if (packetClass == null)
                 return;
 
-            Class<? extends Packet> packetClass = packetInfo.getPacketClass();
             Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
 
             if(isQuery)

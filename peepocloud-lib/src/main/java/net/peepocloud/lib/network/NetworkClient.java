@@ -56,7 +56,7 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
                                     0, 4, 0, 4),
                                     new LengthFieldPrepender(4))
                                     .addLast(new PacketDecoder(NetworkClient.this.packetManager))
-                                    .addLast(new PacketEncoder())
+                                    .addLast(new PacketEncoder(NetworkClient.this.packetManager))
                                     .addLast(new MainChannelHandler(NetworkClient.this.packetManager, NetworkClient.this.firstHandler));
                         }
                     });
