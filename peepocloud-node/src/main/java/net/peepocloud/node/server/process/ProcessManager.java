@@ -9,7 +9,9 @@ import net.peepocloud.node.CloudConfig;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.network.packet.out.server.PacketOutBungeeProcessStarted;
+import net.peepocloud.node.network.packet.out.server.PacketOutBungeeStopped;
 import net.peepocloud.node.network.packet.out.server.PacketOutServerProcessStarted;
+import net.peepocloud.node.network.packet.out.server.PacketOutServerStopped;
 import net.peepocloud.node.server.process.handler.ProcessLogHandler;
 import net.peepocloud.node.server.process.handler.ProcessStartupHandler;
 import net.peepocloud.node.server.process.handler.ProcessStopHandler;
@@ -91,9 +93,11 @@ public class ProcessManager {
         this.processes.remove(process.getName());
         if (process.isProxy()) {
             this.bungeeMemoryAdd.accept(-process.getMemory());
+            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeStopped(process.getProxyInfo()));
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.bungee.stopped").replace("%name%", process.toString()));
         } else if (process.isServer()) {
             this.serverMemoryAdd.accept(-process.getMemory());
+            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerStopped(process.getServerInfo()));
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.server.stopped").replace("%name%", process.toString()));
         }
         PeepoCloudNode.getInstance().getScreenManager().handleProcessStop(process);
@@ -102,11 +106,11 @@ public class ProcessManager {
     void handleProcessStart(CloudProcessImpl process) {
         this.processes.put(process.getName(), process);
         if (process.isProxy()) {
-            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeProcessStarted(((BungeeProcess) process).getProxyInfo()));
+            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeProcessStarted(process.getProxyInfo()));
             this.bungeeMemoryAdd.accept(process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.bungee.started").replace("%name%", process.toString()));
         } else if (process.isServer()) {
-            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerProcessStarted(((ServerProcess) process).getServerInfo()));
+            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerProcessStarted(process.getServerInfo()));
             this.serverMemoryAdd.accept(process.getMemory());
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("process.server.started").replace("%name%", process.toString()));
         }

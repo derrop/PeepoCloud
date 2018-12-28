@@ -127,15 +127,15 @@ public class CommandList extends Command {
 
     private void server(CommandSender sender, MinecraftServerInfo minecraftServerInfo) {
         sender.sendMessage("    - " + minecraftServerInfo.getComponentName() + " @" + minecraftServerInfo.getHost() + ":" + minecraftServerInfo.getPort() +
-                " Motd: " + minecraftServerInfo.getMotd() +
-                " State: " + minecraftServerInfo.getState().getName() +
-                " Template: " + minecraftServerInfo.getTemplate().getName() + "@" + minecraftServerInfo.getTemplate().getStorage() +
-                " Players: " + minecraftServerInfo.getPlayers().size() + "/" + minecraftServerInfo.getMaxPlayers());
+                " | Motd: " + minecraftServerInfo.getMotd() +
+                " | State: " + minecraftServerInfo.getState().getName() +
+                " | Template: " + minecraftServerInfo.getTemplate().getName() + "@" + minecraftServerInfo.getTemplate().getStorage() +
+                " | Players: " + minecraftServerInfo.getPlayers().size() + "/" + minecraftServerInfo.getMaxPlayers());
     }
 
     private void proxy(CommandSender sender, BungeeCordProxyInfo proxyInfo) {
         sender.sendMessage("    - " + proxyInfo.getComponentName() + " @" + proxyInfo.getHost() + ":" + proxyInfo.getPort() +
-                " Template: " + proxyInfo.getTemplate().getName() + "@" + proxyInfo.getTemplate().getStorage() +
-                " Players: " + proxyInfo.getPlayers().size());
+                " | Template: " + proxyInfo.getTemplate().getName() + "@" + proxyInfo.getTemplate().getStorage() +
+                " | Players: " + proxyInfo.getPlayers().size());
     }
 }

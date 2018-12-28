@@ -11,6 +11,8 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.process.bungee.BungeeQueuedEvent;
 import net.peepocloud.node.api.event.process.server.ServerQueuedEvent;
 import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.network.packet.out.server.PacketOutBungeeQueued;
+import net.peepocloud.node.network.packet.out.server.PacketOutServerQueued;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -53,9 +55,11 @@ public class ServerQueue implements Runnable {
         System.out.println("&aServer process queued [" + process + "]");
 
         if (process.isProxy()) {
-            PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeQueuedEvent((BungeeProcess) process, ((BungeeProcess) process).getProxyInfo()));
+            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeQueued(process.getProxyInfo()));
+            PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeQueuedEvent(process, process.getProxyInfo()));
         } else if (process.isServer()){
-            PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerQueuedEvent((ServerProcess) process, ((ServerProcess) process).getServerInfo()));
+            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerQueued(process.getServerInfo()));
+            PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerQueuedEvent(process, process.getServerInfo()));
         }
     }
 

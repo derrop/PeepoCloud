@@ -36,11 +36,12 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
             int id = this.packetManager.getQueryResponses().get(clazz);
 
             byteArrayDataOutput.writeInt(id);
-            byteArrayDataOutput.writeBoolean(packet.getQueryUUID() != null);
+            byteArrayDataOutput.writeBoolean(true);
             if (packet.getQueryUUID() != null)
                 PacketUtils.writeUUID(byteArrayDataOutput, packet.getQueryUUID());
         } else {
             byteArrayDataOutput.writeInt(packet.getId());
+            byteArrayDataOutput.writeBoolean(false);
         }
 
 

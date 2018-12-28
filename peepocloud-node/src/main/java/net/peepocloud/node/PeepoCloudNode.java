@@ -961,13 +961,21 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     public int getNextServerId(String group) {
         AtomicInteger i = new AtomicInteger();
-        this.networkServer.getConnectedNodes().values().forEach(participant -> i.addAndGet(participant.getServers().size() + participant.getStartingServers().size() + participant.getWaitingServers().size()));
+        this.networkServer.getConnectedNodes().values().forEach(participant -> {
+            i.addAndGet(Math.toIntExact(participant.getServers().values().stream().filter(serverInfo -> serverInfo.getGroupName().equals(group)).count()));
+            i.addAndGet(Math.toIntExact(participant.getStartingServers().values().stream().filter(serverInfo -> serverInfo.getGroupName().equals(group)).count()));
+            i.addAndGet(Math.toIntExact(participant.getWaitingServers().values().stream().filter(serverInfo -> serverInfo.getGroupName().equals(group)).count()));
+        });
         return i.get() + this.processManager.getProcessesOfMinecraftGroup(group).size() + this.processManager.getProcessesOfMinecraftGroupQueued(group).size() + 1;
     }
 
     public int getNextProxyId(String group) {
         AtomicInteger i = new AtomicInteger();
-        this.networkServer.getConnectedNodes().values().forEach(participant -> i.addAndGet(participant.getProxies().size() + participant.getStartingProxies().size() + participant.getWaitingProxies().size()));
+        this.networkServer.getConnectedNodes().values().forEach(participant -> {
+            i.addAndGet(Math.toIntExact(participant.getProxies().values().stream().filter(serverInfo -> serverInfo.getGroupName().equals(group)).count()));
+            i.addAndGet(Math.toIntExact(participant.getStartingProxies().values().stream().filter(serverInfo -> serverInfo.getGroupName().equals(group)).count()));
+            i.addAndGet(Math.toIntExact(participant.getWaitingProxies().values().stream().filter(serverInfo -> serverInfo.getGroupName().equals(group)).count()));
+        });
         return i.get() + this.processManager.getProcessesOfBungeeGroup(group).size() + this.processManager.getProcessesOfBungeeGroupQueued(group).size() + 1;
     }
 
