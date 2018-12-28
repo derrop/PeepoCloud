@@ -18,6 +18,7 @@ import net.peepocloud.lib.utility.ZipUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.process.server.*;
 import net.peepocloud.node.api.server.TemplateStorage;
+import net.peepocloud.node.network.packet.out.api.server.PacketOutAPIServerStarted;
 import net.peepocloud.node.server.ServerFilesLoader;
 
 import java.io.IOException;
@@ -140,6 +141,7 @@ public class ServerProcess implements CloudProcessImpl {
             wasRunning = true;
 
             PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerStartEvent(this.serverInfo));
+            PeepoCloudNode.getInstance().sendPacketToServersAndProxies(new PacketOutAPIServerStarted(this.serverInfo));
         } catch (IOException e) {
             e.printStackTrace();
         }

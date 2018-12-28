@@ -12,8 +12,6 @@ import net.peepocloud.node.api.database.Database;
 import java.util.concurrent.ExecutionException;
 
 public class ServerSelectorAddon extends NodeAddon {
-    private Database database;
-    private Database configDatabase;
 
     private SignSelectorConfig signSelectorConfig = new SignSelectorConfig(20, "STAINED_GLASS", (byte) 1, (byte) 5, (byte) 13, (byte) 3, (byte) 14);
 
@@ -31,28 +29,28 @@ public class ServerSelectorAddon extends NodeAddon {
 
     @Override
     public void onLoad() {
-        this.database = super.getNode().getDatabaseManager().getDatabase("serverSelector");
-        this.configDatabase = super.getNode().getDatabaseManager().getDatabase("internal_configs");
+        Database database = super.getNode().getDatabaseManager().getDatabase("serverSelector");
+        Database configDatabase = super.getNode().getDatabaseManager().getDatabase("internal_configs");
 
 
-        this.configDatabase.contains("signSelector").thenAccept(contains -> {
+        configDatabase.contains("signSelector").thenAccept(contains -> {
             if(!contains)
-                this.configDatabase.insert("signSelector", new SimpleJsonObject().append("signSelectorConfig", this.signSelectorConfig));
+                configDatabase.insert("signSelector", new SimpleJsonObject().append("signSelectorConfig", this.signSelectorConfig));
             else {
                 try {
-                    this.signSelectorConfig = this.configDatabase.get("signSelector").get().getObject("signSelectorConfig", SignSelectorConfig.class);
+                    this.signSelectorConfig = configDatabase.get("signSelector").get().getObject("signSelectorConfig", SignSelectorConfig.class);
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        this.database.contains("signSelector").thenAccept(contains -> {
+        database.contains("signSelector").thenAccept(contains -> {
             if(!contains)
-                this.database.insert("signSelector", this.signSelectorContainer);
+                database.insert("signSelector", this.signSelectorContainer);
             else {
                 try {
-                    this.signSelectorContainer = this.database.get("signSelector").get();
+                    this.signSelectorContainer = database.get("signSelector").get();
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }

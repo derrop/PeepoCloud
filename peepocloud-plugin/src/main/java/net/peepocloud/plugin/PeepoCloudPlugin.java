@@ -1,6 +1,5 @@
 package net.peepocloud.plugin;
 
-import net.md_5.bungee.api.config.ServerInfo;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.player.PeepoPlayer;
@@ -11,7 +10,6 @@ import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.utility.network.QueryRequest;
 import net.peepocloud.plugin.api.PeepoCloudPluginAPI;
-import net.peepocloud.plugin.bukkit.serverselector.signselector.SignSelector;
 import net.peepocloud.plugin.bungee.PeepoBungeePlugin;
 import net.peepocloud.plugin.bukkit.PeepoBukkitPlugin;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandler;
@@ -21,13 +19,13 @@ import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.lib.utility.network.NetworkAddress;
-import net.peepocloud.plugin.network.packet.in.info.PacketInAPIProxyInfos;
-import net.peepocloud.plugin.network.packet.in.info.PacketInAPIServerInfos;
+import net.peepocloud.plugin.network.packet.in.server.PacketInAPIProxyStarted;
+import net.peepocloud.plugin.network.packet.in.server.PacketInAPIProxyStopped;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIServerStarted;
 import net.peepocloud.plugin.network.packet.in.PacketInAPISignSelector;
+import net.peepocloud.plugin.network.packet.in.server.PacketInAPIServerStopped;
 import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryProxyInfos;
 import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryServerInfos;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,12 +34,10 @@ import java.util.*;
 public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     private static PeepoCloudPlugin instance;
 
-    private PacketManager packetManager = new PacketManager();
-    private NetworkClient nodeConnector;
-    private Collection<NetworkAPIHandler> networkHandlers = new ArrayList<>();
-    private Scheduler scheduler = new Scheduler();
-
-    private SignSelector signSelector;
+    protected PacketManager packetManager = new PacketManager();
+    protected NetworkClient nodeConnector;
+    protected Collection<NetworkAPIHandler> networkHandlers = new ArrayList<>();
+    protected Scheduler scheduler = new Scheduler();
 
     public PeepoCloudPlugin(Path nodeInfoFile) {
         instance = this;
@@ -54,6 +50,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         SimpleJsonObject nodeInfo = SimpleJsonObject.load(nodeInfoFile);
         this.nodeConnector = new NetworkClient(nodeInfo.getObject("networkAddress", NetworkAddress.class)
                 .toInetSocketAddress(), this.packetManager, new ChannelHandlerAdapter(), nodeInfo.getObject("auth", Auth.class));
+        this.nodeConnector.setConnectedHandler(this.handleConnected());
 
         // deleting the file because the info has been read
         try {
@@ -68,6 +65,9 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         scheduler.getThreadPool().execute(scheduler);
 
         this.packetManager.registerPacket(new PacketInAPIServerStarted());
+        this.packetManager.registerPacket(new PacketInAPIServerStopped());
+        this.packetManager.registerPacket(new PacketInAPIProxyStarted());
+        this.packetManager.registerPacket(new PacketInAPIProxyStopped());
         this.packetManager.registerPacket(new PacketInAPISignSelector());
 
         scheduler.execute(this.nodeConnector, true);
@@ -77,6 +77,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public void shutdown() {
         this.nodeConnector.shutdown();
     }
+
+    public abstract Runnable handleConnected();
 
     @Override
     public abstract boolean isBungee();
@@ -96,14 +98,6 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         if (this.isBungee())
             return (PeepoBungeePlugin) this;
         throw new UnsupportedOperationException("This instance does not support bungeecord");
-    }
-
-    public void enableSignSelector(SignSelector signSelector) {
-        if(this.signSelector == null) {
-            this.signSelector = signSelector;
-            this.registerNetworkHandler(signSelector);
-            signSelector.start(this.scheduler);
-        }
     }
 
     @Override
@@ -305,9 +299,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<MinecraftServerInfo>> getMinecraftServers() {
         QueryRequest<Collection<MinecraftServerInfo>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos()).onComplete(packet -> {
-            if(packet instanceof PacketInAPIServerInfos) {
-                PacketOutAPIQueryServerInfos packetOutAPIQueryServerInfos = (PacketOutAPIQueryServerInfos) packet;
-                request.setResponse(Arrays.asList(packetOutAPIQueryServerInfos.getSimpleJsonObject().getObject("serverInfos", MinecraftServerInfo[].class)));
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
+                else
+                    request.setResponse(null);
             }
         });
         return request;
@@ -317,9 +315,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<MinecraftServerInfo>> getMinecraftServers(String group) {
         QueryRequest<Collection<MinecraftServerInfo>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(group)).onComplete(packet -> {
-            if(packet instanceof PacketInAPIServerInfos) {
-                PacketOutAPIQueryServerInfos packetOutAPIQueryServerInfos = (PacketOutAPIQueryServerInfos) packet;
-                request.setResponse(Arrays.asList(packetOutAPIQueryServerInfos.getSimpleJsonObject().getObject("serverInfos", MinecraftServerInfo[].class)));
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
+                else
+                    request.setResponse(null);
             }
         });
         return request;
@@ -329,9 +331,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<MinecraftServerInfo>> getStartedMinecraftServers() {
         QueryRequest<Collection<MinecraftServerInfo>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(true)).onComplete(packet -> {
-            if(packet instanceof PacketInAPIServerInfos) {
-                PacketOutAPIQueryServerInfos packetOutAPIQueryServerInfos = (PacketOutAPIQueryServerInfos) packet;
-                request.setResponse(Arrays.asList(packetOutAPIQueryServerInfos.getSimpleJsonObject().getObject("serverInfos", MinecraftServerInfo[].class)));
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
+                else
+                    request.setResponse(null);
             }
         });
         return request;
@@ -341,9 +347,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<MinecraftServerInfo>> getStartedMinecraftServers(String group) {
         QueryRequest<Collection<MinecraftServerInfo>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(group, true)).onComplete(packet -> {
-            if(packet instanceof PacketInAPIServerInfos) {
-                PacketOutAPIQueryServerInfos packetOutAPIQueryServerInfos = (PacketOutAPIQueryServerInfos) packet;
-                request.setResponse(Arrays.asList(packetOutAPIQueryServerInfos.getSimpleJsonObject().getObject("serverInfos", MinecraftServerInfo[].class)));
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
+                else
+                    request.setResponse(null);
             }
         });
         return request;
@@ -353,9 +363,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<BungeeCordProxyInfo>> getBungeeProxies() {
         QueryRequest<Collection<BungeeCordProxyInfo>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos()).onComplete(packet -> {
-            if(packet instanceof PacketInAPIProxyInfos) {
-                PacketInAPIProxyInfos packetInAPIProxyInfos = (PacketInAPIProxyInfos) packet;
-                request.setResponse(Arrays.asList(packetInAPIProxyInfos.getSimpleJsonObject().getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+                else
+                    request.setResponse(null);
             }
         });
         return request;
@@ -365,9 +379,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<BungeeCordProxyInfo>> getBungeeProxies(String group) {
         QueryRequest<Collection<BungeeCordProxyInfo>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(group)).onComplete(packet -> {
-            if(packet instanceof PacketInAPIProxyInfos) {
-                PacketInAPIProxyInfos packetInAPIProxyInfos = (PacketInAPIProxyInfos) packet;
-                request.setResponse(Arrays.asList(packetInAPIProxyInfos.getSimpleJsonObject().getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+                else
+                    request.setResponse(null);
             }
         });
         return request;
@@ -377,9 +395,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<BungeeCordProxyInfo>> getStartedBungeeProxies() {
         QueryRequest<Collection<BungeeCordProxyInfo>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(true)).onComplete(packet -> {
-            if(packet instanceof PacketInAPIProxyInfos) {
-                PacketInAPIProxyInfos packetInAPIProxyInfos = (PacketInAPIProxyInfos) packet;
-                request.setResponse(Arrays.asList(packetInAPIProxyInfos.getSimpleJsonObject().getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+                else
+                    request.setResponse(null);
             }
         });
         return request;
@@ -389,9 +411,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<BungeeCordProxyInfo>> getStartedBungeeProxies(String group) {
         QueryRequest<Collection<BungeeCordProxyInfo>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(group, true)).onComplete(packet -> {
-            if(packet instanceof PacketInAPIProxyInfos) {
-                PacketInAPIProxyInfos packetInAPIProxyInfos = (PacketInAPIProxyInfos) packet;
-                request.setResponse(Arrays.asList(packetInAPIProxyInfos.getSimpleJsonObject().getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+                else
+                    request.setResponse(null);
             }
         });
         return request;

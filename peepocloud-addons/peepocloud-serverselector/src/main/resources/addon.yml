@@ -1,0 +1,4 @@
+name: PeepoCloud-ServerSelector
+main: net.peepocloud.addons.serverselector.ServerSelectorAddon
+version: ${cloud.version}
+author: Mc_Ruben & Panamo

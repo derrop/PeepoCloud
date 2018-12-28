@@ -91,7 +91,7 @@ public class NetworkServer implements Runnable {
                                         0, 4, 0, 4),
                                 new LengthFieldPrepender(4))
                                 .addLast(new PacketDecoder(NetworkServer.this.packetManager))
-                                .addLast(new PacketEncoder(NetworkServer.this.packetManager))
+                                .addLast(new PacketEncoder())
                                 .addLast(new MainChannelHandler(NetworkServer.this.packetManager, NetworkServer.this.authHandler));
                     }
                 })
