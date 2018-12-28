@@ -4,6 +4,7 @@ package net.peepocloud.lib.utility;
  */
 
 import com.sun.management.OperatingSystemMXBean;
+import org.apache.commons.io.FileUtils;
 import sun.reflect.ReflectionFactory;
 
 import java.io.ByteArrayOutputStream;
@@ -137,6 +138,11 @@ public class SystemUtils {
         if (!Files.exists(directory))
             return;
         try {
+            FileUtils.deleteDirectory(directory.toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        /*try {
             Files.walkFileTree(
                     directory,
                     EnumSet.noneOf(FileVisitOption.class),
@@ -157,7 +163,7 @@ public class SystemUtils {
             );
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public static int getFullLength(URLConnection connection) {
