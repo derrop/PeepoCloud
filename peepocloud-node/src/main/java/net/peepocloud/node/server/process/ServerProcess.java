@@ -196,7 +196,8 @@ public class ServerProcess implements CloudProcessImpl {
             configurable = PropertiesConfigurable.load(PeepoCloudNode.class.getClassLoader().getResourceAsStream("files/server.properties"));
         }
         configurable.append("server-ip", this.serverInfo.getHost())
-                .append("server-port", this.serverInfo.getPort());
+                .append("server-port", this.serverInfo.getPort())
+                .append("online-mode", false);
         if (this.serverInfo.getMotd() != null) {
             configurable.append("motd", this.serverInfo.getMotd());
         } else {
