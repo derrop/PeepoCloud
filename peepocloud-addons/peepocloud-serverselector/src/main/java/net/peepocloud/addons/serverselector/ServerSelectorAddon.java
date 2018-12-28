@@ -1,11 +1,13 @@
 package net.peepocloud.addons.serverselector;
 
 import net.peepocloud.addons.serverselector.listener.ServerStartListener;
+import net.peepocloud.addons.serverselector.packet.PacketInAPIServerSigns;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.serverselector.signselector.AnimatedSignLayout;
 import net.peepocloud.lib.serverselector.signselector.SignLayout;
 import net.peepocloud.lib.serverselector.signselector.SignSelectorConfig;
 import net.peepocloud.lib.serverselector.signselector.sign.ServerSign;
+import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.addon.node.NodeAddon;
 import net.peepocloud.node.api.database.Database;
 
@@ -29,9 +31,10 @@ public class ServerSelectorAddon extends NodeAddon {
 
     @Override
     public void onLoad() {
+        PeepoCloudNode.getInstance().getPacketManager().registerPacket(new PacketInAPIServerSigns(this));
+
         Database database = super.getNode().getDatabaseManager().getDatabase("serverSelector");
         Database configDatabase = super.getNode().getDatabaseManager().getDatabase("internal_configs");
-
 
         configDatabase.contains("signSelector").thenAccept(contains -> {
             if(!contains)
@@ -58,6 +61,17 @@ public class ServerSelectorAddon extends NodeAddon {
         });
 
         super.getNode().getEventManager().registerListener(this, new ServerStartListener(this));
+    }
+
+    public void saveSigns(ServerSign[] serverSigns) {
+        Database database = super.getNode().getDatabaseManager().getDatabase("serverSelector");
+        try {
+            SimpleJsonObject signSelectorContainer = database.get("signSelector").get();
+            signSelectorContainer.append("serverSigns", serverSigns);
+            database.update("signSelector", signSelectorContainer);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public SignSelectorConfig getSignSelectorConfig() {

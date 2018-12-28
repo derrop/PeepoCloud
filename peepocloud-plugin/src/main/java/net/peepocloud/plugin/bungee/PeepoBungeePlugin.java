@@ -5,6 +5,8 @@ import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.api.bungee.PeepoCloudBungeeAPI;
+import net.peepocloud.plugin.network.packet.in.PacketInAPISignSelector;
+
 import java.net.InetSocketAddress;
 import java.nio.file.Paths;
 
@@ -14,6 +16,8 @@ public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBun
     PeepoBungeePlugin(BungeeLauncher plugin) {
         super(Paths.get("nodeInfo.json"));
         this.plugin = plugin;
+
+        this.packetManager.registerPacket(new PacketInAPISignSelector());
     }
 
     @Override
