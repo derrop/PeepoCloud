@@ -30,6 +30,8 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
     private ChannelHandler firstHandler;
     private Auth auth;
 
+    private Runnable connectedHandler;
+
     public NetworkClient(InetSocketAddress address, PacketManager packetManager, ChannelHandler firstHandler, Auth auth) {
         super(auth.getComponentName(), null, -1);
         this.address = address;
@@ -56,13 +58,17 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
                                     0, 4, 0, 4),
                                     new LengthFieldPrepender(4))
                                     .addLast(new PacketDecoder(NetworkClient.this.packetManager))
-                                    .addLast(new PacketEncoder(NetworkClient.this.packetManager))
+                                    .addLast(new PacketEncoder())
                                     .addLast(new MainChannelHandler(NetworkClient.this.packetManager, NetworkClient.this.firstHandler));
                         }
                     });
             super.channel = bootstrap.connect(address).syncUninterruptibly().channel().writeAndFlush(new PacketOutAuth(this.auth)).syncUninterruptibly().channel();
             super.connectedAt = System.currentTimeMillis();
             System.out.println("&aSuccessfully connected to " + address);
+
+            if(this.connectedHandler != null)
+                this.connectedHandler.run();
+
             super.channel.closeFuture().syncUninterruptibly();
         } catch (Exception exception) {
             System.err.println("&eError while trying to connect to " + address + ": &e"+ exception.getMessage());
@@ -84,5 +90,7 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
         return super.channel.pipeline().get(MainChannelHandler.class);
     }
 
-
+    public void setConnectedHandler(Runnable connectedHandler) {
+        this.connectedHandler = connectedHandler;
+    }
 }

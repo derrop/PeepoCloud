@@ -33,7 +33,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             int id = byteArrayDataInput.readInt();
             boolean isQuery = byteArrayDataInput.readBoolean();
 
-            Class<? extends Packet> packetClass = null;
+            Class<? extends Packet> packetClass;
             if (!isQuery) {
                 PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
                 if (packetInfo == null)
@@ -42,9 +42,13 @@ public class PacketDecoder extends ByteToMessageDecoder {
             } else {
                 Map.Entry<Class<? extends Packet>, Integer> entry =
                         this.packetManager.getQueryResponses().entrySet().stream().filter(entry1 -> entry1.getValue().equals(id)).findFirst().orElse(null);
-                if (entry == null)
-                    return;
-                packetClass = entry.getKey();
+                if (entry == null) {
+                    PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
+                    if (packetInfo == null)
+                        return;
+                    packetClass = packetInfo.getPacketClass();
+                } else
+                    packetClass = entry.getKey();
             }
 
             if (packetClass == null)

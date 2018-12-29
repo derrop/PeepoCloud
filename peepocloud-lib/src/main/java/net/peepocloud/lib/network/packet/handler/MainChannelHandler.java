@@ -2,6 +2,7 @@ package net.peepocloud.lib.network.packet.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketInfo;
@@ -54,11 +55,12 @@ public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
         if(query != null)
             query.setResponse(packet);
 
+
         PacketInfo packetInfo = this.packetManager.getPacketInfo(packet.getId());
         if(packetInfo != null) {
             packetInfo.getPacketHandler().handleInternal(this.participant, packet, (Consumer<Packet>) queryResponse -> {
                 if (packet.getQueryUUID() != null)
-                    this.participant.sendPacket(this.packetManager.convertToQueryPacket(queryResponse, packet.getQueryUUID()));
+                    this.participant.sendPacket(this.packetManager.convertToQueryResponse(queryResponse, packet.getQueryUUID()));
             });
         }
     }

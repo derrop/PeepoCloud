@@ -26,4 +26,8 @@ public abstract class Packet {
     void setQueryUUID(UUID queryUUID) {
         this.queryUUID = queryUUID;
     }
+
+    void setId(int id) {
+        this.id = id;
+    }
 }

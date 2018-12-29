@@ -10,11 +10,13 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.JsonPacketHandler;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
+import net.peepocloud.node.network.packet.out.api.server.PacketOutAPIServerStarted;
 import net.peepocloud.node.network.participant.NodeParticipantImpl;
 
 import java.util.function.Consumer;
 
 public class PacketInServerProcessStarted extends JsonPacketHandler {
+
     @Override
     public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
         if (!(networkParticipant instanceof NodeParticipantImpl))
@@ -25,6 +27,7 @@ public class PacketInServerProcessStarted extends JsonPacketHandler {
             ((NodeParticipantImpl) networkParticipant).getWaitingServers().remove(serverInfo.getComponentName());
         }
         PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerStartEvent(serverInfo));
+        PeepoCloudNode.getInstance().sendPacketToServersAndProxies(new PacketOutAPIServerStarted(serverInfo));
     }
 
     @Override

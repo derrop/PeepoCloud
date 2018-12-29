@@ -1,4 +1,4 @@
-package net.peepocloud.node.network.packet.out.api;
+package net.peepocloud.node.network.packet.out.api.server;
 
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.config.json.SimpleJsonObject;

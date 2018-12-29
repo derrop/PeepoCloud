@@ -10,6 +10,7 @@ import net.peepocloud.lib.serverselector.signselector.SignSelectorConfig;
 import net.peepocloud.lib.serverselector.signselector.sign.ServerSign;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.bukkit.serverselector.BlockServerSelector;
+import net.peepocloud.plugin.network.packet.out.PacketOutAPIServerSigns;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -67,6 +68,10 @@ public class SignSelector extends BlockServerSelector<ServerSign> {
             super.waitingServers.values().forEach(super::handleServerAdd);
 
         }, 0, this.config.getUpdateDelay(), true);
+    }
+
+    public void save() {
+        PeepoCloudPlugin.getInstance().getNodeConnector().sendPacket(new PacketOutAPIServerSigns(super.children));
     }
 
     @Override

@@ -58,6 +58,22 @@ public class PacketManager {
         return packet;
     }
 
+    public Packet convertToQueryResponse(Packet packet, UUID uuid) {
+        packet.setQueryUUID(uuid);
+        Class<? extends Packet> clazz = packet.getClass();
+        if (!this.queryResponses.containsKey(clazz)) {
+            if (packet instanceof JsonPacket) {
+                clazz = JsonPacket.class;
+            } else if (packet instanceof SerializationPacket) {
+                clazz = SerializationPacket.class;
+            } else if (packet instanceof FilePacket) {
+                clazz = FilePacket.class;
+            }
+        }
+        packet.setId(this.queryResponses.get(clazz));
+        return packet;
+    }
+
     /**
      * Sends a query and completes the future when the value is available
      *

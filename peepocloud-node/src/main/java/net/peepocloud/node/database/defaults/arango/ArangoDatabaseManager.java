@@ -78,6 +78,10 @@ public class ArangoDatabaseManager implements DatabaseManager {
         System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.arangodb.successfullyConnected").replace("%host%", config.getHost() + ":" + config.getPort()));
 
         this.arangoDatabase = this.arangoDB.db(config.getDatabase());
+
+        if(!this.arangoDatabase.exists())
+            this.arangoDB.createDatabase(config.getDatabase());
+
         return this.isConnected();
     }
 

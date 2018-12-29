@@ -21,7 +21,7 @@ public class BungeeNetworkHandler implements NetworkAPIHandler {
 
     @Override
     public void handleServerStop(MinecraftServerInfo serverInfo) {
-
+        this.bungeeAPI.unregisterServerInfo(serverInfo);
     }
 
     @Override

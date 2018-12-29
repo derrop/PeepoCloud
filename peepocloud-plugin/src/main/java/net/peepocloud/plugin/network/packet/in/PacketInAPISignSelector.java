@@ -25,10 +25,12 @@ public class PacketInAPISignSelector extends JsonPacketHandler {
 
     @Override
     public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
-        SimpleJsonObject signSelectorContainer = packet.getSimpleJsonObject();
-        SignSelector signSelector = new SignSelector(signSelectorContainer.getObject("config", SignSelectorConfig.class),
-                signSelectorContainer.getObject("serverSigns", ServerSign[].class), signSelectorContainer.getObject("signLayouts", SignLayout[].class),
-                signSelectorContainer.getObject("loadingLayout", AnimatedSignLayout.class), signSelectorContainer.getObject("maintenanceLayout", AnimatedSignLayout.class));
-        PeepoCloudPlugin.getInstance().enableSignSelector(signSelector);
+        if(PeepoCloudPlugin.getInstance().isBukkit()) {
+            SimpleJsonObject signSelectorContainer = packet.getSimpleJsonObject();
+            SignSelector signSelector = new SignSelector(signSelectorContainer.getObject("config", SignSelectorConfig.class),
+                    signSelectorContainer.getObject("serverSigns", ServerSign[].class), signSelectorContainer.getObject("signLayouts", SignLayout[].class),
+                    signSelectorContainer.getObject("loadingLayout", AnimatedSignLayout.class), signSelectorContainer.getObject("maintenanceLayout", AnimatedSignLayout.class));
+            PeepoCloudPlugin.getInstance().toBukkit().enableSignSelector(signSelector);
+        }
     }
 }
