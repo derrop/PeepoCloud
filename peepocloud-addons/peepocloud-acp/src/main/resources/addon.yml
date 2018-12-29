@@ -1,0 +1,4 @@
+name: PeepoCloud-ACP
+version: 1.0
+author: McRupen
+main: net.peepocloud.node.acp.PeepoACP
