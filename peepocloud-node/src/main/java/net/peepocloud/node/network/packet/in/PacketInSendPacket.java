@@ -37,18 +37,11 @@ public class PacketInSendPacket implements PacketHandler<PacketOutSendPacket> {
         if (packet.getPacket() == null)
             return;
         if (packet.getTargets().isEmpty()) {
-            PeepoCloudNode.getInstance().sendPacketToAllOnThisNode(packet.getPacket());
+            PeepoCloudNode.getInstance().sendPacketToServersAndProxies(packet.getPacket());
         } else {
             for (PacketOutSendPacket.PacketReceiver target : packet.getTargets()) {
                 if (target.getName() == null) {
                     switch (target.getType()) {
-                        case NODE:
-                            PeepoCloudNode.getInstance().getServerNodes().values().forEach(nodeParticipant -> {
-                                if (!nodeParticipant.getName().equals(networkParticipant.getName())) {
-                                    nodeParticipant.sendPacket(packet.getPacket());
-                                }
-                            });
-                            break;
                         case BUNGEECORD:
                             PeepoCloudNode.getInstance().getProxiesOnThisNode().values().forEach(bungeeCordParticipant -> {
                                 bungeeCordParticipant.sendPacket(packet.getPacket());
@@ -63,9 +56,6 @@ public class PacketInSendPacket implements PacketHandler<PacketOutSendPacket> {
                 } else {
                     NetworkPacketSender participant = null;
                     switch (target.getType()) {
-                        case NODE:
-                            participant = PeepoCloudNode.getInstance().getServerNodes().get(target.getName());
-                            break;
                         case BUNGEECORD:
                             participant = PeepoCloudNode.getInstance().getProxiesOnThisNode().get(target.getName());
                             break;
@@ -73,7 +63,7 @@ public class PacketInSendPacket implements PacketHandler<PacketOutSendPacket> {
                             participant = PeepoCloudNode.getInstance().getServersOnThisNode().get(target.getName());
                             break;
                     }
-                    if (participant != null && !participant.getName().equals(networkParticipant.getName())) {
+                    if (participant != null) {
                         participant.sendPacket(packet.getPacket());
                     }
                 }

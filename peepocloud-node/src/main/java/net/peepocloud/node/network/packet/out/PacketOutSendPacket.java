@@ -31,6 +31,9 @@ public class PacketOutSendPacket extends Packet {
                 packet instanceof FilePacket || packet instanceof JsonPacket || packet instanceof SerializationPacket,
                 "can only send JsonPacket, SerializationPacket or FilePacket to other nodes"
         );
+        for (PacketReceiver target : targets) {
+            Preconditions.checkArgument(target.type != NetworkComponentType.NODE, "cannot send PacketOutSendPacket with PacketReceiver type NODE");
+        }
         this.targets = targets;
         this.packet = packet;
     }
