@@ -44,12 +44,12 @@ public class CommandManagerImpl implements CommandManager {
                 }
             }
         };
+        this.commandReaderThread.setDaemon(true);
         this.commandReaderThread.start();
     }
 
     public void shutdown() {
         this.commandReaderThread.interrupt();
-        this.commandReaderThread.stop();
     }
 
     /**
