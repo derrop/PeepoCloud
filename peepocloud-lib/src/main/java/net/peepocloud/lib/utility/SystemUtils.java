@@ -21,6 +21,8 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.EnumSet;
 import java.util.concurrent.ThreadLocalRandom;
@@ -32,6 +34,8 @@ public class SystemUtils {
 
     public static final String CENTRAL_SERVER_URL = "http://derrupen.ddns.net:1350/";
     public static final String CENTRAL_SERVER_URL_WS_GSTATS = "ws://derrupen.ddns.net:1351";
+
+    public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy-mm:hh");
 
     private static final char[] values = "abcdefghijklmnopqrstuvwxyzäöüABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890".toCharArray();
 

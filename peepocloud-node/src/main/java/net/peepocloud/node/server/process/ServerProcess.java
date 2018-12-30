@@ -270,4 +270,10 @@ public class ServerProcess implements CloudProcessImpl {
     public String toString() {
         return this.getName() + "/memory=" + this.getMemory() + "/port=" + this.getPort();
     }
+
+    @Override
+    public String getLatestLogPath() {
+        return "logs/latest.log";
+    }
+
 }

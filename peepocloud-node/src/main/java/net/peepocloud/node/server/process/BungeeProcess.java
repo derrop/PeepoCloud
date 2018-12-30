@@ -41,7 +41,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Getter
-@ToString
 public class BungeeProcess implements CloudProcessImpl {
     private Path directory;
     private Process process;
@@ -298,5 +297,10 @@ public class BungeeProcess implements CloudProcessImpl {
     @Override
     public String toString() {
         return this.getName() + "/memory=" + this.getMemory() + "/port=" + this.getPort();
+    }
+
+    @Override
+    public String getLatestLogPath() {
+        return "proxy.log.0";
     }
 }
