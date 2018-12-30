@@ -59,7 +59,7 @@ public class CloudConfig {
     private boolean useGlobalStats;
 
     NodeInfo loadNodeInfo(int usedMemory) {
-        return new NodeInfo(this.nodeName, this.maxMemory, usedMemory, SystemUtils.cpuUsageProcess());
+        return new NodeInfo(this.nodeName, this.maxMemory, usedMemory, Runtime.getRuntime().availableProcessors(), SystemUtils.cpuUsageProcess());
     }
 
     void load() {

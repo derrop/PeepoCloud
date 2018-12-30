@@ -229,6 +229,10 @@ public class NetworkServer implements Runnable {
                     PeepoCloudNode.getInstance().getServerNodes().put(networkParticipant.getName(), (NodeParticipantImpl) networkParticipant);
 
                     successful = true;
+                    System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.connect.node")
+                            .replace("%name%", nodeInfo.getName()).replace("%memory%", Integer.toString(nodeInfo.getMaxMemory()))
+                            .replace("%cpu%", Integer.toString(nodeInfo.getCpuCores()))
+                    );
 
                     PeepoCloudNode.getInstance().getEventManager().callEvent(new NodeConnectEvent((NodeParticipantImpl) networkParticipant));
                     NodeUtils.updateNodeInfoForSupport(null);
@@ -250,9 +254,14 @@ public class NetworkServer implements Runnable {
                     networkParticipant = new MinecraftServerParticipantImpl(networkParticipant.getChannel(), auth);
 
                     ((MinecraftServerParticipantImpl) networkParticipant).setServerInfo(process.getServerInfo());
-
+                    //TODO send packet to nodes that the server is started up successfully
                     PeepoCloudNode.getInstance().getServersOnThisNode().put(auth.getComponentName(), (MinecraftServerParticipantImpl) networkParticipant);
                     successful = true;
+
+                    System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.connect.server")
+                            .replace("%name%", process.getName()).replace("%memory%", Integer.toString(process.getMemory()))
+                    );
+
                     PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerConnectEvent((MinecraftServerParticipantImpl) networkParticipant));
 
                 }
@@ -275,8 +284,12 @@ public class NetworkServer implements Runnable {
                     ((BungeeCordParticipantImpl) networkParticipant).setProxyInfo(process.getProxyInfo());
 
                     PeepoCloudNode.getInstance().getProxiesOnThisNode().put(auth.getComponentName(), (BungeeCordParticipantImpl) networkParticipant);
-
+//TODO send packet to nodes that the server is started up successfully
                     successful = true;
+                    System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.connect.bungee")
+                            .replace("%name%", process.getName()).replace("%memory%", Integer.toString(process.getMemory()))
+                    );
+
                     PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeConnectEvent((BungeeCordParticipantImpl) networkParticipant));
 
                 }

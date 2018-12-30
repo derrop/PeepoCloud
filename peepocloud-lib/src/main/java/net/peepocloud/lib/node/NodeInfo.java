@@ -16,5 +16,6 @@ public class NodeInfo {
     private String name;
     private int maxMemory;
     private int usedMemory;
+    private int cpuCores;
     private double cpuUsage;
 }
