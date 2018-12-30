@@ -125,7 +125,7 @@ public class CloudConfig {
         if (Files.exists(mainPath)) {
             configurable = YamlConfigurable.load(mainPath);
         } else {
-            System.out.println("&cShould this cloud use g stats? Type \"yes\", if it should use g stats");
+            System.out.println("&cShould this cloud use global stats? Type \"yes\", if it should use global stats");
             String line = PeepoCloudNode.getInstance().getLogger().readLine();
             boolean gStats = line.equalsIgnoreCase("yes") || line.equalsIgnoreCase("true");
             configurable = new YamlConfigurable()

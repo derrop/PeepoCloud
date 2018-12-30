@@ -266,17 +266,17 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         this.internalConfig = SimpleJsonObject.load("internal/internalData.json");
 
         if (!this.internalConfig.contains("acceptedInformationsSendingToServer")) {
-            System.out.println("&4Do you accept, that some data of your cloud and server (the ip address hashed, the ISP of your server, the name of your operating system, the version of the cloud, the uniqueId of your cloud, the maximum amount of memory of your cloud and the cpu cores) will be send to our server and saved there? We won't share the hashed ip address and the unique id of your cloud, but the other information are important for the support. Please type &eyes&4, if you agree, but please, you won't get any support if you do not agree to this, because we need information about your system to help you.)");
+            System.out.println("&4Do you accept, that some data of your cloud and server (the ip address hashed, the ISP of your server, the name of your operating system, the version of the cloud, the uniqueId of your cloud, the maximum amount of memory of your cloud and the cpu cores) will be send to our server and saved there? We won't share the hashed ip address and the unique id of your cloud, but the other information are important for the support. Please type &eyes&4, if you agree, but please, you won't get any support for errors if you do not agree to this, because we need information about your system to help you.)");
             String s = this.logger.readLine1();
             if (s.equalsIgnoreCase("yes")) {
                 System.out.println("&aYou have accepted that the data named above will be saved on our server.");
                 this.internalConfig.append("acceptedInformationsSendingToServer", true);
                 this.saveInternalConfigFile();
             } else {
-                System.out.println("&cYou have not accepted that the data named above will be send to our server. You won't get any support for the system.");
+                System.out.println("&cYou have not accepted that the data named above will be send to our server. You won't get any support if you have errors with the system.");
             }
         } else if (!this.internalConfig.getBoolean("acceptedInformationsSendingToServer")) {
-            System.out.println("&cYou have not accepted that the data named above will be send to our server. You won't get any support for the system.");
+            System.out.println("&cYou have not accepted that the data named above will be send to our server. You won't get any support if you have errors the system.");
         } else {
             System.out.println("&aYou have accepted that the ip address of your server hashed, the ISP of your server, the name of your operating system, the version of the cloud, the uniqueId of your cloud, the maximum amount of memory of your cloud and the cpu cores will be saved on our server.");
         }
