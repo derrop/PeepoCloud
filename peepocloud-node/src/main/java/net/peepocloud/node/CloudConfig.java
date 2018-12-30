@@ -115,8 +115,8 @@ public class CloudConfig {
         } catch (Exception e) {
             if (!SystemUtils.isServerOffline(e)) {
                 e.printStackTrace();
-                return false;
             }
+            return false;
         }
         return true;
     }
