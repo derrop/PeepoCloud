@@ -100,6 +100,7 @@ public class CloudConfig {
             connection.setRequestProperty("Peepo-UserName", this.username);
             connection.setRequestProperty("Peepo-ApiToken", this.apiToken);
             connection.setDoInput(true);
+            connection.setConnectTimeout(1000);
             connection.connect();
             try (InputStream inputStream = connection.getInputStream();
                  Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {

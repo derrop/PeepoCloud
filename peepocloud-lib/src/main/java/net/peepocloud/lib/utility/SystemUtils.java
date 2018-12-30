@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -236,7 +237,8 @@ public class SystemUtils {
     }
 
     public static boolean isServerOffline(Exception e) {
-        return e instanceof ConnectException && (e.getMessage().equals("Connection refused: connect") || e.getMessage().equals("Connection timed out: connect"));
+        return (e instanceof ConnectException && (e.getMessage().equals("Connection refused: connect") || e.getMessage().equals("Connection timed out: connect"))) ||
+                (e instanceof SocketTimeoutException && (e.getMessage().equals("connect timed out")));
     }
 
     public static String getOperatingSystem() {
