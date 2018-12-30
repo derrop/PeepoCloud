@@ -51,6 +51,7 @@ public class AutoUpdaterManager {
     public UpdateCheckResponse checkUpdatesSync() {
         try {
             URLConnection connection = new URL(SystemUtils.CENTRAL_SERVER_URL + "updatecheck?version=" + SystemUtils.getCurrentVersion()).openConnection();
+            connection.setConnectTimeout(1000);
             connection.connect();
 
             try (InputStream inputStream = connection.getInputStream();
