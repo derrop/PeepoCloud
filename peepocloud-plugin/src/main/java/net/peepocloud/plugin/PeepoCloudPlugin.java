@@ -1,5 +1,6 @@
 package net.peepocloud.plugin;
 
+import com.google.gson.reflect.TypeToken;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
@@ -438,12 +439,11 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<MinecraftGroup>> getMinecraftGroups() {
         QueryRequest<Collection<MinecraftGroup>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryGroups(NetworkComponentType.MINECRAFT_SERVER)).onComplete(packet -> {
-            System.out.println(new SimpleJsonObject().append("p", packet).toPrettyJson());
             if (packet instanceof JsonPacket) {
                 JsonPacket response = (JsonPacket) packet;
                 SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
                 if (simpleJsonObject != null && simpleJsonObject.contains("groups"))
-                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("groups", MinecraftGroup[].class)));
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("groups", MinecraftGroup[].class)));
                 else
                     request.setResponse(null);
             } else
