@@ -45,6 +45,10 @@ public class MinecraftServerInfo implements PacketSerializable {
         return AbstractPeepoCloudAPI.getInstance().getMinecraftGroup(this.groupName);
     }
 
+    public void shutdown() {
+        AbstractPeepoCloudAPI.getInstance().stopMinecraftServer(this);
+    }
+
     @Override
     public void serialize(DataOutput dataOutput) throws Exception {
         dataOutput.writeUTF(componentName);

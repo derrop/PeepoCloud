@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import net.peepocloud.lib.AbstractPeepoCloudAPI;
 import net.peepocloud.lib.network.packet.serialization.ReflectivePacketSerializable;
 import net.peepocloud.lib.server.GroupMode;
 import net.peepocloud.lib.server.Template;
@@ -31,4 +32,9 @@ public class MinecraftGroup implements ReflectivePacketSerializable {
     private String signLayoutName;
     private boolean fallback;
     private String fallbackPermission;
+
+    public void update() {
+        AbstractPeepoCloudAPI.getInstance().updateMinecraftGroup(this);
+    }
+
 }

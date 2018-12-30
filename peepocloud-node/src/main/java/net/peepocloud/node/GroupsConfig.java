@@ -27,6 +27,7 @@ public class GroupsConfig {
                 this.loadGroup(group);
             }
         });
+
         return this.minecraftGroups;
     }
 
@@ -58,6 +59,14 @@ public class GroupsConfig {
                 this.loadGroup(group);
             success.accept(aBoolean);
         }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
+    }
+
+    public void deleteMinecraftGroup(String name) {
+        PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups").deleteAsync(name);
+    }
+
+    public void deleteBungeeGroup(String name) {
+        PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("bungeeGroups").deleteAsync(name);
     }
 
     public void update(MinecraftGroup group) {

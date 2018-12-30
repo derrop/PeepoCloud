@@ -49,6 +49,7 @@ public class CommandManagerImpl implements CommandManager {
 
     public void shutdown() {
         this.commandReaderThread.interrupt();
+        this.commandReaderThread.stop();
     }
 
     /**

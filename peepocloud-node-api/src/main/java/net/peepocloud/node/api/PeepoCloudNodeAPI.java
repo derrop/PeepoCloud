@@ -457,6 +457,18 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
 
     public abstract MinecraftGroup getMinecraftGroup(String name);
 
+    public abstract Map<String, MinecraftGroup> getMinecraftGroups();
+
+    public abstract Map<String, BungeeGroup> getBungeeGroups();
+
+    public abstract void deleteMinecraftGroup(MinecraftGroup group);
+
+    public abstract void deleteBungeeGroup(BungeeGroup group);
+
+    public abstract void deleteMinecraftGroup(String name);
+
+    public abstract void deleteBungeeGroup(String name);
+
     /**
      * Copies a template by the loaded {@link TemplateStorage} specified in the {@link Template} or if not found the local storage to the given {@link Path}
      *

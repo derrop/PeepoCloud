@@ -5,8 +5,10 @@ package net.peepocloud.lib;
 
 import com.google.common.base.Preconditions;
 import net.peepocloud.lib.player.PeepoPlayer;
+import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
+import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 
 import java.util.UUID;
 
@@ -36,5 +38,17 @@ public abstract class AbstractPeepoCloudAPI {
     public abstract MinecraftGroup getMinecraftGroup(String name);
 
     public abstract BungeeGroup getBungeeGroup(String name);
+
+    public abstract void stopMinecraftServer(MinecraftServerInfo serverInfo);
+
+    public abstract void stopMinecraftServer(String name);
+
+    public abstract void stopBungeeProxy(BungeeCordProxyInfo proxyInfo);
+
+    public abstract void stopBungeeProxy(String name);
+
+    public abstract void updateMinecraftGroup(MinecraftGroup group);
+
+    public abstract void updateBungeeGroup(BungeeGroup group);
 
 }

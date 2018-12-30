@@ -64,6 +64,17 @@ public class ColoredLogger extends Logger implements ConsoleLogger {
         System.setErr(new PrintStream(new LoggingOutputStream(Level.SEVERE), true));
     }
 
+    public void shutdown() {
+        try {
+            this.consoleReader.print(ConsoleColor.RESET.toString());
+            this.consoleReader.drawLine();
+            this.consoleReader.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.consoleReader.close();
+    }
+
     /**
      * @deprecated don't use after {@link CommandManagerImpl} has been started
      * @return the line read from the console

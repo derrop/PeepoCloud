@@ -13,22 +13,22 @@ import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.command.Command;
 import net.peepocloud.node.api.command.CommandSender;
+import net.peepocloud.node.api.command.TabCompletable;
 import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.setup.Setup;
 import net.peepocloud.node.setup.type.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class CommandCreate extends Command {
+public class CommandCreate extends Command implements TabCompletable {
     public CommandCreate() {
         super("create");
     }
 
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
-        if (args.length != 2 && args.length != 3) {
+        if (args.length != 2 && args.length != 3 && args.length != 5) {
             sendHelp(sender);
             return;
         }
@@ -249,7 +249,45 @@ public class CommandCreate extends Command {
             break;
 
             case "template": {
+                if (args.length != 5) {
+                    sendHelp(sender);
+                    return;
+                }
 
+                String templateName = args[3];
+                String templateStorage = args[4];
+
+                if (args[1].equalsIgnoreCase("minecraftgroup")) {
+                    MinecraftGroup group = PeepoCloudNode.getInstance().getMinecraftGroup(args[2]);
+                    if (group == null) {
+                        sender.sendMessageLanguageKey("command.create.template.minecraftgroup.groupNotFound");
+                        return;
+                    }
+                    if (group.getTemplates().stream().anyMatch(template -> template.getName().equalsIgnoreCase(templateName))) {
+                        sender.sendMessageLanguageKey("command.create.template.minecraftgroup.alreadyExists");
+                        return;
+                    }
+                    group.getTemplates().add(new Template(templateName, templateStorage));
+                    group.update();
+                    sender.sendMessageLanguageKey("command.create.template.minecraftgroup.success");
+
+                } else if (args[1].equalsIgnoreCase("bungeegroup")) {
+                    BungeeGroup group = PeepoCloudNode.getInstance().getBungeeGroup(args[2]);
+                    if (group == null) {
+                        sender.sendMessageLanguageKey("command.create.template.bungeegroup.groupNotFound");
+                        return;
+                    }
+                    if (group.getTemplates().stream().anyMatch(template -> template.getName().equalsIgnoreCase(templateName))) {
+                        sender.sendMessageLanguageKey("command.create.template.bungeegroup.alreadyExists");
+                        return;
+                    }
+                    group.getTemplates().add(new Template(templateName, templateStorage));
+                    group.update();
+                    sender.sendMessageLanguageKey("command.create.template.bungeegroup.success");
+
+                } else {
+                    sendHelp(sender);
+                }
             }
             break;
 
@@ -275,9 +313,26 @@ public class CommandCreate extends Command {
         sender.sendMessage(
                 "create bungeegroup <name>",
                 "create minecraftgroup <name>",
-                "create template <name>",
+                "create template <minecraftgroup|bungeegroup> <groupName> <name> <storage>",
                 "create node <name>",
                 "create user <name> <password>"
         );
     }
+
+    @Override
+    public Collection<String> tabComplete(CommandSender sender, String commandLine, String[] args) {
+        return args.length == 1 ? Arrays.asList("bungeegroup", "minecraftgroup", "template", "node", "user") :
+                args[0].equalsIgnoreCase("template") ?
+                        args.length == 2 ?
+                                Arrays.asList("minecraftgroup", "bungeegroup") :
+                                args.length == 3 ?
+                                        args[1].equalsIgnoreCase("minecraftgroup") ? PeepoCloudNode.getInstance().getMinecraftGroups().keySet() :
+                                                args[1].equalsIgnoreCase("bungeegroup") ? PeepoCloudNode.getInstance().getBungeeGroups().keySet() :
+                                                        Collections.emptyList() :
+                                        args.length == 5 ? PeepoCloudNode.getInstance().getTemplateStorages().stream().map(TemplateStorage::getName).collect(Collectors.toList()) :
+                                                Collections.emptyList()
+                        : Collections.emptyList()
+                ;
+    }
+
 }

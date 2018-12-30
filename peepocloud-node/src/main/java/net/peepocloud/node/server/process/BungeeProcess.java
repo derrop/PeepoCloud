@@ -54,10 +54,12 @@ public class BungeeProcess implements CloudProcessImpl {
     private Map<UUID, Consumer<String>> screenHandlers = new ConcurrentHashMap<>();
     @Setter
     private Consumer<String> networkScreenHandler;
+    private GroupMode groupMode;
 
     BungeeProcess(BungeeCordProxyInfo proxyInfo, ProcessManager processManager) {
         this.proxyInfo = proxyInfo;
-        this.directory = PeepoCloudNode.getInstance().getBungeeGroup(proxyInfo.getGroupName()).getGroupMode() == GroupMode.SAVE ?
+        this.groupMode = proxyInfo.getGroup().getGroupMode();
+        this.directory = this.groupMode == GroupMode.SAVE ?
                 Paths.get("internal/savedProxies/" + proxyInfo.getGroupName() + "/" + proxyInfo.getComponentId()) :
                 Paths.get("internal/tempProxies/" + proxyInfo.getGroupName() + "/" + proxyInfo.getComponentId());
         this.processManager = processManager;
@@ -286,7 +288,7 @@ public class BungeeProcess implements CloudProcessImpl {
             this.screenHandlers.clear();
             this.networkScreenHandler = null;
             this.cachedLog.clear();
-            if (PeepoCloudNode.getInstance().getBungeeGroup(this.proxyInfo.getGroupName()).getGroupMode() != GroupMode.SAVE) {
+            if (this.groupMode != GroupMode.SAVE) {
                 SystemUtils.sleepUninterruptedly(500);
                 SystemUtils.deleteDirectory(this.directory);
             }

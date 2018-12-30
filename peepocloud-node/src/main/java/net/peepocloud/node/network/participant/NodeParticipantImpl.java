@@ -13,6 +13,7 @@ import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.api.network.NodeParticipant;
+import net.peepocloud.node.network.packet.out.node.PacketOutExecuteNodeCommand;
 import net.peepocloud.node.network.packet.out.server.process.start.PacketOutStartBungee;
 import net.peepocloud.node.network.packet.out.server.process.start.PacketOutStartServer;
 
@@ -61,6 +62,11 @@ public class NodeParticipantImpl extends NetworkParticipant implements NodeParti
         this.startingServers.clear();
         this.startingProxies.clear();
         this.getChannel().close();
+    }
+
+    @Override
+    public void executeCommand(String command) {
+        this.sendPacket(new PacketOutExecuteNodeCommand(command));
     }
 
 }

@@ -48,10 +48,12 @@ public class ServerProcess implements CloudProcessImpl {
     private Map<UUID, Consumer<String>> screenHandlers = new ConcurrentHashMap<>();
     @Setter
     private Consumer<String> networkScreenHandler;
+    private GroupMode groupMode;
 
     ServerProcess(MinecraftServerInfo serverInfo, ProcessManager processManager) {
         this.serverInfo = serverInfo;
-        this.directory = PeepoCloudNode.getInstance().getMinecraftGroup(serverInfo.getGroupName()).getGroupMode() == GroupMode.SAVE ?
+        this.groupMode = serverInfo.getGroup().getGroupMode();
+        this.directory = this.groupMode == GroupMode.SAVE ?
                 Paths.get("internal/savedServers/" + serverInfo.getGroupName() + "/" + serverInfo.getComponentId()) :
                 Paths.get("internal/tempServers/" + serverInfo.getGroupName() + "/" + serverInfo.getComponentId());
         this.processManager = processManager;
@@ -240,7 +242,7 @@ public class ServerProcess implements CloudProcessImpl {
         this.shuttingDown = true;
 
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            boolean save = PeepoCloudNode.getInstance().getMinecraftGroup(this.serverInfo.getGroupName()).getGroupMode() == GroupMode.SAVE;
+            boolean save = this.groupMode == GroupMode.SAVE;
             if (isRunning()) {
                 if (save) {
                     this.dispatchCommand("save-all");

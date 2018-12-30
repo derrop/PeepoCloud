@@ -40,6 +40,10 @@ public class BungeeCordProxyInfo implements PacketSerializable {
         return AbstractPeepoCloudAPI.getInstance().getBungeeGroup(this.groupName);
     }
 
+    public void shutdown() {
+        AbstractPeepoCloudAPI.getInstance().stopBungeeProxy(this);
+    }
+
     @Override
     public void serialize(DataOutput dataOutput) throws Exception {
         dataOutput.writeUTF(componentName);

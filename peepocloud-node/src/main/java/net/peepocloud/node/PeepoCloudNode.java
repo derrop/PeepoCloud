@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.lib.server.Template;
 import net.peepocloud.lib.users.UserManager;
@@ -54,6 +55,8 @@ import net.peepocloud.lib.network.packet.out.group.PacketOutCreateBungeeGroup;
 import net.peepocloud.lib.network.packet.out.group.PacketOutCreateMinecraftGroup;
 import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateBungee;
 import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateServer;
+import net.peepocloud.node.network.packet.out.group.PacketOutBungeeGroupDeleted;
+import net.peepocloud.node.network.packet.out.group.PacketOutMinecraftGroupDeleted;
 import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
 import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
 import net.peepocloud.node.screen.ScreenManagerImpl;
@@ -371,7 +374,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                 new CommandStats(),
                 new CommandGStats(),
                 new CommandConfig(),
-                new CommandList()
+                new CommandList(),
+                new CommandShutdown(),
+                new CommandDelete()
         );
 
         this.logger.debug("Registered " + this.commandManager.getCommands().size() + " commands");
@@ -384,20 +389,17 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
         this.nodeAddonManager.disableAndUnloadAddons();
 
+        this.connectedNodes.values().forEach(NetworkParticipant::close);
+        this.getServerNodes().values().forEach(NodeParticipant::closeConnection);
+        this.networkServer.close();
+
         this.commandManager.shutdown();
         this.databaseLoader.shutdown();
         this.databaseManager.shutdown();
 
         this.scheduler.disable();
 
-        try {
-            this.logger.getConsoleReader().print(ConsoleColor.RESET.toString());
-            this.logger.getConsoleReader().drawLine();
-            this.logger.getConsoleReader().flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        this.logger.getConsoleReader().close();
+        this.logger.shutdown();
     }
 
     private void loadConfigs() {
@@ -723,6 +725,30 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     public MinecraftGroup getMinecraftGroup(String name) {
         return this.minecraftGroups.get(name);
+    }
+
+    @Override
+    public void deleteMinecraftGroup(MinecraftGroup group) {
+        this.deleteMinecraftGroup(group.getName());
+    }
+
+    @Override
+    public void deleteBungeeGroup(BungeeGroup group) {
+        this.deleteBungeeGroup(group.getName());
+    }
+
+    @Override
+    public void deleteMinecraftGroup(String name) {
+        this.groupsConfig.deleteMinecraftGroup(name);
+        this.minecraftGroups.remove(name);
+        this.sendPacketToNodes(new PacketOutMinecraftGroupDeleted(name));
+    }
+
+    @Override
+    public void deleteBungeeGroup(String name) {
+        this.groupsConfig.deleteBungeeGroup(name);
+        this.bungeeGroups.remove(name);
+        this.sendPacketToNodes(new PacketOutBungeeGroupDeleted(name));
     }
 
     public void sendPacketToNodes(Packet packet) {
@@ -1083,9 +1109,16 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     }
 
     public MinecraftServerInfo startMinecraftServer(NodeInfo nodeInfo, MinecraftGroup group, String name, int id, int memory) {
+        if (!this.running)
+            return null;
+
         if (this.getNextServerId(group.getName()) - 1 >= group.getMaxServers() || this.isServerStarted(name))
             return null;
         if (nodeInfo == null) //not enough ram on any node free
+            return null;
+
+        Template template = this.findTemplate(group);
+        if (template == null)
             return null;
 
         if (this.nodeInfo.getName().equals(nodeInfo.getName())) {
@@ -1101,7 +1134,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     group.getMotd(),
                     MinecraftState.OFFLINE,
                     new HashMap<>(),
-                    this.findTemplate(group),
+                    template,
                     -1L
             );
             this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(serverInfo), false);
@@ -1123,7 +1156,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     group.getMotd(),
                     MinecraftState.OFFLINE,
                     new HashMap<>(),
-                    this.findTemplate(group),
+                    template,
                     -1L
             );
             channel.startMinecraftServer(serverInfo);
@@ -1133,6 +1166,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     }
 
     public void startMinecraftServer(MinecraftServerInfo serverInfo) {
+        if (!this.running)
+            return;
+
         MinecraftGroup group = this.getMinecraftGroup(serverInfo.getGroupName());
         if (group == null)
             return;
@@ -1172,8 +1208,17 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     }
 
-
     public void stopMinecraftGroup(String name) {
+
+    }
+
+    public void stopBungeeGroup(BungeeGroup group) {
+
+    }
+
+
+    public void stopMinecraftGroup(MinecraftGroup group) {
+
     }
 
     public BungeeCordProxyInfo startBungeeProxy(BungeeGroup group) {
@@ -1215,10 +1260,17 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     }
 
     public BungeeCordProxyInfo startBungeeProxy(NodeInfo nodeInfo, BungeeGroup group, String name, int id, int memory) {
+        if (!this.running)
+            return null;
+
         int nextId = this.getNextProxyId(group.getName()) - 1;
         if (nextId >= group.getMaxServers() || this.isProxyStarted(name))
             return null;
         if (nodeInfo == null) //not enough ram on any node free
+            return null;
+
+        Template template = this.findTemplate(group);
+        if (template == null)
             return null;
 
         if (this.nodeInfo.getName().equals(nodeInfo.getName())) {
@@ -1231,7 +1283,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     this.cloudConfig.getHost().getHost(),
                     group.getStartPort() + nextId,
                     new HashMap<>(),
-                    this.findTemplate(group),
+                    template,
                     -1L
             );
             this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(serverInfo), false);
@@ -1250,7 +1302,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     channel.getAddress(),
                     group.getStartPort() + nextId,
                     new HashMap<>(),
-                    this.findTemplate(group),
+                    template,
                     -1L
             );
 
@@ -1261,6 +1313,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     }
 
     public void startBungeeProxy(BungeeCordProxyInfo proxyInfo) {
+        if (!this.running)
+            return;
+
         if (this.nodeInfo.getName().equals(proxyInfo.getParentComponentName())) {
             this.processManager.getServerQueue().queueProcess(this.processManager.getServerQueue().createProcess(proxyInfo), false);
         } else {
@@ -1273,10 +1328,14 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     }
 
     public Template findTemplate(MinecraftGroup group) {
+        if (group.getTemplates().isEmpty())
+            return null;
         return group.getTemplates().get(ThreadLocalRandom.current().nextInt(group.getTemplates().size()));
     }
 
     public Template findTemplate(BungeeGroup group) {
+        if (group.getTemplates().isEmpty())
+            return null;
         return group.getTemplates().get(ThreadLocalRandom.current().nextInt(group.getTemplates().size()));
     }
 

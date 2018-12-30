@@ -65,6 +65,7 @@ public class NetworkServer implements Runnable {
     private NodeParticipant coreNode;
     @Getter
     private InetSocketAddress serverHost;
+    private EventLoopGroup bossGroup, workerGroup;
 
     private ChannelHandler authHandler = new ServerAuthChannelHandler();
     private ChannelHandler defaultHandler = new ServerDefaultHandler();
@@ -79,8 +80,8 @@ public class NetworkServer implements Runnable {
         System.out.println("&eTrying to bind server @" + this.address);
         this.serverHost = address;
         this.packetManager.registerPacket(new PacketInfo(-1, PacketInAuth.class, new PacketInAuth.NetworkAuthHandler(this)));
-        EventLoopGroup bossGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
-        EventLoopGroup workerGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        bossGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        workerGroup = EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
         PeepoCloudNode.getInstance().getLogger().debug("Using " + (EPOLL ? "epoll transport" : "nio transport"));
 
@@ -102,6 +103,13 @@ public class NetworkServer implements Runnable {
                 })
                 .bind(this.address);
         System.out.println("&aServer bound on @" + this.address);
+    }
+
+    public void close() {
+        if (this.bossGroup != null)
+            this.bossGroup.shutdownGracefully();
+        if (this.workerGroup != null)
+            this.workerGroup.shutdownGracefully();
     }
 
     public boolean isSelfNodeCore() {
