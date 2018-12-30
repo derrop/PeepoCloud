@@ -5,6 +5,8 @@ package net.peepocloud.node;
 
 import com.google.gson.JsonElement;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.network.packet.out.group.PacketOutCreateBungeeGroup;
+import net.peepocloud.lib.network.packet.out.group.PacketOutCreateMinecraftGroup;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.node.api.database.Database;
@@ -46,8 +48,10 @@ public class GroupsConfig {
     public void createGroup(BungeeGroup group, Consumer<Boolean> success) {
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("bungeeGroups");
         doCreate(aBoolean -> {
-            if (aBoolean)
+            if (aBoolean) {
                 this.loadGroup(group);
+                PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
+            }
             success.accept(aBoolean);
         }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
     }
@@ -55,8 +59,10 @@ public class GroupsConfig {
     public void createGroup(MinecraftGroup group, Consumer<Boolean> success) {
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups");
         doCreate(aBoolean -> {
-            if (aBoolean)
+            if (aBoolean) {
                 this.loadGroup(group);
+                PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutCreateMinecraftGroup(group));
+            }
             success.accept(aBoolean);
         }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
     }
