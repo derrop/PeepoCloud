@@ -15,10 +15,7 @@ import net.peepocloud.node.api.command.Command;
 import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.setup.Setup;
-import net.peepocloud.node.setup.type.ArraySetupAcceptable;
-import net.peepocloud.node.setup.type.EnumSetupAcceptable;
-import net.peepocloud.node.setup.type.IntegerSetupAcceptable;
-import net.peepocloud.node.setup.type.StringSetupAcceptable;
+import net.peepocloud.node.setup.type.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -214,7 +211,15 @@ public class CommandCreate extends Command {
                     );
                     String motd = setup.getData().getString("motd");
 
-                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort, false, "default");
+                    setup.request(
+                            "fallback",
+                            PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.fallback.provide"),
+                            PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.fallback.invalid"),
+                            (BooleanSetupAcceptable) input -> true
+                    );
+                    boolean fallback = setup.getData().getBoolean("fallback");
+
+                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort, false, "default", fallback);
 
                     PeepoCloudNode.getInstance().getGroupsConfig().createGroup(group, success -> {
                         if (success) {

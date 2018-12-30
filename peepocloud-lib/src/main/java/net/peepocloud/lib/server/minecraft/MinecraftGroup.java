@@ -29,4 +29,5 @@ public class MinecraftGroup implements ReflectivePacketSerializable {
     private int startPort;
     private boolean maintenance;
     private String signLayoutName;
+    private boolean fallback;
 }
