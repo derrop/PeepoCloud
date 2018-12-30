@@ -28,6 +28,7 @@ import net.peepocloud.lib.network.packet.handler.MainChannelHandler;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.server.minecraft.MinecraftState;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.network.bungeecord.BungeeConnectEvent;
@@ -36,6 +37,8 @@ import net.peepocloud.node.api.event.network.node.NodeConnectEvent;
 import net.peepocloud.node.api.network.NodeParticipant;
 import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.network.packet.auth.PacketInAuth;
+import net.peepocloud.node.network.packet.out.server.connection.PacketOutBungeeConnected;
+import net.peepocloud.node.network.packet.out.server.connection.PacketOutServerConnected;
 import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
 import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
 import net.peepocloud.node.network.participant.NodeParticipantImpl;
@@ -254,8 +257,12 @@ public class NetworkServer implements Runnable {
                     networkParticipant = new MinecraftServerParticipantImpl(networkParticipant.getChannel(), auth);
 
                     ((MinecraftServerParticipantImpl) networkParticipant).setServerInfo(process.getServerInfo());
-                    //TODO send packet to nodes that the server is started up successfully
+                    process.getServerInfo().setState(MinecraftState.LOBBY);
+                    PeepoCloudNode.getInstance().updateServerInfo(process.getServerInfo());
+
                     PeepoCloudNode.getInstance().getServersOnThisNode().put(auth.getComponentName(), (MinecraftServerParticipantImpl) networkParticipant);
+                    PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerConnected(process.getServerInfo()));
+
                     successful = true;
 
                     System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.connect.server")
@@ -284,7 +291,8 @@ public class NetworkServer implements Runnable {
                     ((BungeeCordParticipantImpl) networkParticipant).setProxyInfo(process.getProxyInfo());
 
                     PeepoCloudNode.getInstance().getProxiesOnThisNode().put(auth.getComponentName(), (BungeeCordParticipantImpl) networkParticipant);
-//TODO send packet to nodes that the server is started up successfully
+                    PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeConnected(process.getProxyInfo()));
+
                     successful = true;
                     System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.connect.bungee")
                             .replace("%name%", process.getName()).replace("%memory%", Integer.toString(process.getMemory()))

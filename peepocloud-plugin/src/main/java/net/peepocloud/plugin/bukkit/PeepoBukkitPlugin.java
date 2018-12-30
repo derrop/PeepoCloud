@@ -18,7 +18,7 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
         super(Paths.get("nodeInfo.json"));
         this.plugin = plugin;
 
-        plugin.getCommand("cloudplugin").setExecutor(this.cloudPluginCommand);
+        //plugin.getCommand("cloudplugin").setExecutor(this.cloudPluginCommand);
     }
 
     @Override

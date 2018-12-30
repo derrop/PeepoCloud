@@ -1,4 +1,4 @@
-package net.peepocloud.node.network.packet.out.server;
+package net.peepocloud.node.network.packet.out.server.process.stop;
 /*
  * Created by Mc_Ruben on 28.12.2018
  */

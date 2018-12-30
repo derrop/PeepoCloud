@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -43,7 +44,7 @@ public class ServerProcess implements CloudProcessImpl {
     private long startup;
     private boolean shuttingDown = false;
     private volatile boolean wasRunning = false;
-    private List<String> cachedLog = new ArrayList<>();
+    private Deque<String> cachedLog = new ConcurrentLinkedDeque<>();
     private Map<UUID, Consumer<String>> screenHandlers = new ConcurrentHashMap<>();
     @Setter
     private Consumer<String> networkScreenHandler;

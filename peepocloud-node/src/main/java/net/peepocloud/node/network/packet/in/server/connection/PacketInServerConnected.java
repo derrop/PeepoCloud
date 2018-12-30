@@ -1,6 +1,6 @@
-package net.peepocloud.node.network.packet.in.server;
+package net.peepocloud.node.network.packet.in.server.connection;
 /*
- * Created by Mc_Ruben on 28.12.2018
+ * Created by Mc_Ruben on 30.12.2018
  */
 
 import net.peepocloud.lib.network.NetworkPacketSender;
@@ -9,16 +9,14 @@ import net.peepocloud.lib.network.packet.handler.PacketHandler;
 import net.peepocloud.lib.network.packet.serialization.SerializationPacket;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.api.event.network.minecraftserver.ServerStopEvent;
 import net.peepocloud.node.api.network.NodeParticipant;
-import net.peepocloud.node.network.participant.NodeParticipantImpl;
 
 import java.util.function.Consumer;
 
-public class PacketInServerStopped implements PacketHandler<SerializationPacket> {
+public class PacketInServerConnected implements PacketHandler<SerializationPacket> {
     @Override
     public int getId() {
-        return 38;
+        return 33;
     }
 
     @Override
@@ -30,12 +28,16 @@ public class PacketInServerStopped implements PacketHandler<SerializationPacket>
     public void handlePacket(NetworkPacketSender networkParticipant, SerializationPacket packet, Consumer<Packet> queryResponse) {
         if (!(networkParticipant instanceof NodeParticipant) || !(packet.getSerializable() instanceof MinecraftServerInfo))
             return;
-        NodeParticipantImpl participant = (NodeParticipantImpl) networkParticipant;
-        MinecraftServerInfo serverInfo = (MinecraftServerInfo) packet.getSerializable();
-        participant.getServers().remove(serverInfo.getComponentName());
-        participant.getStartingServers().remove(serverInfo.getComponentName());
-        participant.getWaitingServers().remove(serverInfo.getComponentName());
 
-        PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerStopEvent(serverInfo));
+        NodeParticipant participant = (NodeParticipant) networkParticipant;
+        MinecraftServerInfo serverInfo = (MinecraftServerInfo) packet.getSerializable();
+
+        participant.getServers().put(serverInfo.getComponentName(), serverInfo);
+        participant.getStartingServers().remove(serverInfo.getComponentName());
+
+        System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.connect.server.other")
+                .replace("%name%", serverInfo.getComponentName()).replace("%memory%", Integer.toString(serverInfo.getMemory()))
+                .replace("%node%", serverInfo.getParentComponentName())
+        );
     }
 }

@@ -3,13 +3,17 @@ package net.peepocloud.lib.server.minecraft;
  * Created by Mc_Ruben on 11.11.2018
  */
 
+import com.google.common.io.ByteArrayDataOutput;
 import lombok.*;
 import net.peepocloud.lib.AbstractPeepoCloudAPI;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.packet.serialization.PacketSerializable;
 import net.peepocloud.lib.server.Template;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -56,16 +60,16 @@ public class MinecraftServerInfo implements PacketSerializable {
         dataOutput.writeUTF(host);
         dataOutput.writeInt(port);
         dataOutput.writeInt(maxPlayers);
-        dataOutput.writeUTF(motd);
-        dataOutput.writeUTF(state.name());
+        dataOutput.writeUTF(String.valueOf(motd));
+        dataOutput.writeByte(state.ordinal());
         dataOutput.writeInt(players.size());
         for (Map.Entry<UUID, String> entry : players.entrySet()) {
             dataOutput.writeLong(entry.getKey().getMostSignificantBits());
             dataOutput.writeLong(entry.getKey().getLeastSignificantBits());
             dataOutput.writeUTF(entry.getValue());
         }
-        dataOutput.writeUTF(template.getName());
-        dataOutput.writeUTF(template.getStorage());
+        dataOutput.writeUTF(String.valueOf(template.getName()));
+        dataOutput.writeUTF(String.valueOf(template.getStorage()));
         dataOutput.writeLong(startup);
     }
 
@@ -80,7 +84,7 @@ public class MinecraftServerInfo implements PacketSerializable {
         port = dataInput.readInt();
         maxPlayers = dataInput.readInt();
         motd = dataInput.readUTF();
-        state = MinecraftState.valueOf(dataInput.readUTF());
+        state = MinecraftState.values()[dataInput.readByte()];
         int size = dataInput.readInt();
         players = new HashMap<>(size);
         for (int i = 0; i < size; i++) {

@@ -11,8 +11,8 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.event.process.bungee.BungeeQueuedEvent;
 import net.peepocloud.node.api.event.process.server.ServerQueuedEvent;
 import net.peepocloud.node.api.server.CloudProcess;
-import net.peepocloud.node.network.packet.out.server.PacketOutBungeeQueued;
-import net.peepocloud.node.network.packet.out.server.PacketOutServerQueued;
+import net.peepocloud.node.network.packet.out.server.process.start.PacketOutBungeeQueued;
+import net.peepocloud.node.network.packet.out.server.process.start.PacketOutServerQueued;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;

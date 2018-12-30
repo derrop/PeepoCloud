@@ -1,4 +1,4 @@
-package net.peepocloud.node.network.packet.in.server;
+package net.peepocloud.node.network.packet.in.server.process.start;
 /*
  * Created by Mc_Ruben on 06.12.2018
  */

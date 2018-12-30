@@ -13,8 +13,8 @@ import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.api.network.NodeParticipant;
-import net.peepocloud.node.network.packet.out.server.PacketOutStartBungee;
-import net.peepocloud.node.network.packet.out.server.PacketOutStartServer;
+import net.peepocloud.node.network.packet.out.server.process.start.PacketOutStartBungee;
+import net.peepocloud.node.network.packet.out.server.process.start.PacketOutStartServer;
 
 import java.util.HashMap;
 import java.util.Map;
