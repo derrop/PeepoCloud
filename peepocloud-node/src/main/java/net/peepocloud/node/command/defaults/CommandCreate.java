@@ -219,7 +219,17 @@ public class CommandCreate extends Command {
                     );
                     boolean fallback = setup.getData().getBoolean("fallback");
 
-                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort, false, "default", fallback);
+                    if (fallback) {
+                        setup.request(
+                                "fallbackPermission",
+                                PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.fallbackPermission.provide"),
+                                PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.fallbackPermission.invalid"),
+                                (StringSetupAcceptable) input -> true
+                        );
+                    }
+                    String fallbackPermission = setup.getData().getString("fallbackPermission");
+
+                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort, false, "default", fallback, fallbackPermission);
 
                     PeepoCloudNode.getInstance().getGroupsConfig().createGroup(group, success -> {
                         if (success) {

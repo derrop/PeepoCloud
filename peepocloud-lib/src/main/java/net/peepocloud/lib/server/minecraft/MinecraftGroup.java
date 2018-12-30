@@ -30,4 +30,5 @@ public class MinecraftGroup implements ReflectivePacketSerializable {
     private boolean maintenance;
     private String signLayoutName;
     private boolean fallback;
+    private String fallbackPermission;
 }
