@@ -11,7 +11,10 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.addon.node.NodeAddon;
 import net.peepocloud.node.api.database.Database;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class ServerSelectorAddon extends NodeAddon {
 
@@ -63,15 +66,29 @@ public class ServerSelectorAddon extends NodeAddon {
         super.getNode().getEventManager().registerListener(this, new ServerStartListener(this));
     }
 
-    public void saveSigns(ServerSign[] serverSigns) {
+    public void saveSigns(ServerSign[] serverSigns, String group) {
         Database database = super.getNode().getDatabaseManager().getDatabase("serverSelector");
         try {
-            SimpleJsonObject signSelectorContainer = database.get("signSelector").get();
-            signSelectorContainer.append("serverSigns", serverSigns);
-            database.update("signSelector", signSelectorContainer);
+            this.signSelectorContainer = database.get("signSelector").get();
+
+            Collection<ServerSign> currentSigns = Arrays.asList(this.signSelectorContainer.getObject("serverSigns", ServerSign[].class));
+            Collection<ServerSign> oldGroupSigns = this.getSignsFromGroup(group);
+
+            currentSigns.removeAll(oldGroupSigns);
+            currentSigns.addAll(Arrays.asList(serverSigns));
+
+            this.signSelectorContainer.append("serverSigns", currentSigns);
+
+            database.update("signSelector", this.signSelectorContainer);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+    }
+
+    public Collection<ServerSign> getSignsFromGroup(String group) {
+        return Arrays.stream(this.signSelectorContainer
+                .getObject("serverSigns", ServerSign[].class)).filter(serverSign ->
+                serverSign.getPosition().getSavedOnGroup().equalsIgnoreCase(group)).collect(Collectors.toList());
     }
 
     public SignSelectorConfig getSignSelectorConfig() {

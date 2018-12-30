@@ -14,6 +14,7 @@ import net.peepocloud.lib.utility.network.PacketUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class PacketDecoder extends ByteToMessageDecoder {
     private PacketManager packetManager;
@@ -32,23 +33,20 @@ public class PacketDecoder extends ByteToMessageDecoder {
             ByteArrayDataInput byteArrayDataInput = ByteStreams.newDataInput(bytes);
             int id = byteArrayDataInput.readInt();
             boolean isQuery = byteArrayDataInput.readBoolean();
+            UUID queryUUID = isQuery ? PacketUtils.readUUID(byteArrayDataInput) : null;
 
             Class<? extends Packet> packetClass;
-            if (!isQuery) {
+            if (isQuery && this.packetManager.hasQuery(queryUUID)) {
+                Map.Entry<Class<? extends Packet>, Integer> entry =
+                        this.packetManager.getQueryResponses().entrySet().stream().filter(entry1 -> entry1.getValue().equals(id)).findFirst().orElse(null);
+                if (entry == null)
+                    return;
+                packetClass = entry.getKey();
+            } else {
                 PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
                 if (packetInfo == null)
                     return;
                 packetClass = packetInfo.getPacketClass();
-            } else {
-                Map.Entry<Class<? extends Packet>, Integer> entry =
-                        this.packetManager.getQueryResponses().entrySet().stream().filter(entry1 -> entry1.getValue().equals(id)).findFirst().orElse(null);
-                if (entry == null) {
-                    PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
-                    if (packetInfo == null)
-                        return;
-                    packetClass = packetInfo.getPacketClass();
-                } else
-                    packetClass = entry.getKey();
             }
 
             if (packetClass == null)
@@ -57,7 +55,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
 
             if(isQuery)
-                this.packetManager.convertToQueryPacket(packet, PacketUtils.readUUID(byteArrayDataInput));
+                this.packetManager.convertToQueryPacket(packet, queryUUID);
 
             packet.read(byteArrayDataInput);
             list.add(packet);

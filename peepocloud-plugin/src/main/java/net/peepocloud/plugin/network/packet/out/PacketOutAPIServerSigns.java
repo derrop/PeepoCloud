@@ -10,8 +10,8 @@ import java.util.Collection;
 public class PacketOutAPIServerSigns extends JsonPacket {
 
 
-    public PacketOutAPIServerSigns(Collection<ServerSign> serverSigns) {
+    public PacketOutAPIServerSigns(Collection<ServerSign> serverSigns, String group) {
         super(151);
-        super.setSimpleJsonObject(new SimpleJsonObject().append("serverSigns", serverSigns));
+        super.setSimpleJsonObject(new SimpleJsonObject().append("serverSigns", serverSigns).append("group", group));
     }
 }

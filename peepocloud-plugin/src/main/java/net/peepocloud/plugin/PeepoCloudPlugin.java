@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     private static PeepoCloudPlugin instance;
@@ -437,6 +438,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     public QueryRequest<Collection<MinecraftGroup>> getMinecraftGroups() {
         QueryRequest<Collection<MinecraftGroup>> request = new QueryRequest<>();
         this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryGroups(NetworkComponentType.MINECRAFT_SERVER)).onComplete(packet -> {
+            System.out.println(new SimpleJsonObject().append("p", packet).toPrettyJson());
             if (packet instanceof JsonPacket) {
                 JsonPacket response = (JsonPacket) packet;
                 SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();

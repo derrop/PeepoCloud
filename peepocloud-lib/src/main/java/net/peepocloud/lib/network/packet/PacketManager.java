@@ -58,6 +58,7 @@ public class PacketManager {
         return packet;
     }
 
+
     public Packet convertToQueryResponse(Packet packet, UUID uuid) {
         packet.setQueryUUID(uuid);
         Class<? extends Packet> clazz = packet.getClass();
@@ -72,6 +73,10 @@ public class PacketManager {
         }
         packet.setId(this.queryResponses.get(clazz));
         return packet;
+    }
+
+    public boolean hasQuery(UUID uuid) {
+        return this.pendingQueries.containsKey(uuid);
     }
 
     /**
@@ -99,7 +104,7 @@ public class PacketManager {
      */
 
     public Packet packetQuery(NetworkPacketSender networkParticipant, Packet packet) {
-        return this.packetQueryAsync(networkParticipant, packet).complete(6, TimeUnit.SECONDS);
+        return this.packetQueryAsync(networkParticipant, packet).complete(4, TimeUnit.SECONDS);
     }
 
     public QueryRequest<Packet> getQueryAndRemove(UUID uuid) {

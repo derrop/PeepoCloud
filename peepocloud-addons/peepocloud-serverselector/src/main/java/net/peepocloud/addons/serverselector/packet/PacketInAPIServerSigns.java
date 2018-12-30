@@ -2,6 +2,7 @@ package net.peepocloud.addons.serverselector.packet;
 
 
 import net.peepocloud.addons.serverselector.ServerSelectorAddon;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
@@ -24,7 +25,8 @@ public class PacketInAPIServerSigns extends JsonPacketHandler {
 
     @Override
     public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
-        if(packet.getSimpleJsonObject() != null && packet.getSimpleJsonObject().contains("serverSigns"))
-            this.serverSelectorAddon.saveSigns(packet.getSimpleJsonObject().getObject("serverSigns", ServerSign[].class));
+        SimpleJsonObject simpleJsonObject = packet.getSimpleJsonObject();
+        if(simpleJsonObject != null && simpleJsonObject.contains("serverSigns"))
+            this.serverSelectorAddon.saveSigns(simpleJsonObject.getObject("serverSigns", ServerSign[].class), simpleJsonObject.getString("group"));
     }
 }

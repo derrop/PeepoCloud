@@ -32,7 +32,8 @@ public class SignProvider {
     }
 
     public void save() {
-        PeepoCloudPlugin.getInstance().getNodeConnector().sendPacket(new PacketOutAPIServerSigns(this.serverSigns));
+        PeepoCloudPlugin.getInstance().getNodeConnector().sendPacket(
+                new PacketOutAPIServerSigns(this.serverSigns, PeepoCloudPlugin.getInstance().toBukkit().getCurrentServerInfo().getGroupName()));
     }
 
     public Sign getMinecraftSign(ServerSign serverSign) {

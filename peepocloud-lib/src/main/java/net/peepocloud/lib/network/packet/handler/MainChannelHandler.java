@@ -11,9 +11,13 @@ import net.peepocloud.lib.utility.network.QueryRequest;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
+    private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
+
     private NetworkParticipant participant;
     private PacketManager packetManager;
     private ChannelHandler channelHandler;
@@ -58,10 +62,10 @@ public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
 
         PacketInfo packetInfo = this.packetManager.getPacketInfo(packet.getId());
         if(packetInfo != null) {
-            packetInfo.getPacketHandler().handleInternal(this.participant, packet, (Consumer<Packet>) queryResponse -> {
+            THREAD_POOL.execute(() -> packetInfo.getPacketHandler().handleInternal(this.participant, packet, (Consumer<Packet>) queryResponse -> {
                 if (packet.getQueryUUID() != null)
                     this.participant.sendPacket(this.packetManager.convertToQueryResponse(queryResponse, packet.getQueryUUID()));
-            });
+            }));
         }
     }
 
