@@ -9,7 +9,7 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 
 public class PacketOutBungeeProcessStarted extends JsonPacket {
     public PacketOutBungeeProcessStarted(BungeeCordProxyInfo proxyInfo) {
-        super(17);
+        super(19);
         this.setSimpleJsonObject(new SimpleJsonObject().append("proxyInfo", proxyInfo));
     }
 }

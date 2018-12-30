@@ -31,6 +31,6 @@ public class PacketInBungeeProcessStarted extends JsonPacketHandler {
 
     @Override
     public int getId() {
-        return 17;
+        return 19;
     }
 }
