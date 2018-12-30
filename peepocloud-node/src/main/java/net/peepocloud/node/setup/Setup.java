@@ -66,9 +66,9 @@ public class Setup {
         if (setupAcceptable instanceof BooleanSetupAcceptable) {
             response = this.logger.readLineUntil(
                     s ->
-                            (s.equalsIgnoreCase("true") ||
+                            (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("no") ||
                                     s.equalsIgnoreCase("false")) &&
-                                    ((BooleanSetupAcceptable) setupAcceptable).onPrint(Boolean.parseBoolean(s)),
+                                    ((BooleanSetupAcceptable) setupAcceptable).onPrint(s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes")),
                     invalidInputMessage,
                     cancellable ? "cancel" : null
             );
