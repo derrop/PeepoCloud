@@ -22,7 +22,7 @@ public class CloudPluginCommand implements CommandExecutor {
             String name = args[0].toLowerCase();
             SubCommandExecutor subCommandExecutor = this.subCommandExecutors.get(name);
             if(subCommandExecutor != null)
-                subCommandExecutor.getExecutor().onCommand(sender, command, label, Arrays.copyOfRange(args, 1, args.length));
+                return subCommandExecutor.subExecutor().onCommand(sender, command, label, Arrays.copyOfRange(args, 1, args.length));
             else
                 this.sendHelp(sender);
         }
@@ -32,7 +32,7 @@ public class CloudPluginCommand implements CommandExecutor {
     private void sendHelp(CommandSender sender) {
         sender.sendMessage("§7/cloudplugin - Hilfe");
         for(SubCommandExecutor subCommandExecutor : this.subCommandExecutors.values())
-            sender.sendMessage("  §e/cloudplugin" + subCommandExecutor.getUsage() + " §8> §7" + subCommandExecutor.getDescription());
+            sender.sendMessage("  §e/cloudplugin " + subCommandExecutor.getUsage() + " §8> §7" + subCommandExecutor.getDescription());
 
     }
 

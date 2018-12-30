@@ -24,4 +24,15 @@ public class ServerSign extends ServerSelectorChild {
     public SignLayout getBasicLayout() {
         return basicLayout;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj)
+            return true;
+        if(obj instanceof ServerSign) {
+            ServerSign serverSign = (ServerSign) obj;
+            return serverSign.position.equals(this.position) && serverSign.getGroupName().equalsIgnoreCase(super.getGroupName());
+        }
+        return false;
+    }
 }

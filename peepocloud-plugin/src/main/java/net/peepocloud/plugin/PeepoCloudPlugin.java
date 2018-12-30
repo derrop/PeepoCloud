@@ -1,6 +1,8 @@
 package net.peepocloud.plugin;
 
+import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.network.packet.JsonPacket;
+import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.lib.scheduler.Scheduler;
@@ -22,8 +24,8 @@ import net.peepocloud.lib.utility.network.NetworkAddress;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIProxyStarted;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIProxyStopped;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIServerStarted;
-import net.peepocloud.plugin.network.packet.in.PacketInAPISignSelector;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIServerStopped;
+import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryGroups;
 import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryProxyInfos;
 import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryServerInfos;
 import java.io.IOException;
@@ -75,6 +77,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     @Override
     public void shutdown() {
         this.nodeConnector.shutdown();
+        this.scheduler.disable();
     }
 
     public abstract Runnable handleConnected();
@@ -305,7 +308,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
                 else
                     request.setResponse(null);
-            }
+            } else
+                request.setResponse(null);
         });
         return request;
     }
@@ -321,7 +325,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
                 else
                     request.setResponse(null);
-            }
+            } else
+                request.setResponse(null);
         });
         return request;
     }
@@ -337,7 +342,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
                 else
                     request.setResponse(null);
-            }
+            } else
+                request.setResponse(null);
         });
         return request;
     }
@@ -353,7 +359,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
                 else
                     request.setResponse(null);
-            }
+            } else
+                request.setResponse(null);
         });
         return request;
     }
@@ -369,7 +376,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
                 else
                     request.setResponse(null);
-            }
+            } else
+                request.setResponse(null);
         });
         return request;
     }
@@ -385,7 +393,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
                 else
                     request.setResponse(null);
-            }
+            } else
+                request.setResponse(null);
         });
         return request;
     }
@@ -401,7 +410,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
                 else
                     request.setResponse(null);
-            }
+            } else
+                request.setResponse(null);
         });
         return request;
     }
@@ -417,9 +427,60 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
                 else
                     request.setResponse(null);
-            }
+            } else
+                request.setResponse(null);
         });
         return request;
+    }
+
+    @Override
+    public QueryRequest<Collection<MinecraftGroup>> getMinecraftGroups() {
+        QueryRequest<Collection<MinecraftGroup>> request = new QueryRequest<>();
+        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryGroups(NetworkComponentType.MINECRAFT_SERVER)).onComplete(packet -> {
+            if (packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if (simpleJsonObject != null && simpleJsonObject.contains("groups"))
+                     request.setResponse(Arrays.asList(simpleJsonObject.getObject("groups", MinecraftGroup[].class)));
+                else
+                    request.setResponse(null);
+            } else
+                request.setResponse(null);
+        });
+        return request;
+    }
+
+    @Override
+    public QueryRequest<Collection<BungeeGroup>> getBungeeGroups() {
+        QueryRequest<Collection<BungeeGroup>> request = new QueryRequest<>();
+        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryGroups(NetworkComponentType.BUNGEECORD)).onComplete(packet -> {
+            if (packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if (simpleJsonObject != null && simpleJsonObject.contains("groups"))
+                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("groups", BungeeGroup[].class)));
+                else
+                    request.setResponse(null);
+            } else
+                request.setResponse(null);
+        });
+        return request;
+    }
+
+    @Override
+    public MinecraftGroup getMinecraftGroup(String name) {
+        Collection<MinecraftGroup> minecraftGroups = this.getMinecraftGroups().complete();
+        if(minecraftGroups != null)
+            return minecraftGroups.stream().filter(minecraftGroup -> minecraftGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return null;
+    }
+
+    @Override
+    public BungeeGroup getBungeeGroup(String name) {
+        Collection<BungeeGroup> bungeeGroups = this.getBungeeGroups().complete();
+        if(bungeeGroups != null)
+            return bungeeGroups.stream().filter(bungeeGroup -> bungeeGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return null;
     }
 
     @Override
@@ -445,16 +506,6 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     @Override
     public long getStartupTime() {
         return 0;
-    }
-
-    @Override
-    public MinecraftGroup getMinecraftGroup(String name) {
-        return null;
-    }
-
-    @Override
-    public BungeeGroup getBungeeGroup(String name) {
-        return null;
     }
 
 

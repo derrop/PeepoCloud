@@ -1,11 +1,12 @@
 package net.peepocloud.plugin.bungee;
 
+import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.api.bungee.PeepoCloudBungeeAPI;
-import net.peepocloud.plugin.network.packet.in.PacketInAPISignSelector;
+import net.peepocloud.plugin.network.packet.in.PacketInProxyInfo;
 
 import java.net.InetSocketAddress;
 import java.nio.file.Paths;
@@ -13,11 +14,13 @@ import java.nio.file.Paths;
 public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBungeeAPI {
     private BungeeLauncher plugin;
 
+    private BungeeCordProxyInfo currentProxyInfo;
+
     PeepoBungeePlugin(BungeeLauncher plugin) {
         super(Paths.get("nodeInfo.json"));
         this.plugin = plugin;
 
-        this.packetManager.registerPacket(new PacketInAPISignSelector());
+        super.getPacketManager().registerPacket(new PacketInProxyInfo());
     }
 
     @Override
@@ -36,10 +39,7 @@ public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBun
 
     @Override
     public Runnable handleConnected() {
-        return () -> {
-            System.out.println(new SimpleJsonObject().append("ds", super.getMinecraftServers().complete()).toPrettyJson());
-            super.getMinecraftServers().complete().forEach(this::registerServerInfo);
-        };
+        return () -> super.getMinecraftServers().complete().forEach(this::registerServerInfo);
     }
 
     @Override
@@ -52,6 +52,13 @@ public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBun
         return false;
     }
 
+    public void updateCurrentProxyInfo(BungeeCordProxyInfo proxyInfo) {
+        this.currentProxyInfo = proxyInfo;
+    }
+
+    public BungeeCordProxyInfo getCurrentProxyInfo() {
+        return currentProxyInfo;
+    }
 
     @Override
     public BungeeLauncher getPlugin() {

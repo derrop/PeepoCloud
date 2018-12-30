@@ -3,17 +3,13 @@ package net.peepocloud.lib.server.minecraft;
  * Created by Mc_Ruben on 11.11.2018
  */
 
-import com.google.common.io.ByteArrayDataOutput;
+
 import lombok.*;
 import net.peepocloud.lib.AbstractPeepoCloudAPI;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.packet.serialization.PacketSerializable;
 import net.peepocloud.lib.server.Template;
-
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -23,7 +19,6 @@ import java.util.UUID;
 @ToString
 @EqualsAndHashCode
 public class MinecraftServerInfo implements PacketSerializable {
-
     private String componentName;
     private String groupName;
     private int componentId;

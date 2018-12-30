@@ -8,11 +8,14 @@ public class BukkitLauncher extends JavaPlugin {
     @Override
     public void onEnable() {
         this.bukkitAPI = new PeepoBukkitPlugin(this);
+        this.bukkitAPI.registerNetworkHandler(new BukkitNetworkHandler(this.bukkitAPI));
+
         this.bukkitAPI.bootstrap();
     }
 
     @Override
     public void onDisable() {
-        this.bukkitAPI.shutdown();
+        if(this.bukkitAPI != null)
+            this.bukkitAPI.shutdown();
     }
 }

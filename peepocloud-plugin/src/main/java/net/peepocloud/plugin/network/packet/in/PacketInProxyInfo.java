@@ -8,10 +8,12 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
 import net.peepocloud.lib.network.packet.serialization.SerializationPacket;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.plugin.PeepoCloudPlugin;
 
 import java.util.function.Consumer;
 
 public class PacketInProxyInfo implements PacketHandler<SerializationPacket> {
+
     @Override
     public int getId() {
         return 8;
@@ -28,7 +30,7 @@ public class PacketInProxyInfo implements PacketHandler<SerializationPacket> {
             return;
 
         BungeeCordProxyInfo proxyInfo = (BungeeCordProxyInfo) packet.getSerializable();
-
-        //TODO
+        if(PeepoCloudPlugin.getInstance().isBungee())
+            PeepoCloudPlugin.getInstance().toBungee().updateCurrentProxyInfo(proxyInfo);
     }
 }

@@ -9,8 +9,7 @@ import net.peepocloud.lib.serverselector.signselector.SignLayout;
 import net.peepocloud.lib.serverselector.signselector.SignSelectorConfig;
 import net.peepocloud.lib.serverselector.signselector.sign.ServerSign;
 import net.peepocloud.plugin.PeepoCloudPlugin;
-import net.peepocloud.plugin.bukkit.serverselector.BlockServerSelector;
-import net.peepocloud.plugin.network.packet.out.PacketOutAPIServerSigns;
+import net.peepocloud.plugin.bukkit.serverselector.SingleServerChildServerSelector;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,7 +18,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.material.MaterialData;
 import java.util.*;
 
-public class SignSelector extends BlockServerSelector<ServerSign> {
+public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
     private SignSelectorConfig config;
     private SignProvider signProvider;
     private Map<String, SignLayout> signLayouts = new HashMap<>();
@@ -34,17 +33,19 @@ public class SignSelector extends BlockServerSelector<ServerSign> {
             this.signLayouts.put(signLayout.getLayoutName().toLowerCase(), signLayout);
 
         for(ServerSign serverSign : serverSigns) {
-            serverSign.setBasicLayout(this.signLayouts.get(PeepoCloudPlugin.getInstance()
-                    .getMinecraftGroup(serverSign.getServerInfo().getGroupName()).getSignLayoutName()));
+            serverSign.setBasicLayout(this.signLayouts.get(serverSign.getServerInfo().getGroup().getSignLayoutName()));
             super.children.add(serverSign);
         }
 
         this.loadingLayout = loadingLayout;
         this.maintenanceLayout = maintenanceLayout;
+
+        for(MinecraftServerInfo startedServer : PeepoCloudPlugin.getInstance().getStartedMinecraftServers().complete())
+            super.waitingServers.put(startedServer.getComponentName().toLowerCase(), startedServer);
     }
 
     @Override
-    public void start(Scheduler scheduler) {
+    public void handleStart(Scheduler scheduler) {
         scheduler.repeat(() -> {
             this.loadingLayout.nextStep();
             this.maintenanceLayout.nextStep();
@@ -68,10 +69,6 @@ public class SignSelector extends BlockServerSelector<ServerSign> {
             super.waitingServers.values().forEach(super::handleServerAdd);
 
         }, 0, this.config.getUpdateDelay(), true);
-    }
-
-    public void save() {
-        PeepoCloudPlugin.getInstance().getNodeConnector().sendPacket(new PacketOutAPIServerSigns(super.children));
     }
 
     @Override
@@ -110,7 +107,7 @@ public class SignSelector extends BlockServerSelector<ServerSign> {
         if(serverInfo == null)
             backBlockSubId = this.config.getBackBlockNoServerSubId();
         else {
-            if(PeepoCloudPlugin.getInstance().getMinecraftGroup(serverInfo.getGroupName()).isMaintenance())
+            if(serverInfo.getGroup().isMaintenance())
                 backBlockSubId = this.config.getBackBlockMaintenanceSubId();
             else if(serverInfo.getPlayers().size() >= serverInfo.getMaxPlayers())
                 backBlockSubId = this.config.getBackBlockFullServerSubId();
@@ -134,7 +131,7 @@ public class SignSelector extends BlockServerSelector<ServerSign> {
         if(serverSign.getServerInfo() == null)
             return this.loadingLayout.getCurrentLayout();
 
-        MinecraftGroup signGroup = PeepoCloudPlugin.getInstance().getMinecraftGroup(serverSign.getServerInfo().getGroupName());
+        MinecraftGroup signGroup = serverSign.getServerInfo().getGroup();
         if(signGroup == null)
             return null;
 

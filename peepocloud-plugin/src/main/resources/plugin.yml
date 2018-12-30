@@ -2,5 +2,9 @@ name: PeepoCloudPlugin
 version: ${project.version}
 main: net.peepocloud.plugin.bukkit.BukkitLauncher
 authors:
-  - Panamo
   - Mc_Ruben
+  - Panamo
+
+commands:
+  cloudplugin:
+

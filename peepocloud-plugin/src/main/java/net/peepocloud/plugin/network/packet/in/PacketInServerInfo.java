@@ -8,10 +8,12 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
 import net.peepocloud.lib.network.packet.serialization.SerializationPacket;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.plugin.PeepoCloudPlugin;
 
 import java.util.function.Consumer;
 
 public class PacketInServerInfo implements PacketHandler<SerializationPacket> {
+
     @Override
     public int getId() {
         return 9;
@@ -28,7 +30,7 @@ public class PacketInServerInfo implements PacketHandler<SerializationPacket> {
             return;
 
         MinecraftServerInfo serverInfo = (MinecraftServerInfo) packet.getSerializable();
-
-        //TODO
+        if(PeepoCloudPlugin.getInstance().isBukkit())
+            PeepoCloudPlugin.getInstance().toBukkit().updateCurrentServerInfo(serverInfo);
     }
 }

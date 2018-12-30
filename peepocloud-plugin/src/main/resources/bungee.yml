@@ -1,6 +1,4 @@
 name: PeepoCloudPlugin
 version: ${cloud.version}
 main: net.peepocloud.plugin.bungee.BungeeLauncher
-authors:
-  - Panamo
-  - Mc_Ruben
+author: Mc_Ruben & Panamo

@@ -205,6 +205,12 @@ public abstract class PeepoCloudPluginAPI extends AbstractPeepoCloudAPI {
      */
     public abstract QueryRequest<Collection<BungeeCordProxyInfo>> getStartedBungeeProxies(String group);
 
+
+    public abstract QueryRequest<Collection<MinecraftGroup>> getMinecraftGroups();
+
+    public abstract QueryRequest<Collection<BungeeGroup>> getBungeeGroups();
+
+
     /**
      * Gets the infos of all nodes connected in the network
      *

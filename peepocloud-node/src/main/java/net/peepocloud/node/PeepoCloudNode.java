@@ -388,6 +388,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         this.databaseLoader.shutdown();
         this.databaseManager.shutdown();
 
+        this.scheduler.disable();
+
         try {
             this.logger.getConsoleReader().print(ConsoleColor.RESET.toString());
             this.logger.getConsoleReader().drawLine();
