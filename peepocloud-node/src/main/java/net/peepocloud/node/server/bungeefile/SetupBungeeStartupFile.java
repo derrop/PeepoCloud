@@ -12,6 +12,7 @@ import net.peepocloud.node.api.utility.FileDownloading;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class SetupBungeeStartupFile { //TODO implement languagesystem
 
@@ -23,7 +24,8 @@ public class SetupBungeeStartupFile { //TODO implement languagesystem
                     "type",
                     "Please specify a bungee version [" + versions + "]",
                     "You have to specify one of the following: " + versions,
-                    new ArraySetupAcceptable<>(fileVersions.toArray())
+                    new ArraySetupAcceptable<>(fileVersions.toArray()),
+                    fileVersions.stream().map(BungeeStartupFileVersion::getName).collect(Collectors.toList())
             );
             String type = setup.getData().getString("type");
             String url = null;
@@ -42,15 +44,14 @@ public class SetupBungeeStartupFile { //TODO implement languagesystem
     }
 
     private static void requestVersions(Setup setup, Collection<ServerVersion> serverVersions) {
-        StringBuilder invalid = new StringBuilder();
-        for (ServerVersion version : serverVersions) {
-            invalid.append(version.getVersion()).append(", ");
-        }
+        String s = serverVersions.stream().map(ServerVersion::getVersion).collect(Collectors.joining(", "));
         setup.request(
                 "version",
-                "Please specify the version [" + invalid.substring(0, invalid.length() - 2) + "]",
-                "You have to specify one of the following versions: " + invalid.substring(0, invalid.length() - 2),
-                new ArraySetupAcceptable<>(serverVersions.toArray()));
+                "Please specify the version [" + s + "]",
+                "You have to specify one of the following versions: " + s,
+                new ArraySetupAcceptable<>(serverVersions.toArray()),
+                serverVersions.stream().map(ServerVersion::getVersion).collect(Collectors.toList())
+        );
     }
 
 }

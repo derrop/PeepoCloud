@@ -12,6 +12,7 @@ import net.peepocloud.node.api.logging.ConsoleLogger;
  * Represents a progess bar animation in the console that is updated all 10 milliseconds
  */
 public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
+
     @Getter
     @Setter
     private int length;
@@ -72,6 +73,17 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
         return String.valueOf(length);
     }
 
+    protected String formatTime(long millis) {
+        long seconds = (millis / 1000);
+        String min = String.valueOf(seconds / 60);
+        String sec = String.valueOf(seconds - ((seconds / 60) * 60));
+        if (min.length() == 1)
+            min = "0" + min;
+        if (sec.length() == 1)
+            sec = "0" + sec;
+        return min + ":" + sec;
+    }
+
     private void doUpdate(double percent) {
         char[] chars = new char[100];
         for (int i = 0; i < (int) percent; i++) {
@@ -93,12 +105,13 @@ public class ConsoleProgressBarAnimation extends AbstractConsoleAnimation {
     }
 
     private String format(String input, double percent) {
-        long time = (System.currentTimeMillis() - start) / 1000;
+        long millis = System.currentTimeMillis() - start;
+        long time = millis / 1000;
         return input == null ? "" : input
                 .replace("%value%", formatCurrentValue(this.currentValue))
                 .replace("%length%", formatLength(this.length))
                 .replace("%percent%", String.format("%.2f", percent))
-                .replace("%time%", String.valueOf(time))
+                .replace("%time%", formatTime(millis))
                 .replace("%bps%", String.valueOf(time == 0 ? "0" : ((currentValue / 1000) / time) * 8)); //bits per second
     }
 }

@@ -24,7 +24,7 @@ public class CommandManagerImpl implements CommandManager {
     private Thread commandReaderThread;
 
     public CommandManagerImpl(ColoredLogger logger) {
-        logger.getConsoleReader().addCompleter(new CommandCompleter(this));
+        logger.getConsoleReader().addCompleter(new CommandCompleter(this, logger));
         this.commandReaderThread = new Thread("ConsoleCommand Reader") {
             @Override
             public void run() {

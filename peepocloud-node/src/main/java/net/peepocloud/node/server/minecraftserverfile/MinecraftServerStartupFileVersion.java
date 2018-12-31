@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -43,16 +44,13 @@ public class MinecraftServerStartupFileVersion {
     }
 
     public static String asString(Collection<MinecraftServerStartupFileVersion> versions) {
-        StringBuilder builder = new StringBuilder();
-        for (MinecraftServerStartupFileVersion availableVersion : versions) {
-            builder.append(availableVersion.name).append(", ");
-        }
-        return builder.substring(0, builder.length() - 2);
+        return versions.stream().map(minecraftServerStartupFileVersion -> minecraftServerStartupFileVersion.name).collect(Collectors.joining(", "));
     }
 
     public static Collection<MinecraftServerStartupFileVersion> getAvailableVersions() {
         try {
             URLConnection connection = new URL(SystemUtils.CENTRAL_SERVER_URL + "spigotVersions").openConnection();
+            connection.setConnectTimeout(1000);
             connection.connect();
             try (InputStream inputStream = connection.getInputStream();
                  Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {

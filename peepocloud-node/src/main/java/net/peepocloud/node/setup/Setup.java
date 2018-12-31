@@ -3,6 +3,7 @@ package net.peepocloud.node.setup;
  * Created by Mc_Ruben on 12.11.2018
  */
 
+import lombok.Getter;
 import net.peepocloud.lib.config.Configurable;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
@@ -11,7 +12,9 @@ import net.peepocloud.node.setup.type.BooleanSetupAcceptable;
 import net.peepocloud.node.setup.type.IntegerSetupAcceptable;
 import net.peepocloud.node.setup.type.StringSetupAcceptable;
 
+import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Setup {
 
@@ -19,10 +22,13 @@ public class Setup {
     private Configurable configurable;
     private boolean cancellable = false;
     private boolean cancelled = false;
+    @Getter
+    private Collection<String> currentAvailable;
 
     public Setup(Configurable configurable, ColoredLogger logger) {
         this.logger = logger;
         this.configurable = configurable;
+        logger.setRunningSetup(this);
     }
 
     /**
@@ -57,20 +63,20 @@ public class Setup {
         return this;
     }
 
-    public Setup request(String name, String requestMessage, String invalidInputMessage, SetupAcceptable setupAcceptable) {
+    public Setup request(String name, String requestMessage, String invalidInputMessage, SetupAcceptable setupAcceptable, Collection<String> available) {
         if (this.cancelled)
             return this;
+        this.currentAvailable = available;
         System.out.println(requestMessage);
         String response;
         Object val = null;
         if (setupAcceptable instanceof BooleanSetupAcceptable) {
-            response = this.logger.readLineUntil(
+            response = this.readUntil(
                     s ->
                             (s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("no") ||
                                     s.equalsIgnoreCase("false")) &&
                                     ((BooleanSetupAcceptable) setupAcceptable).onPrint(s.equalsIgnoreCase("true") || s.equalsIgnoreCase("yes")),
-                    invalidInputMessage,
-                    cancellable ? "cancel" : null
+                    invalidInputMessage
             );
             if (response != null) {
                 val = Boolean.parseBoolean(
@@ -78,12 +84,11 @@ public class Setup {
                 );
             }
         } else if (setupAcceptable instanceof IntegerSetupAcceptable) {
-            response = this.logger.readLineUntil(
+            response = this.readUntil(
                     s ->
                             SystemUtils.isInteger(s) &&
                                     ((IntegerSetupAcceptable) setupAcceptable).onPrint(Integer.parseInt(s)),
-                    invalidInputMessage,
-                    cancellable ? "cancel" : null
+                    invalidInputMessage
             );
             if (response != null) {
                 val = Integer.parseInt(
@@ -91,10 +96,9 @@ public class Setup {
                 );
             }
         } else if (setupAcceptable instanceof StringSetupAcceptable) {
-            response = this.logger.readLineUntil(
+            response = this.readUntil(
                     ((StringSetupAcceptable) setupAcceptable)::onPrint,
-                    invalidInputMessage,
-                    cancellable ? "cancel" : null
+                    invalidInputMessage
             );
             if (response != null) {
                 val = response;
@@ -102,6 +106,7 @@ public class Setup {
         } else {
             throw new IllegalArgumentException("setupAcceptable must be an instance of BooleanSetupAcceptable, IntegerSetupAcceptable or StringSetupAcceptable");
         }
+        this.currentAvailable = null;
         if (response == null && this.cancellable) {
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("setup.cancelled"));
             this.cancelled = true;
@@ -111,6 +116,10 @@ public class Setup {
             return this;
         this.configurable.append(name, val);
         return this;
+    }
+
+    private String readUntil(Function<String, Boolean> function, String invalidInputMessage) {
+        return this.logger.readLineUntil(s -> function.apply(s.trim()), invalidInputMessage, this.cancellable ? "cancel" : null).trim();
     }
 
     /**

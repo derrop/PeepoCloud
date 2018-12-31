@@ -54,6 +54,7 @@ public class BungeeStartupFileVersion {
     public static Collection<BungeeStartupFileVersion> getAvailableVersions() {
         try {
             URLConnection connection = new URL(SystemUtils.CENTRAL_SERVER_URL + "bungeeVersions").openConnection();
+            connection.setConnectTimeout(1000);
             connection.connect();
             try (InputStream inputStream = connection.getInputStream();
                  Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {

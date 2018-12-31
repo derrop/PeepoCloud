@@ -52,7 +52,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "groupMode",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.groupmode.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.groupmode.invalid"),
-                            new EnumSetupAcceptable(GroupMode.class)
+                            new EnumSetupAcceptable(GroupMode.class),
+                            Arrays.stream(GroupMode.values()).map(GroupMode::name).collect(Collectors.toList())
                     );
 
                     GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode").toUpperCase());
@@ -68,7 +69,8 @@ public class CommandCreate extends Command implements TabCompletable {
                                 "templateStorage",
                                 PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.templatestorage.provide").replace("%storages%", Arrays.toString(storages)),
                                 PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.templatestorage.invalid").replace("%storages%", Arrays.toString(storages)),
-                                new ArraySetupAcceptable<>(storages)
+                                new ArraySetupAcceptable<>(storages),
+                                Arrays.stream(storages).map(Object::toString).collect(Collectors.toList())
                         );
                         storage = setup.getData().getString("templateStorage");
                     }
@@ -80,7 +82,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "memory",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.memory.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.memory.invalid"),
-                            (IntegerSetupAcceptable) input -> true
+                            (IntegerSetupAcceptable) input -> true,
+                            Arrays.asList("128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768")
                     );
                     int memory = setup.getData().getInt("memory");
                     memory = memory >= 64 ? memory : memory * 1024; //>= 64 = gb; < 64 = mb
@@ -89,7 +92,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "minServers",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.minServers.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.minServers.invalid"),
-                            (IntegerSetupAcceptable) input -> true
+                            (IntegerSetupAcceptable) input -> true,
+                            null
                     );
                     int minServers = setup.getData().getInt("minServers");
 
@@ -97,7 +101,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "maxServers",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.maxServers.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.maxServers.invalid"),
-                            (IntegerSetupAcceptable) input -> true
+                            (IntegerSetupAcceptable) input -> true,
+                            null
                     );
                     int maxServers = setup.getData().getInt("maxServers");
 
@@ -105,7 +110,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "startPort",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.startPort.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.startPort.invalid"),
-                            (IntegerSetupAcceptable) input -> input <= 65535 && input > 0
+                            (IntegerSetupAcceptable) input -> input <= 65535 && input > 0,
+                            null
                     );
                     int startPort = setup.getData().getInt("startPort");
 
@@ -138,7 +144,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "groupMode",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.groupmode.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.groupmode.invalid"),
-                            new EnumSetupAcceptable(GroupMode.class)
+                            new EnumSetupAcceptable(GroupMode.class),
+                            Arrays.stream(GroupMode.values()).map(GroupMode::name).collect(Collectors.toList())
                     );
 
                     GroupMode groupMode = GroupMode.valueOf(setup.getData().getString("groupMode").toUpperCase());
@@ -154,7 +161,8 @@ public class CommandCreate extends Command implements TabCompletable {
                                 "templateStorage",
                                 PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.templatestorage.provide").replace("%storages%", Arrays.toString(storages)),
                                 PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.bungeegroup.templatestorage.invalid").replace("%storages%", Arrays.toString(storages)),
-                                new ArraySetupAcceptable<>(storages)
+                                new ArraySetupAcceptable<>(storages),
+                                Arrays.stream(storages).map(Object::toString).collect(Collectors.toList())
                         );
                         storage = setup.getData().getString("templateStorage");
                     }
@@ -166,7 +174,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "memory",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.memory.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.memory.invalid"),
-                            (IntegerSetupAcceptable) input -> true
+                            (IntegerSetupAcceptable) input -> true,
+                            Arrays.asList("128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768")
                     );
                     int memory = setup.getData().getInt("memory");
                     memory = memory >= 64 ? memory : memory * 1024; //>= 64 = gb; < 64 = mb
@@ -175,7 +184,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "minServers",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.minServers.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.minServers.invalid"),
-                            (IntegerSetupAcceptable) input -> true
+                            (IntegerSetupAcceptable) input -> true,
+                            null
                     );
                     int minServers = setup.getData().getInt("minServers");
 
@@ -183,7 +193,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "maxServers",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.maxServers.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.maxServers.invalid"),
-                            (IntegerSetupAcceptable) input -> true
+                            (IntegerSetupAcceptable) input -> true,
+                            null
                     );
                     int maxServers = setup.getData().getInt("maxServers");
 
@@ -191,7 +202,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "startPort",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.startPort.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.startPort.invalid"),
-                            (IntegerSetupAcceptable) input -> input > 0 && input <= 65535
+                            (IntegerSetupAcceptable) input -> input > 0 && input <= 65535,
+                            null
                     );
                     int startPort = setup.getData().getInt("startPort");
 
@@ -199,7 +211,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "maxPlayers",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.maxPlayers.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.maxPlayers.invalid"),
-                            (IntegerSetupAcceptable) input -> true
+                            (IntegerSetupAcceptable) input -> true,
+                            null
                     );
                     int maxPlayers = setup.getData().getInt("maxPlayers");
 
@@ -207,7 +220,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "motd",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.motd.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.motd.invalid"),
-                            (StringSetupAcceptable) input -> true
+                            (StringSetupAcceptable) input -> true,
+                            null
                     );
                     String motd = setup.getData().getString("motd");
 
@@ -215,7 +229,8 @@ public class CommandCreate extends Command implements TabCompletable {
                             "fallback",
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.fallback.provide"),
                             PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.fallback.invalid"),
-                            (BooleanSetupAcceptable) input -> true
+                            (BooleanSetupAcceptable) input -> true,
+                            Arrays.asList("true", "false")
                     );
                     boolean fallback = setup.getData().getBoolean("fallback");
 
@@ -224,7 +239,8 @@ public class CommandCreate extends Command implements TabCompletable {
                                 "fallbackPermission",
                                 PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.fallbackPermission.provide"),
                                 PeepoCloudNode.getInstance().getLanguagesManager().getMessage("command.create.minecraftgroup.fallbackPermission.invalid"),
-                                (StringSetupAcceptable) input -> true
+                                (StringSetupAcceptable) input -> true,
+                                null
                         );
                     }
                     String fallbackPermission = setup.getData().getString("fallbackPermission");

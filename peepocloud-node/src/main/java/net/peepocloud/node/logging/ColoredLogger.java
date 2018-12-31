@@ -12,6 +12,7 @@ import net.peepocloud.node.api.logging.AbstractConsoleAnimation;
 import net.peepocloud.node.api.logging.ConsoleColor;
 import net.peepocloud.node.api.logging.ConsoleLogger;
 import net.peepocloud.node.command.CommandManagerImpl;
+import net.peepocloud.node.setup.Setup;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -35,6 +36,9 @@ public class ColoredLogger extends Logger implements ConsoleLogger {
     @Getter
     private AbstractConsoleAnimation runningAnimation;
     private Consumer<String> lineAcceptor;
+    @Getter
+    @Setter
+    private Setup runningSetup;
     @Getter
     @Setter
     private boolean debugging;

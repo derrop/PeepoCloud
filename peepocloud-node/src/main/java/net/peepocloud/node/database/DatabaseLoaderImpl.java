@@ -126,7 +126,8 @@ public class DatabaseLoaderImpl extends DatabaseLoader {
                                 "db",
                                 PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.setup.request").replace("%dbs%", dbs),
                                 PeepoCloudNode.getInstance().getLanguagesManager().getMessage("database.loader.setup.invalid").replace("%dbs%", dbs),
-                                new ArraySetupAcceptable<>(databases.keySet().toArray())
+                                new ArraySetupAcceptable<>(databases.keySet().toArray()),
+                                databases.keySet()
                         );
                         PeepoCloudNode.getInstance().getInternalConfig().append("databaseManager", setup.getData().getString("db").toLowerCase());
                         PeepoCloudNode.getInstance().saveInternalConfigFile();
