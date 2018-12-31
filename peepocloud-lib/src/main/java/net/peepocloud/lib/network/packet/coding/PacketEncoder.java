@@ -27,6 +27,8 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
         if(isQuery)
             PacketUtils.writeUUID(byteArrayDataOutput, packet.getQueryUUID());
 
+
+
         packet.write(byteArrayDataOutput);
         byteBuf.writeBytes(byteArrayDataOutput.toByteArray());
     }

@@ -59,7 +59,7 @@ public class BungeeStartupFileVersion {
             try (InputStream inputStream = connection.getInputStream();
                  Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
 
-                Map<String, BungeeStartupFileVersion> versionMap = SimpleJsonObject.GSON.fromJson(reader, new TypeToken<Map<String, BungeeStartupFileVersion>>() {
+                Map<String, BungeeStartupFileVersion> versionMap = SimpleJsonObject.GSON.get().fromJson(reader, new TypeToken<Map<String, BungeeStartupFileVersion>>() {
                 }.getType());
                 return versionMap.values();
             }

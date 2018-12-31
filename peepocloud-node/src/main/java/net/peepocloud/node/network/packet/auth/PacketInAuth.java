@@ -40,7 +40,7 @@ public class PacketInAuth extends JsonPacket {
             SimpleJsonObject jsonObject = packet.getSimpleJsonObject();
             if (jsonObject == null)
                 return;
-            Auth auth = SimpleJsonObject.GSON.fromJson(jsonObject.asJsonObject(), Auth.class);
+            Auth auth = SimpleJsonObject.GSON.get().fromJson(jsonObject.asJsonObject(), Auth.class);
             if (auth == null) {
                 networkParticipant.close();
                 return;
