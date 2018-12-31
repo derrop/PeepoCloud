@@ -39,6 +39,7 @@ public class CreateSignSubCommand extends SubCommandExecutor {
                             player.sendMessage("§7You have to look at a sign!");
                     } else
                         player.sendMessage("§7This group does not exist!");
+
                 } else
                     player.sendMessage("§7Usage: §e/cloudplugin " + super.getUsage());
             }

@@ -55,18 +55,19 @@ public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
         if(this.channelHandler.packet(this.participant, packet))
             return;
 
-        QueryRequest<Packet> query = this.packetManager.getQueryAndRemove(packet.getQueryUUID());
-        if(query != null)
-            query.setResponse(packet);
+        THREAD_POOL.execute(() -> {
+            QueryRequest<Packet> query = this.packetManager.getQueryAndRemove(packet.getQueryUUID());
+            if (query != null)
+                query.setResponse(packet);
 
-
-        PacketInfo packetInfo = this.packetManager.getPacketInfo(packet.getId());
-        if(packetInfo != null) {
-            THREAD_POOL.execute(() -> packetInfo.getPacketHandler().handleInternal(this.participant, packet, (Consumer<Packet>) queryResponse -> {
-                if (packet.getQueryUUID() != null)
-                    this.participant.sendPacket(this.packetManager.convertToQueryResponse(queryResponse, packet.getQueryUUID()));
-            }));
-        }
+            PacketInfo packetInfo = this.packetManager.getPacketInfo(packet.getId());
+            if (packetInfo != null) {
+                packetInfo.getPacketHandler().handleInternal(this.participant, packet, (Consumer<Packet>) queryResponse -> {
+                    if (packet.getQueryUUID() != null)
+                        this.participant.sendPacket(this.packetManager.convertToQueryResponse(queryResponse, packet.getQueryUUID()));
+                });
+            }
+        });
     }
 
     public void setParticipant(NetworkParticipant participant) {
