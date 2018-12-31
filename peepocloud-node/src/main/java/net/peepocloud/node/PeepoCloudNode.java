@@ -8,10 +8,6 @@ import com.google.gson.JsonObject;
 import jline.console.ConsoleReader;
 import lombok.Getter;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
-import net.peepocloud.lib.network.NetworkPacketSender;
-import net.peepocloud.lib.player.PeepoPlayer;
-import net.peepocloud.lib.server.Template;
-import net.peepocloud.lib.users.UserManager;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
@@ -19,13 +15,22 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
+import net.peepocloud.lib.network.packet.in.PacketInToggleDebug;
+import net.peepocloud.lib.network.packet.out.PacketOutToggleDebug;
+import net.peepocloud.lib.network.packet.out.group.PacketOutCreateBungeeGroup;
+import net.peepocloud.lib.network.packet.out.group.PacketOutCreateMinecraftGroup;
+import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateBungee;
+import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateServer;
 import net.peepocloud.lib.node.NodeInfo;
+import net.peepocloud.lib.player.PeepoPlayer;
+import net.peepocloud.lib.scheduler.Scheduler;
+import net.peepocloud.lib.server.Template;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftState;
-import net.peepocloud.lib.scheduler.Scheduler;
+import net.peepocloud.lib.users.UserManager;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.addon.AddonManagerImpl;
 import net.peepocloud.node.addon.defaults.DefaultAddonManagerImpl;
@@ -33,28 +38,24 @@ import net.peepocloud.node.api.PeepoCloudNodeAPI;
 import net.peepocloud.node.api.addon.AddonManager;
 import net.peepocloud.node.api.addon.defaults.DefaultAddonManager;
 import net.peepocloud.node.api.addon.node.NodeAddon;
+import net.peepocloud.node.api.command.CommandSender;
+import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.api.event.DefaultEventManager;
-import net.peepocloud.node.api.event.EventManager;
 import net.peepocloud.node.api.network.BungeeCordParticipant;
 import net.peepocloud.node.api.network.MinecraftServerParticipant;
 import net.peepocloud.node.api.network.NodeParticipant;
+import net.peepocloud.node.api.server.CloudProcess;
+import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.command.CommandManagerImpl;
-import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.command.defaults.*;
 import net.peepocloud.node.database.DatabaseLoaderImpl;
-import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.languagesystem.LanguagesManagerImpl;
 import net.peepocloud.node.logging.ColoredLogger;
-import net.peepocloud.node.api.logging.ConsoleColor;
 import net.peepocloud.node.network.ClientNodeImpl;
 import net.peepocloud.node.network.ConnectableNode;
 import net.peepocloud.node.network.NetworkServer;
 import net.peepocloud.node.network.packet.out.PacketOutSendPacket;
 import net.peepocloud.node.network.packet.out.PacketOutUpdateNodeInfo;
-import net.peepocloud.lib.network.packet.out.group.PacketOutCreateBungeeGroup;
-import net.peepocloud.lib.network.packet.out.group.PacketOutCreateMinecraftGroup;
-import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateBungee;
-import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateServer;
 import net.peepocloud.node.network.packet.out.group.PacketOutBungeeGroupDeleted;
 import net.peepocloud.node.network.packet.out.group.PacketOutMinecraftGroupDeleted;
 import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
@@ -62,17 +63,16 @@ import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
 import net.peepocloud.node.screen.ScreenManagerImpl;
 import net.peepocloud.node.server.ServerFilesLoader;
 import net.peepocloud.node.server.process.BungeeProcess;
-import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.server.process.ProcessManager;
 import net.peepocloud.node.server.process.ServerProcess;
 import net.peepocloud.node.server.template.TemplateLocalStorage;
-import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.statistic.StatisticsManager;
 import net.peepocloud.node.updater.AutoUpdaterManager;
 import net.peepocloud.node.updater.UpdateCheckResponse;
 import net.peepocloud.node.utility.NodeUtils;
 import net.peepocloud.node.utility.users.NodeUserManager;
 import org.reflections.Reflections;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -352,6 +352,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     } catch (InstantiationException | IllegalAccessException e) {
                     }
                 });
+        this.packetManager.registerPacket(new PacketInToggleDebug());
         this.logger.debug("Registered " + this.packetManager.getRegisteredPackets().size() + " packet handlers");
     }
 
@@ -376,7 +377,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                 new CommandConfig(),
                 new CommandList(),
                 new CommandShutdown(),
-                new CommandDelete()
+                new CommandDelete(),
+                new CommandDebug()
         );
 
         this.logger.debug("Registered " + this.commandManager.getCommands().size() + " commands");
@@ -697,10 +699,19 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         return this.bungeeGroups.get(name);
     }
 
+    @Override
+    public void setDebuggingOnThisComponent(boolean enable) {
+        this.logger.setDebugging(enable);
+    }
+
+    @Override
+    public void debug(String message) {
+        this.logger.debug(message);
+    }
+
     //TODO
     @Override
     public void sendPlayerMessage(UUID uniqueId, String message) {
-
     }
 
     @Override
@@ -749,6 +760,17 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         this.groupsConfig.deleteBungeeGroup(name);
         this.bungeeGroups.remove(name);
         this.sendPacketToNodes(new PacketOutBungeeGroupDeleted(name));
+    }
+
+    @Override
+    public void setDebugging(boolean enabled) {
+        this.setDebuggingOnThisComponent(enabled);
+        this.sendPacketToAll(new PacketOutToggleDebug(enabled));
+    }
+
+    @Override
+    public boolean isDebugging() {
+        return this.logger.isDebugging();
     }
 
     public void sendPacketToNodes(Packet packet) {

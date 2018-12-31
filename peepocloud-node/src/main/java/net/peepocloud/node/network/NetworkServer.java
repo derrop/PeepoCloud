@@ -25,6 +25,7 @@ import net.peepocloud.lib.network.packet.coding.PacketDecoder;
 import net.peepocloud.lib.network.packet.coding.PacketEncoder;
 import net.peepocloud.lib.network.packet.handler.ChannelHandler;
 import net.peepocloud.lib.network.packet.handler.MainChannelHandler;
+import net.peepocloud.lib.network.packet.out.PacketOutToggleDebug;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
@@ -322,6 +323,10 @@ public class NetworkServer implements Runnable {
             MainChannelHandler channelHandler = networkParticipant.getChannel().pipeline().get(MainChannelHandler.class);
             channelHandler.setChannelHandler(this.defaultHandler);
             channelHandler.setParticipant(networkParticipant);
+
+            if (PeepoCloudNode.getInstance().getLogger().isDebugging()) {
+                networkParticipant.sendPacket(new PacketOutToggleDebug(true));
+            }
         } else {
             networkParticipant.getChannel().close();
         }

@@ -35,7 +35,7 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
     @Override
     public Runnable handleConnected() {
         return () -> {
-
+            System.out.println(this.getMinecraftGroups().complete());
         };
     }
 

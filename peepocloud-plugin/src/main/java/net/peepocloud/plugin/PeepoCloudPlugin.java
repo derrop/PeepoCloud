@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
+import net.peepocloud.lib.network.packet.in.PacketInToggleDebug;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.lib.scheduler.Scheduler;
@@ -42,6 +43,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     protected NetworkClient nodeConnector;
     protected Collection<NetworkAPIHandler> networkHandlers = new ArrayList<>();
     protected Scheduler scheduler = new Scheduler();
+    private boolean debugging = false;
 
     public PeepoCloudPlugin(Path nodeInfoFile) {
         instance = this;
@@ -72,6 +74,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         this.packetManager.registerPacket(new PacketInAPIServerStopped());
         this.packetManager.registerPacket(new PacketInAPIProxyStarted());
         this.packetManager.registerPacket(new PacketInAPIProxyStopped());
+        this.packetManager.registerPacket(new PacketInToggleDebug());
 
         scheduler.execute(this.nodeConnector, true);
     }
@@ -102,6 +105,18 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         if (this.isBungee())
             return (PeepoBungeePlugin) this;
         throw new UnsupportedOperationException("This instance does not support bungeecord");
+    }
+
+    @Override
+    public void setDebuggingOnThisComponent(boolean enable) {
+        this.debugging = enable;
+    }
+
+    @Override
+    public void debug(String message) {
+        if (this.debugging) {
+            System.out.println("&5[DEBUG] " + message);
+        }
     }
 
     @Override

@@ -52,6 +52,20 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
     }
 
     /**
+     * Sets the debugging state on the network
+     *
+     * @param enabled if debugging should be enabled
+     */
+    public abstract void setDebugging(boolean enabled);
+
+    /**
+     * Gets the debugging state on the network
+     *
+     * @return if debugging is enabled in the network
+     */
+    public abstract boolean isDebugging();
+
+    /**
      * Gets the {@link ExecutorService} (cached thread pool) of this instance.
      *
      * @return the {@link ExecutorService} instance in this node

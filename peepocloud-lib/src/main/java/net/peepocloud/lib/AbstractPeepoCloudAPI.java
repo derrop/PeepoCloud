@@ -25,6 +25,10 @@ public abstract class AbstractPeepoCloudAPI {
         AbstractPeepoCloudAPI.instance = instance;
     }
 
+    public abstract void setDebuggingOnThisComponent(boolean enable);
+
+    public abstract void debug(String message);
+
     public abstract void sendPlayerMessage(UUID uniqueId, String message);
 
     public abstract void sendPlayer(UUID uniqueId, String server);
