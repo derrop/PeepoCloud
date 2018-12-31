@@ -19,7 +19,8 @@ import java.nio.file.Paths;
 public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
 
     public static final JsonParser PARSER = new JsonParser();
-    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final ThreadLocal<Gson> GSON = ThreadLocal.withInitial(() -> new GsonBuilder().setPrettyPrinting().create());
+
 
     private JsonObject jsonObject;
 
@@ -56,7 +57,7 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
     }
 
     public SimpleJsonObject(Object object) {
-        JsonElement jsonElement = GSON.toJsonTree(object);
+        JsonElement jsonElement = GSON.get().toJsonTree(object);
         Preconditions.checkArgument(jsonElement.isJsonObject(), "JsonInput must be an json object, not " + jsonElement.getClass().getSimpleName());
         this.jsonObject = jsonElement.getAsJsonObject();
     }
@@ -67,7 +68,7 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
             return this;
         }
 
-        this.jsonObject.add(key, GSON.toJsonTree(value));
+        this.jsonObject.add(key, GSON.get().toJsonTree(value));
         return this;
     }
 
@@ -139,11 +140,11 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
     }
 
     public <T> T getObject(String key, Class<T> tClass) {
-        return this.get(key) == null ? null : GSON.fromJson(this.get(key), tClass);
+        return this.get(key) == null ? null : GSON.get().fromJson(this.get(key), tClass);
     }
 
     public Object getObject(String key, Type type) {
-        return this.get(key) == null ? null : GSON.fromJson(this.get(key), type);
+        return this.get(key) == null ? null : GSON.get().fromJson(this.get(key), type);
     }
 
     public SimpleJsonObject getJsonObject(String key) {
@@ -159,7 +160,7 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
         SystemUtils.createFile(path);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(path.toFile()), StandardCharsets.UTF_8)) {
-            GSON.toJson(this.jsonObject, writer);
+            GSON.get().toJson(this.jsonObject, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -199,7 +200,7 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
     }
 
     public String toPrettyJson() {
-        return GSON.toJson(this.jsonObject);
+        return GSON.get().toJson(this.jsonObject);
     }
 
     public byte[] toBytes() {

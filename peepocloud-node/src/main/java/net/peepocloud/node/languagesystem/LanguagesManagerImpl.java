@@ -77,7 +77,7 @@ public class LanguagesManagerImpl extends LanguagesManager {
     public void getAvailableLanguages(Consumer<Collection<String>> consumer) {
         HttpClient.get(SystemUtils.CENTRAL_SERVER_URL + "languages?all=response", null, (s, throwable) -> {
             if (throwable == null) {
-                Collection<String> languages = SimpleJsonObject.GSON.fromJson(s, new TypeToken<Collection<String>>() {
+                Collection<String> languages = SimpleJsonObject.GSON.get().fromJson(s, new TypeToken<Collection<String>>() {
                 }.getType());
                 consumer.accept(languages);
             } else {
@@ -94,7 +94,7 @@ public class LanguagesManagerImpl extends LanguagesManager {
             connection.connect();
             try (InputStream inputStream = connection.getInputStream();
                  Reader reader = new InputStreamReader(inputStream)) {
-                languages = SimpleJsonObject.GSON.fromJson(reader, new TypeToken<Collection<String>>() {
+                languages = SimpleJsonObject.GSON.get().fromJson(reader, new TypeToken<Collection<String>>() {
                 }.getType());
             }
         } catch (IOException e) {
@@ -136,7 +136,7 @@ public class LanguagesManagerImpl extends LanguagesManager {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         if (!jsonObject.get("success").getAsBoolean())
             return null;
-        return SimpleJsonObject.GSON.fromJson(jsonObject.get("response"), Language.class);
+        return SimpleJsonObject.GSON.get().fromJson(jsonObject.get("response"), Language.class);
     }
 
     /**

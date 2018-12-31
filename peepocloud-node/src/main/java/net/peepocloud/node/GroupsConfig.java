@@ -24,7 +24,7 @@ public class GroupsConfig {
         this.minecraftGroups = new HashMap<>();
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("minecraftGroups");
         database.forEach(simpleJsonObject -> {
-            MinecraftGroup group = SimpleJsonObject.GSON.fromJson(simpleJsonObject.asJsonObject(), MinecraftGroup.class);
+            MinecraftGroup group = SimpleJsonObject.GSON.get().fromJson(simpleJsonObject.asJsonObject(), MinecraftGroup.class);
             if (group != null) {
                 this.loadGroup(group);
             }
@@ -37,7 +37,7 @@ public class GroupsConfig {
         this.bungeeGroups = new HashMap<>();
         Database database = PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("bungeeGroups");
         database.forEach(simpleJsonObject -> {
-            BungeeGroup group = SimpleJsonObject.GSON.fromJson(simpleJsonObject.asJsonObject(), BungeeGroup.class);
+            BungeeGroup group = SimpleJsonObject.GSON.get().fromJson(simpleJsonObject.asJsonObject(), BungeeGroup.class);
             if (group != null) {
                 this.loadGroup(group);
             }
@@ -53,7 +53,7 @@ public class GroupsConfig {
                 PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
             }
             success.accept(aBoolean);
-        }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
+        }, database, group.getName(), SimpleJsonObject.GSON.get().toJsonTree(group));
     }
 
     public void createGroup(MinecraftGroup group, Consumer<Boolean> success) {
@@ -64,7 +64,7 @@ public class GroupsConfig {
                 PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutCreateMinecraftGroup(group));
             }
             success.accept(aBoolean);
-        }, database, group.getName(), SimpleJsonObject.GSON.toJsonTree(group));
+        }, database, group.getName(), SimpleJsonObject.GSON.get().toJsonTree(group));
     }
 
     public void deleteMinecraftGroup(String name) {

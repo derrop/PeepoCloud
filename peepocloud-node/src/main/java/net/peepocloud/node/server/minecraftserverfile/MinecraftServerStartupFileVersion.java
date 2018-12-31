@@ -55,7 +55,7 @@ public class MinecraftServerStartupFileVersion {
             try (InputStream inputStream = connection.getInputStream();
                  Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
 
-                Map<String, MinecraftServerStartupFileVersion> versionMap = SimpleJsonObject.GSON.fromJson(reader, new TypeToken<Map<String, MinecraftServerStartupFileVersion>>() {
+                Map<String, MinecraftServerStartupFileVersion> versionMap = SimpleJsonObject.GSON.get().fromJson(reader, new TypeToken<Map<String, MinecraftServerStartupFileVersion>>() {
                 }.getType());
                 return versionMap.values();
             }

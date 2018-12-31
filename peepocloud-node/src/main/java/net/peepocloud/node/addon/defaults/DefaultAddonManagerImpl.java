@@ -28,7 +28,7 @@ public class DefaultAddonManagerImpl extends DefaultAddonManager {
                 consumer.accept(null);
                 throwable.printStackTrace();
             } else {
-                consumer.accept(SimpleJsonObject.GSON.fromJson(s, new TypeToken<Collection<DefaultAddonConfig>>() {
+                consumer.accept(SimpleJsonObject.GSON.get().fromJson(s, new TypeToken<Collection<DefaultAddonConfig>>() {
                 }.getType()));
             }
         });

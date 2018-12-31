@@ -1,5 +1,6 @@
 package net.peepocloud.plugin.bukkit;
 
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.api.bukkit.PeepoCloudBukkitAPI;
@@ -35,7 +36,7 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
     @Override
     public Runnable handleConnected() {
         return () -> {
-
+            System.out.println(new SimpleJsonObject().append("test", super.getMinecraftServers().complete()).toPrettyJson());
         };
     }
 

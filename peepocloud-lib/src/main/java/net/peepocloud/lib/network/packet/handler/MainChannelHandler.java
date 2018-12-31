@@ -60,6 +60,7 @@ public class MainChannelHandler extends SimpleChannelInboundHandler<Packet> {
             if (query != null)
                 query.setResponse(packet);
 
+
             PacketInfo packetInfo = this.packetManager.getPacketInfo(packet.getId());
             if (packetInfo != null) {
                 packetInfo.getPacketHandler().handleInternal(this.participant, packet, (Consumer<Packet>) queryResponse -> {

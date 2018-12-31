@@ -10,6 +10,6 @@ public class PacketOutAuth extends JsonPacket {
 
     public PacketOutAuth(Auth auth) {
         super(-1);
-        setSimpleJsonObject(new SimpleJsonObject(SimpleJsonObject.GSON.toJsonTree(auth).getAsJsonObject()));
+        setSimpleJsonObject(new SimpleJsonObject(SimpleJsonObject.GSON.get().toJsonTree(auth).getAsJsonObject()));
     }
 }

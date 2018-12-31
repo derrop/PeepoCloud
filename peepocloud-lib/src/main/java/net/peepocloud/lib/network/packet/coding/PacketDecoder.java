@@ -52,6 +52,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
             if (packetClass == null)
                 return;
 
+
             Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
 
             if(isQuery)

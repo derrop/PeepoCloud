@@ -39,7 +39,7 @@ public class NodeUtils {
 
                 try (OutputStream outputStream = connection.getOutputStream();
                      Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
-                    SimpleJsonObject.GSON.toJson(
+                    SimpleJsonObject.GSON.get().toJson(
                             new SimpleJsonObject()
                                     .append("username", PeepoCloudNode.getInstance().getCloudConfig().getUsername())
                                     .append("apiToken", PeepoCloudNode.getInstance().getCloudConfig().getApiToken())
