@@ -5,8 +5,8 @@ package net.peepocloud.addons.acp.websocket.auth;
 
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.websocket.server.WebSocket;
-import net.peepocloud.node.websocket.server.auth.SynchronizedWebSocketServerAuthMethod;
+import net.peepocloud.node.api.websocket.server.WebSocket;
+import net.peepocloud.node.api.websocket.server.auth.SynchronizedWebSocketServerAuthMethod;
 
 import java.util.function.Consumer;
 

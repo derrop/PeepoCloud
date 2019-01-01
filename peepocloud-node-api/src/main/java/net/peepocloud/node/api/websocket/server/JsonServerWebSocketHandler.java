@@ -1,4 +1,4 @@
-package net.peepocloud.node.websocket.server;
+package net.peepocloud.node.api.websocket.server;
 /*
  * Created by Mc_Ruben on 09.12.2018
  */

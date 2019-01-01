@@ -15,7 +15,7 @@ import net.peepocloud.node.api.event.player.PlayerLogoutEvent;
 import net.peepocloud.node.api.event.user.UserCreateEvent;
 import net.peepocloud.node.api.event.user.UserDeleteEvent;
 import net.peepocloud.node.api.event.user.UserUpdateEvent;
-import net.peepocloud.node.websocket.server.WebSocketServer;
+import net.peepocloud.node.api.websocket.server.WebSocketServer;
 
 @AllArgsConstructor
 public class ACPDashboardListener {

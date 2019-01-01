@@ -8,7 +8,7 @@ import net.peepocloud.addons.acp.handler.ACPWebSocketDefaultHandler;
 import net.peepocloud.addons.acp.listener.ACPDashboardListener;
 import net.peepocloud.addons.acp.websocket.auth.ACPWebSocketAuthMethod;
 import net.peepocloud.node.api.addon.node.NodeAddon;
-import net.peepocloud.node.websocket.server.WebSocketServer;
+import net.peepocloud.node.api.websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;

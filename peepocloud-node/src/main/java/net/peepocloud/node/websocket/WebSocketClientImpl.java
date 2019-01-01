@@ -1,12 +1,10 @@
 package net.peepocloud.node.websocket;
 /*
- * Created by Mc_Ruben on 05.12.2018
+ * Created by Mc_Ruben on 01.01.2019
  */
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
@@ -17,75 +15,28 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.websocketx.*;
-import lombok.Getter;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
+import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.websocket.server.WebSocket;
+import net.peepocloud.node.api.websocket.WebSocketClient;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-@Getter
-public class WebSocketClient {
+public class WebSocketClientImpl extends WebSocketClient {
 
-    private Collection<WebSocketHandler> handlers = new ArrayList<>();
-    private Channel channel;
-    private URI uri;
-    private boolean reconnect;
-    private int maxReconnectTries;
-    private boolean connected;
-    private ExecutorService executorService = Executors.newCachedThreadPool();
-
-    WebSocket webSocket;
-
-    public void registerHandler(WebSocketHandler handler) {
-        this.handlers.add(handler);
+    static {
+        factory = new WebSocketClientFactory() {
+            @Override
+            public WebSocketClient createClient() {
+                return new WebSocketClientImpl();
+            }
+        };
     }
 
-    public void unregisterHandler(WebSocketHandler handler) {
-        this.handlers.remove(handler);
-    }
-
-    public void connect(URI uri, boolean reconnect, int maxReconnectTries) {
-        this.reconnect = reconnect;
-        if (reconnect) {
-            this.uri = uri;
-            this.maxReconnectTries = maxReconnectTries;
-            this.executorService.execute(() -> {
-                while (!this.connect0(uri) && (this.maxReconnectTries == -1 || this.maxReconnectTries-- >= 0)) {
-                    SystemUtils.sleepUninterruptedly(5000);
-                }
-            });
-        } else {
-            this.connect0(uri);
-        }
-    }
-
-    public void connect(URI uri, boolean reconnect) {
-        this.reconnect = reconnect;
-        if (reconnect) {
-            this.uri = uri;
-            this.maxReconnectTries = -1;
-            this.executorService.execute(() -> {
-                while (!this.connect0(uri)) {
-                    SystemUtils.sleepUninterruptedly(5000);
-                }
-            });
-        } else {
-            this.connect0(uri);
-        }
-    }
-
-    public void connect(URI uri) {
-        this.connect0(uri);
-    }
-
-    private boolean connect0(URI uri) {
+    protected boolean connect0(URI uri) {
         System.out.println("Trying to connect web socket to " + uri + "...");
         try {
             int port = uri.getPort();
@@ -148,31 +99,6 @@ public class WebSocketClient {
                 }
             });
         }
-    }
-
-    public void close() {
-        if (this.channel != null)
-            this.channel.close().syncUninterruptibly();
-        this.reconnect = false;
-    }
-
-    public ChannelFuture send(byte[] bytes) {
-        return this.send(new BinaryWebSocketFrame(Unpooled.wrappedBuffer(bytes)));
-    }
-
-    public ChannelFuture send(String message) {
-        return this.send(new TextWebSocketFrame(message));
-    }
-
-    public ChannelFuture send(WebSocketFrame webSocketFrame) {
-        if (this.isConnected()) {
-            return this.channel.writeAndFlush(webSocketFrame);
-        }
-        return null;
-    }
-
-    public boolean isConnected() {
-        return this.connected && this.channel != null && this.channel.isOpen();
     }
 
 }

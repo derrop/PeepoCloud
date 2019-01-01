@@ -13,6 +13,7 @@ import net.peepocloud.lib.config.yaml.YamlConfigurable;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.lib.utility.network.NetworkAddress;
+import net.peepocloud.node.api.NodeConfig;
 import net.peepocloud.node.network.ConnectableNode;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,8 +32,7 @@ import java.util.Map;
 
 @Getter
 @ToString
-@EqualsAndHashCode
-public class CloudConfig {
+public class CloudConfig extends NodeConfig {
 
     private final Path networkPath = Paths.get("networking.yml");
     private final Path mainPath = Paths.get("config.yml");

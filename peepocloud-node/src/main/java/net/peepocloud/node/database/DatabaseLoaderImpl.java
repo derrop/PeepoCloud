@@ -16,8 +16,8 @@ import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.database.defaults.arango.ArangoDatabaseManager;
 import net.peepocloud.node.database.defaults.mongo.MongoDatabaseManager;
 import net.peepocloud.node.database.defaults.mysql.MySQLDatabaseManager;
-import net.peepocloud.node.setup.type.ArraySetupAcceptable;
-import net.peepocloud.node.setup.Setup;
+import net.peepocloud.node.api.setup.type.ArraySetupAcceptable;
+import net.peepocloud.node.api.setup.Setup;
 
 import java.io.IOException;
 import java.nio.file.Files;

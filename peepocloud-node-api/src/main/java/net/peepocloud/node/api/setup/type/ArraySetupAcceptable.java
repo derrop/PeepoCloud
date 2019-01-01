@@ -1,4 +1,4 @@
-package net.peepocloud.node.setup.type;
+package net.peepocloud.node.api.setup.type;
 /*
  * Created by Mc_Ruben on 23.11.2018
  */

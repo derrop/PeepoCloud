@@ -9,8 +9,8 @@ import net.peepocloud.lib.users.User;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.network.ClientNode;
-import net.peepocloud.node.websocket.server.JsonServerWebSocketHandler;
-import net.peepocloud.node.websocket.server.WebSocket;
+import net.peepocloud.node.api.websocket.server.JsonServerWebSocketHandler;
+import net.peepocloud.node.api.websocket.server.WebSocket;
 
 import java.lang.management.ManagementFactory;
 import java.util.function.Consumer;

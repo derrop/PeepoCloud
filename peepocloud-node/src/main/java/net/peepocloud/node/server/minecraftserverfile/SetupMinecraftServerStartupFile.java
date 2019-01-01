@@ -6,8 +6,8 @@ package net.peepocloud.node.server.minecraftserverfile;
 import net.peepocloud.lib.config.yaml.YamlConfigurable;
 import net.peepocloud.node.logging.ColoredLogger;
 import net.peepocloud.node.server.ServerVersion;
-import net.peepocloud.node.setup.type.ArraySetupAcceptable;
-import net.peepocloud.node.setup.Setup;
+import net.peepocloud.node.api.setup.type.ArraySetupAcceptable;
+import net.peepocloud.node.api.setup.Setup;
 import net.peepocloud.node.api.utility.FileDownloading;
 
 import java.nio.file.Path;

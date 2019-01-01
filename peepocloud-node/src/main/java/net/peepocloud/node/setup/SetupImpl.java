@@ -1,22 +1,35 @@
 package net.peepocloud.node.setup;
 /*
- * Created by Mc_Ruben on 12.11.2018
+ * Created by Mc_Ruben on 01.01.2019
  */
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.peepocloud.lib.config.Configurable;
 import net.peepocloud.lib.utility.SystemUtils;
-import net.peepocloud.node.PeepoCloudNode;
+import net.peepocloud.node.api.PeepoCloudNodeAPI;
+import net.peepocloud.node.api.logging.ConsoleLogger;
+import net.peepocloud.node.api.setup.Setup;
+import net.peepocloud.node.api.setup.SetupAcceptable;
+import net.peepocloud.node.api.setup.type.BooleanSetupAcceptable;
+import net.peepocloud.node.api.setup.type.IntegerSetupAcceptable;
+import net.peepocloud.node.api.setup.type.StringSetupAcceptable;
 import net.peepocloud.node.logging.ColoredLogger;
-import net.peepocloud.node.setup.type.BooleanSetupAcceptable;
-import net.peepocloud.node.setup.type.IntegerSetupAcceptable;
-import net.peepocloud.node.setup.type.StringSetupAcceptable;
 
 import java.util.Collection;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Setup {
+public class SetupImpl extends Setup {
+
+    static {
+        factory = new SetupFactory() {
+            @Override
+            public Setup createSetup(Configurable configurable, ConsoleLogger logger) {
+                Preconditions.checkArgument(logger.getClass().equals(ColoredLogger.class), "logger must be an instance of ColoredLogger");
+                return new SetupImpl(configurable, logger);
+            }
+        };
+    }
 
     private ColoredLogger logger;
     private Configurable configurable;
@@ -25,44 +38,19 @@ public class Setup {
     @Getter
     private Collection<String> currentAvailable;
 
-    public Setup(Configurable configurable, ColoredLogger logger) {
-        this.logger = logger;
+    public SetupImpl(Configurable configurable, ConsoleLogger logger) {
         this.configurable = configurable;
-        logger.setRunningSetup(this);
+        this.logger = (ColoredLogger) logger;
+        this.logger.setRunningSetup(this);
     }
 
-    /**
-     * Starts a setup asynchronously
-     * @param configurable the configurable to which the user input is saved
-     * @param logger the logger in which the setup is made
-     * @param consumer the consumer which will be accepted with the new setup asynchronously
-     */
-    public static void startSetupAsync(Configurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
-        PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            consumer.accept(new Setup(configurable, logger));
-        });
-    }
-
-    /**
-     * Starts a setup synchronously
-     * @param configurable the configurable to which the user input is saved
-     * @param logger the logger in which the setup is made
-     * @param consumer the consumer which will be accepted with the new setup synchronously
-     */
-    public static void startSetupSync(Configurable configurable, ColoredLogger logger, Consumer<Setup> consumer) {
-        consumer.accept(new Setup(configurable, logger));
-    }
-
-    /**
-     * Defines if the user can type "cancel" to cancel the setup, default is false
-     * @param cancellable if the user can type "cancel" to cancel the setup {@code true} or {@code false} if not
-     * @return this
-     */
+    @Override
     public Setup setCancellable(boolean cancellable) {
         this.cancellable = cancellable;
         return this;
     }
 
+    @Override
     public Setup request(String name, String requestMessage, String invalidInputMessage, SetupAcceptable setupAcceptable, Collection<String> available) {
         if (this.cancelled)
             return this;
@@ -108,7 +96,7 @@ public class Setup {
         }
         this.currentAvailable = null;
         if (response == null && this.cancellable) {
-            System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("setup.cancelled"));
+            System.out.println(PeepoCloudNodeAPI.getInstance().getLanguagesManager().getMessage("setup.cancelled"));
             this.cancelled = true;
             return this;
         }
@@ -118,16 +106,13 @@ public class Setup {
         return this;
     }
 
-    private String readUntil(Function<String, Boolean> function, String invalidInputMessage) {
-        return this.logger.readLineUntil(s -> function.apply(s.trim()), invalidInputMessage, this.cancellable ? "cancel" : null).trim();
-    }
-
-    /**
-     * Gets the {@link Configurable} which was specified to this Setup with all the user data
-     * @return the {@link Configurable} of this setup
-     */
+    @Override
     public Configurable getData() {
         return this.configurable;
+    }
+
+    private String readUntil(Function<String, Boolean> function, String invalidInputMessage) {
+        return this.logger.readLineUntil(s -> function.apply(s.trim()), invalidInputMessage, this.cancellable ? "cancel" : null).trim();
     }
 
 }

@@ -66,11 +66,13 @@ import net.peepocloud.node.server.process.BungeeProcess;
 import net.peepocloud.node.server.process.ProcessManager;
 import net.peepocloud.node.server.process.ServerProcess;
 import net.peepocloud.node.server.template.TemplateLocalStorage;
-import net.peepocloud.node.statistic.StatisticsManager;
+import net.peepocloud.node.api.statistic.StatisticsManager;
+import net.peepocloud.node.setup.SetupImpl;
 import net.peepocloud.node.updater.AutoUpdaterManager;
 import net.peepocloud.node.updater.UpdateCheckResponse;
 import net.peepocloud.node.utility.NodeUtils;
 import net.peepocloud.node.utility.users.NodeUserManager;
+import net.peepocloud.node.websocket.WebSocketClientImpl;
 import org.reflections.Reflections;
 
 import java.io.IOException;
@@ -217,6 +219,14 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         instance = this;
 
         PeepoCloudNodeAPI.setInstance(this);
+
+        //create factories for those classes
+        try {
+            Class.forName(WebSocketClientImpl.class.getName());
+            Class.forName(SetupImpl.class.getName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
 
         this.scheduler = new Scheduler();

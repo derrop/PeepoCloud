@@ -11,15 +11,17 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
 import lombok.*;
+import net.peepocloud.node.api.websocket.WebSocketClient;
+import net.peepocloud.node.api.websocket.WebSocketHandler;
 
 @Getter
 class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
 
-    private WebSocketClient webSocketClient;
+    private WebSocketClientImpl webSocketClient;
     private WebSocketClientHandshaker handshaker;
     private ChannelPromise channelPromise;
 
-    WebSocketClientHandler(WebSocketClient webSocketClient, WebSocketClientHandshaker handshaker) {
+    WebSocketClientHandler(WebSocketClientImpl webSocketClient, WebSocketClientHandshaker handshaker) {
         this.webSocketClient = webSocketClient;
         this.handshaker = handshaker;
     }

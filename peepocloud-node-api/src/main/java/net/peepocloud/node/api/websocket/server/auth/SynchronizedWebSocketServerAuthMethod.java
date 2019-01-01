@@ -1,11 +1,11 @@
-package net.peepocloud.node.websocket.server.auth;
+package net.peepocloud.node.api.websocket.server.auth;
 /*
  * Created by Mc_Ruben on 09.12.2018
  */
 
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
-import net.peepocloud.node.websocket.server.WebSocket;
+import net.peepocloud.node.api.websocket.server.WebSocket;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;

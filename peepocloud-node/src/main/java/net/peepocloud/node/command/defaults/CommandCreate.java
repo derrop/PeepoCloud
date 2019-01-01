@@ -15,8 +15,8 @@ import net.peepocloud.node.api.command.Command;
 import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.api.command.TabCompletable;
 import net.peepocloud.node.api.server.TemplateStorage;
-import net.peepocloud.node.setup.Setup;
-import net.peepocloud.node.setup.type.*;
+import net.peepocloud.node.api.setup.Setup;
+import net.peepocloud.node.api.setup.type.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

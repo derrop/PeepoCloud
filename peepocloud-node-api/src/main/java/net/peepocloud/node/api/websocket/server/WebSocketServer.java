@@ -1,4 +1,4 @@
-package net.peepocloud.node.websocket.server;
+package net.peepocloud.node.api.websocket.server;
 /*
  * Created by Mc_Ruben on 05.12.2018
  */
@@ -17,7 +17,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import lombok.Getter;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
-import net.peepocloud.node.websocket.server.auth.WebSocketServerAuthMethod;
+import net.peepocloud.node.api.websocket.server.auth.WebSocketServerAuthMethod;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

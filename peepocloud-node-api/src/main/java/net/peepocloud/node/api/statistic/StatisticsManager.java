@@ -1,18 +1,18 @@
-package net.peepocloud.node.statistic;
+package net.peepocloud.node.api.statistic;
 /*
  * Created by Mc_Ruben on 11.11.2018
  */
 
 import lombok.Getter;
-import net.peepocloud.node.api.event.network.bungeecord.BungeeStartEvent;
-import net.peepocloud.node.api.event.network.minecraftserver.ServerStartEvent;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
-import net.peepocloud.node.PeepoCloudNode;
-import net.peepocloud.node.api.event.network.node.NodeConnectEvent;
+import net.peepocloud.node.api.PeepoCloudNodeAPI;
 import net.peepocloud.node.api.database.Database;
 import net.peepocloud.node.api.event.EventHandler;
-import net.peepocloud.node.websocket.WebSocketClient;
+import net.peepocloud.node.api.event.network.bungeecord.BungeeStartEvent;
+import net.peepocloud.node.api.event.network.minecraftserver.ServerStartEvent;
+import net.peepocloud.node.api.event.network.node.NodeConnectEvent;
+import net.peepocloud.node.api.websocket.WebSocketClient;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class StatisticsManager {
     public void reload(boolean enableGlobalStats) {
         boolean connected = this.webSocketClient != null && this.webSocketClient.isConnected();
         if (enableGlobalStats && !connected) {
-            this.webSocketClient = new WebSocketClient();
+            this.webSocketClient = WebSocketClient.create();
             this.webSocketClient.connect(URI.create(SystemUtils.CENTRAL_SERVER_URL_WS_GSTATS), true);
         }
     }
@@ -78,7 +78,7 @@ public class StatisticsManager {
     }
 
     private Database getDatabase() {
-        return PeepoCloudNode.getInstance().getDatabaseManager().getDatabase("internal_configs");
+        return PeepoCloudNodeAPI.getInstance().getDatabaseManager().getDatabase("internal_configs");
     }
 
     private void update(String key, long add) {
@@ -105,7 +105,7 @@ public class StatisticsManager {
     }
 
     private void sendGlobalStatsUpdate(String key, long val) {
-        if (PeepoCloudNode.getInstance().getCloudConfig().isUseGlobalStats()) {
+        if (PeepoCloudNodeAPI.getInstance().getCloudConfig().isUseGlobalStats()) {
             if (this.webSocketClient != null) {
                 this.webSocketClient.send(new SimpleJsonObject().append("update", key).append("val", val).toJson());
             }

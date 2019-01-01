@@ -66,6 +66,12 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
     public abstract boolean isDebugging();
 
     /**
+     * Gets the configuration instance of this Node containing the data of all configs of the cloud in the directory where this instance is running (not of sub directories)
+     * @return the {@link NodeConfig} of this Node
+     */
+    public abstract NodeConfig getCloudConfig();
+
+    /**
      * Gets the {@link ExecutorService} (cached thread pool) of this instance.
      *
      * @return the {@link ExecutorService} instance in this node
