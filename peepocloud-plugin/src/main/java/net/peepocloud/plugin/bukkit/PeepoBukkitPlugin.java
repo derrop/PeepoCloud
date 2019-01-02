@@ -26,17 +26,16 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
         super(Paths.get("nodeInfo.json"));
         this.plugin = plugin;
 
+        plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, "BungeeCord");
         plugin.getCommand("cloudplugin").setExecutor(this.cloudPluginCommand);
-
-        super.getPacketManager().registerPacket(new PacketInServerInfo());
-        super.getPacketManager().registerPacket(new PacketInAPISignSelector());
     }
 
     @Override
-    public Runnable handleConnected() {
-        return () -> {
-            System.out.println(this.getMinecraftGroups().complete());
-        };
+    public void bootstrap() {
+        super.getPacketManager().registerPacket(new PacketInServerInfo());
+        super.getPacketManager().registerPacket(new PacketInAPISignSelector());
+
+        super.bootstrap();
     }
 
     @Override
@@ -76,6 +75,10 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
 
     public CloudPluginCommand getCloudPluginCommand() {
         return cloudPluginCommand;
+    }
+
+    public SignSelector getSignSelector() {
+        return signSelector;
     }
 
     @Override

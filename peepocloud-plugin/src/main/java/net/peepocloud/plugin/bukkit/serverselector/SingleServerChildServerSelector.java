@@ -23,6 +23,23 @@ public abstract class SingleServerChildServerSelector<Child extends ServerSelect
             return super.add(child);
         }
 
+        @Override
+        public boolean remove(Object o) {
+            Child child = (Child) o;
+            MinecraftServerInfo serverInfo = child.getServerInfo();
+            if(serverInfo != null)
+                SingleServerChildServerSelector.this.waitingServers.put(serverInfo.getComponentName().toLowerCase(), serverInfo);
+            return super.remove(o);
+        }
+
+        @Override
+        public Child remove(int index) {
+            Child child = super.remove(index);
+            MinecraftServerInfo serverInfo = child.getServerInfo();
+            if(serverInfo != null)
+                SingleServerChildServerSelector.this.waitingServers.put(serverInfo.getComponentName().toLowerCase(), serverInfo);
+            return child;
+        }
     };
 
     protected Map<String, MinecraftServerInfo> waitingServers = new ConcurrentHashMap<>();

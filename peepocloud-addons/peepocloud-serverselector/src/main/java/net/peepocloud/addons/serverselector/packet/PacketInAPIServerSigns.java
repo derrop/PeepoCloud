@@ -26,7 +26,8 @@ public class PacketInAPIServerSigns extends JsonPacketHandler {
     @Override
     public void handlePacket(NetworkPacketSender networkParticipant, JsonPacket packet, Consumer<Packet> queryResponse) {
         SimpleJsonObject simpleJsonObject = packet.getSimpleJsonObject();
-        if(simpleJsonObject != null && simpleJsonObject.contains("serverSigns"))
+        System.out.println(simpleJsonObject.toPrettyJson());
+        if(simpleJsonObject != null && simpleJsonObject.contains("serverSigns") && simpleJsonObject.contains("group"))
             this.serverSelectorAddon.saveSigns(simpleJsonObject.getObject("serverSigns", ServerSign[].class), simpleJsonObject.getString("group"));
     }
 }

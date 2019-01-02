@@ -3,8 +3,10 @@ package net.peepocloud.plugin.network.packet.out;
 
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.packet.JsonPacket;
+import net.peepocloud.lib.serverselector.Position;
 import net.peepocloud.lib.serverselector.signselector.sign.ServerSign;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class PacketOutAPIServerSigns extends JsonPacket {
@@ -12,6 +14,7 @@ public class PacketOutAPIServerSigns extends JsonPacket {
 
     public PacketOutAPIServerSigns(Collection<ServerSign> serverSigns, String group) {
         super(151);
-        super.setSimpleJsonObject(new SimpleJsonObject().append("serverSigns", serverSigns).append("group", group));
+        super.setSimpleJsonObject(new SimpleJsonObject().append("group", group).append("serverSigns", serverSigns));
     }
+
 }
