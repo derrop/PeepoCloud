@@ -27,9 +27,9 @@ public class PacketInAPIQueryGroups extends JsonPacketHandler {
             NetworkComponentType type = simpleJsonObject.getObject("type", NetworkComponentType.class);
 
             if (type == NetworkComponentType.MINECRAFT_SERVER)
-                response.setSimpleJsonObject(new SimpleJsonObject().append("groups", PeepoCloudNode.getInstance().getMinecraftGroups()));
+                response.setSimpleJsonObject(new SimpleJsonObject().append("groups", PeepoCloudNode.getInstance().getMinecraftGroups().values()));
             else if (type == NetworkComponentType.BUNGEECORD)
-                response.setSimpleJsonObject(new SimpleJsonObject().append("groups", PeepoCloudNode.getInstance().getBungeeGroups()));
+                response.setSimpleJsonObject(new SimpleJsonObject().append("groups", PeepoCloudNode.getInstance().getBungeeGroups().values()));
         }
 
         queryResponse.accept(response);

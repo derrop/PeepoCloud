@@ -7,8 +7,6 @@ import net.peepocloud.lib.utility.network.NetworkAddress;
 
 public abstract class NodeConfig {
 
-    private boolean useGlobalStats;
-
     public abstract String getNodeName();
 
     public abstract NetworkAddress getHost();
