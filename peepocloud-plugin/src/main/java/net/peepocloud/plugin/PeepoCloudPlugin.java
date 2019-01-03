@@ -1,6 +1,6 @@
 package net.peepocloud.plugin;
 
-import com.google.gson.reflect.TypeToken;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     private static PeepoCloudPlugin instance;
@@ -44,6 +43,9 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     protected Collection<NetworkAPIHandler> networkHandlers = new ArrayList<>();
     protected Scheduler scheduler = new Scheduler();
     private boolean debugging = false;
+
+    private Map<String, MinecraftGroup> minecraftGroups;
+    private Map<String, BungeeGroup> bungeeGroups;
 
     public PeepoCloudPlugin(Path nodeInfoFile) {
         instance = this;
@@ -56,7 +58,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         SimpleJsonObject nodeInfo = SimpleJsonObject.load(nodeInfoFile);
         this.nodeConnector = new NetworkClient(nodeInfo.getObject("networkAddress", NetworkAddress.class)
                 .toInetSocketAddress(), this.packetManager, new ChannelHandlerAdapter(), nodeInfo.getObject("auth", Auth.class));
-        this.nodeConnector.setConnectedHandler(this.handleConnected());
+        this.nodeConnector.setExceptionTask(this::shutdown);
 
         // deleting the file because the info has been read
         try {
@@ -68,7 +70,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
 
     @Override
     public void bootstrap() {
-        scheduler.getThreadPool().execute(scheduler);
+        this.scheduler.getThreadPool().execute(this.scheduler);
 
         this.packetManager.registerPacket(new PacketInAPIServerStarted());
         this.packetManager.registerPacket(new PacketInAPIServerStopped());
@@ -76,7 +78,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         this.packetManager.registerPacket(new PacketInAPIProxyStopped());
         this.packetManager.registerPacket(new PacketInToggleDebug());
 
-        scheduler.execute(this.nodeConnector, true);
+        this.nodeConnector.run();
     }
 
     @Override
@@ -84,8 +86,6 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         this.nodeConnector.shutdown();
         this.scheduler.disable();
     }
-
-    public abstract Runnable handleConnected();
 
     @Override
     public abstract boolean isBungee();
@@ -451,53 +451,63 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     }
 
     @Override
-    public QueryRequest<Collection<MinecraftGroup>> getMinecraftGroups() {
-        QueryRequest<Collection<MinecraftGroup>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryGroups(NetworkComponentType.MINECRAFT_SERVER)).onComplete(packet -> {
+    public Collection<MinecraftGroup> getMinecraftGroups() {
+        if(this.minecraftGroups != null) {
+            return this.minecraftGroups.values();
+        } else {
+            Packet packet = this.packetManager.packetQuery(this.nodeConnector, new PacketOutAPIQueryGroups(NetworkComponentType.MINECRAFT_SERVER));
             if (packet instanceof JsonPacket) {
                 JsonPacket response = (JsonPacket) packet;
                 SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if (simpleJsonObject != null && simpleJsonObject.contains("groups"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("groups", MinecraftGroup[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+                if (simpleJsonObject != null && simpleJsonObject.contains("groups")) {
+                    Collection<MinecraftGroup> minecraftGroups = Arrays.asList(simpleJsonObject.getObject("groups", MinecraftGroup[].class));
+
+                    this.minecraftGroups = new HashMap<>();
+                    for(MinecraftGroup minecraftGroup : minecraftGroups)
+                        this.minecraftGroups.put(minecraftGroup.getName().toLowerCase(), minecraftGroup);
+
+                    return minecraftGroups;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
-    public QueryRequest<Collection<BungeeGroup>> getBungeeGroups() {
-        QueryRequest<Collection<BungeeGroup>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryGroups(NetworkComponentType.BUNGEECORD)).onComplete(packet -> {
+    public Collection<BungeeGroup> getBungeeGroups() {
+        if(this.bungeeGroups != null) {
+            return this.bungeeGroups.values();
+        } else {
+            Packet packet = this.packetManager.packetQuery(this.nodeConnector, new PacketOutAPIQueryGroups(NetworkComponentType.BUNGEECORD));
             if (packet instanceof JsonPacket) {
                 JsonPacket response = (JsonPacket) packet;
                 SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if (simpleJsonObject != null && simpleJsonObject.contains("groups"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("groups", BungeeGroup[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+                if (simpleJsonObject != null && simpleJsonObject.contains("groups")) {
+                    Collection<BungeeGroup> bungeeGroups = Arrays.asList(simpleJsonObject.getObject("groups", BungeeGroup[].class));
+
+                    this.bungeeGroups = new HashMap<>();
+                    for(BungeeGroup bungeeGroup : bungeeGroups)
+                        this.bungeeGroups.put(bungeeGroup.getName().toLowerCase(), bungeeGroup);
+
+                    return bungeeGroups;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
     public MinecraftGroup getMinecraftGroup(String name) {
-        Collection<MinecraftGroup> minecraftGroups = this.getMinecraftGroups().complete();
-        if(minecraftGroups != null)
-            return minecraftGroups.stream().filter(minecraftGroup -> minecraftGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-        return null;
+        if(this.minecraftGroups == null)
+            this.getMinecraftGroups();
+        return this.minecraftGroups.get(name.toLowerCase());
     }
 
     @Override
     public BungeeGroup getBungeeGroup(String name) {
-        Collection<BungeeGroup> bungeeGroups = this.getBungeeGroups().complete();
-        if(bungeeGroups != null)
-            return bungeeGroups.stream().filter(bungeeGroup -> bungeeGroup.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
-        return null;
+        if(this.bungeeGroups == null)
+            this.getBungeeGroups();
+        return this.bungeeGroups.get(name.toLowerCase());
     }
 
     @Override
@@ -528,6 +538,41 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
 
     @Override
     public void sendPlayer(UUID uniqueId, String server) {
+
+    }
+
+    @Override
+    public void sendPlayerActionBar(UUID uniqueId, BaseComponent... message) {
+
+    }
+
+    @Override
+    public void sendPlayerMessage(UUID uniqueId, BaseComponent... components) {
+
+    }
+
+    @Override
+    public void sendPlayerFallback(UUID uniqueId) {
+
+    }
+
+    @Override
+    public void sendPlayerTitle(UUID uniqueId, BaseComponent[] title, BaseComponent[] subTitle, int fadeIn, int stay, int fadeOut) {
+
+    }
+
+    @Override
+    public void playerChat(UUID uniqueId, String message) {
+
+    }
+
+    @Override
+    public void kickPlayer(UUID uniqueId, BaseComponent... reason) {
+
+    }
+
+    @Override
+    public void setPlayerTabHeaderFooter(UUID uniqueId, BaseComponent[] header, BaseComponent[] footer) {
 
     }
 
