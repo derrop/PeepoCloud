@@ -145,7 +145,7 @@ public class PropertiesConfigurable implements Configurable<PropertiesConfigurab
     }
 
     @Override
-    public Object getObject(String key, Type type) {
+    public <T> T getObject(String key, Type type) {
         throw new UnsupportedOperationException("not supported in PropertiesConfigurable");
     }
 

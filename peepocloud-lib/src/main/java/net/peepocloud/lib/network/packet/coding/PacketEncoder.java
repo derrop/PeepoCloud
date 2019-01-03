@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.AllArgsConstructor;
+import net.peepocloud.lib.AbstractPeepoCloudAPI;
 import net.peepocloud.lib.network.packet.FilePacket;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
@@ -27,7 +28,8 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
         if(isQuery)
             PacketUtils.writeUUID(byteArrayDataOutput, packet.getQueryUUID());
 
-
+        AbstractPeepoCloudAPI.getInstance().debug("Sending packet to " + channelHandlerContext.channel().localAddress()
+                + " (" + packet.getClass().getSimpleName() + "/" + packet.getId() + "/" + packet.getQueryUUID() + ")");
 
         packet.write(byteArrayDataOutput);
         byteBuf.writeBytes(byteArrayDataOutput.toByteArray());

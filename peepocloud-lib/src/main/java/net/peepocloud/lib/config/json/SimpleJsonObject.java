@@ -143,7 +143,7 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
         return this.get(key) == null ? null : GSON.get().fromJson(this.get(key), tClass);
     }
 
-    public Object getObject(String key, Type type) {
+    public <T> T getObject(String key, Type type) {
         return this.get(key) == null ? null : GSON.get().fromJson(this.get(key), type);
     }
 

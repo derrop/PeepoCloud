@@ -58,11 +58,5 @@ public class ServerDefaultHandler extends ChannelHandlerAdapter {
         PeepoCloudNode.getInstance().getLogger().debug("Participant [" + networkParticipant.getName() + "/" + networkParticipant.getAddress() + "] disconnected (" + networkParticipant.getClass().getSimpleName() + ")");
     }
 
-    @Override
-    public boolean packet(NetworkParticipant networkParticipant, Packet packet) {
-        if (PeepoCloudNode.getInstance().getLogger().isDebugging()) {
-            PeepoCloudNode.getInstance().getLogger().debug("Receiving packet [id=" + packet.getId() + "/queryUniqueId=" + packet.getQueryUUID() + "] from " + networkParticipant.getName());
-        }
-        return false;
-    }
+
 }

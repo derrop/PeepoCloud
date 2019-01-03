@@ -137,8 +137,8 @@ public class YamlConfigurable implements Configurable<YamlConfigurable> {
     }
 
     @Override
-    public Object getObject(String key, Type type) {
-        return this.configuration.get(key);
+    public <T> T getObject(String key, Type type) {
+        return (T) this.configuration.get(key);
     }
 
     public Object get(String key) {

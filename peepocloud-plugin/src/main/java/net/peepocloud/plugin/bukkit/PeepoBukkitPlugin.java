@@ -12,7 +12,6 @@ import net.peepocloud.plugin.bukkit.serverselector.signselector.SignSelector;
 import net.peepocloud.plugin.network.packet.in.PacketInAPISignSelector;
 import net.peepocloud.plugin.network.packet.in.PacketInServerInfo;
 import org.bukkit.Bukkit;
-
 import java.nio.file.Paths;
 
 public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBukkitAPI {

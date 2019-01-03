@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.EmptyByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import net.peepocloud.lib.AbstractPeepoCloudAPI;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketInfo;
 import net.peepocloud.lib.network.packet.PacketManager;
@@ -40,23 +41,30 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 Map.Entry<Class<? extends Packet>, Integer> entry =
                         this.packetManager.getQueryResponses().entrySet().stream().filter(entry1 -> entry1.getValue().equals(id)).findFirst().orElse(null);
                 if (entry == null)
-                    return;
-                packetClass = entry.getKey();
+                    packetClass = null;
+                else
+                    packetClass = entry.getKey();
             } else {
                 PacketInfo packetInfo = this.packetManager.getPacketInfo(id);
                 if (packetInfo == null)
-                    return;
-                packetClass = packetInfo.getPacketClass();
+                    packetClass = null;
+                else
+                    packetClass = packetInfo.getPacketClass();
             }
 
-            if (packetClass == null)
+            if (packetClass == null) {
+                AbstractPeepoCloudAPI.getInstance().debug("Received invalid/unregistered packet from " + channelHandlerContext.channel().localAddress()
+                        + " (" + id + "/" + queryUUID + ")");
                 return;
-
+            }
 
             Packet packet = packetClass.getDeclaredConstructor(int.class).newInstance(id);
 
             if(isQuery)
                 this.packetManager.convertToQueryPacket(packet, queryUUID);
+
+            AbstractPeepoCloudAPI.getInstance().debug("Received packet from " + channelHandlerContext.channel().localAddress()
+                    + " (" + packet.getClass().getSimpleName() + "/" + packet.getId() + "/" + packet.getQueryUUID() + ")");
 
             packet.read(byteArrayDataInput);
             list.add(packet);

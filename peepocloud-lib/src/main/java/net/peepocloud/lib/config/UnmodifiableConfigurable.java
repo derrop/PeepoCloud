@@ -96,7 +96,7 @@ public class UnmodifiableConfigurable<T extends Configurable> implements Configu
     }
 
     @Override
-    public Object getObject(String key, Type type) {
+    public <T1> T1  getObject(String key, Type type) {
         return this.configurable.getObject(key, type);
     }
 

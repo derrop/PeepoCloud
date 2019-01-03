@@ -42,7 +42,7 @@ public interface Configurable<V extends Configurable> {
 
     <T> T getObject(String key, Class<T> tClass);
 
-    Object getObject(String key, Type type);
+    <T> T getObject(String key, Type type);
 
     void saveAsFile(Path path);
 

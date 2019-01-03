@@ -11,6 +11,10 @@ public class ServerAuthChannelHandler extends ChannelHandlerAdapter {
 
     @Override
     public boolean packet(NetworkParticipant networkParticipant, Packet packet) {
-        return packet.getId() != -1;
+        if(packet.getId() != -1) {
+            networkParticipant.close();
+            return true;
+        }
+        return false;
     }
 }
