@@ -6,10 +6,12 @@ package net.peepocloud.plugin.network.packet.auth;
 import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
+import net.peepocloud.plugin.PeepoCloudPlugin;
 
 import java.util.function.Consumer;
 
 public class PacketInAuthSuccessful implements PacketHandler<Packet> {
+
     @Override
     public int getId() {
         return 0;
@@ -22,6 +24,6 @@ public class PacketInAuthSuccessful implements PacketHandler<Packet> {
 
     @Override
     public void handlePacket(NetworkPacketSender networkParticipant, Packet packet, Consumer<Packet> queryResponse) {
-        //TODO
+        PeepoCloudPlugin.getInstance().handleSuccessfulLogin();
     }
 }

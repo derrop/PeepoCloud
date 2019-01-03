@@ -66,7 +66,7 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
                     continue;
                 }
 
-                if(serverInfo != null && serverInfo.getState() != MinecraftState.LOBBY)
+                if(serverInfo != null && serverInfo.getState() == MinecraftState.IN_GAME)
                     serverSign.setServerInfo(null);
 
                 this.update(serverSign);

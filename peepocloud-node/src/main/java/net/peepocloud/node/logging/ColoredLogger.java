@@ -180,7 +180,7 @@ public class ColoredLogger extends Logger implements ConsoleLogger {
 
     public void debug(String line) {
         if (this.debugging) {
-            this.print("&5[DEBUG] " + line + "\n");
+            System.out.println("&5[DEBUG] " + line);
         }
     }
 

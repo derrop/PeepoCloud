@@ -37,6 +37,8 @@ public abstract class PeepoCloudPluginAPI extends AbstractPeepoCloudAPI {
     public abstract void bootstrap();
     public abstract void shutdown();
 
+    public abstract void handleSuccessfulLogin();
+
     public abstract boolean isBukkit();
     public abstract boolean isBungee();
     public abstract PeepoCloudBukkitAPI toBukkit();

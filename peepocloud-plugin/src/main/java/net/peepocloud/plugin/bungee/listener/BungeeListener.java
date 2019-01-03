@@ -9,6 +9,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
+import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -62,13 +63,10 @@ public class BungeeListener implements Listener {
             if (!response.isAllowed()) {
                 event.setCancelled(true);
                 event.setCancelReason(TextComponent.fromLegacyText(response.getKickReason()));
+            } else {
+                //TODO cache player
                 event.completeIntent(this.plugin);
-                return;
             }
-
-            //TODO cache player
-            event.completeIntent(this.plugin);
-
         });
     }
 
@@ -83,9 +81,9 @@ public class BungeeListener implements Listener {
                 ServerInfo serverInfo = fallback(event.getPlayer());
                 if (serverInfo == null) {
                     event.setCancelled(true);
-                    event.getPlayer().disconnect(TextComponent.fromLegacyText("§cNo lobby found")); //TODO configurable
-                }
-                event.setTarget(serverInfo);
+                    event.getPlayer().disconnect(TextComponent.fromLegacyText("§cNo fallback-server found")); //TODO configurable
+                } else
+                    event.setTarget(serverInfo);
             }
             break;
 

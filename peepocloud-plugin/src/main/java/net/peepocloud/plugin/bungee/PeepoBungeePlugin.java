@@ -5,6 +5,7 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.api.bungee.PeepoCloudBungeeAPI;
+import net.peepocloud.plugin.bungee.listener.BungeeListener;
 import net.peepocloud.plugin.network.packet.in.PacketInProxyInfo;
 import java.net.InetSocketAddress;
 import java.nio.file.Paths;
@@ -23,13 +24,22 @@ public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBun
     PeepoBungeePlugin(BungeeLauncher plugin) {
         super(Paths.get("nodeInfo.json"));
         this.plugin = plugin;
+
+        this.plugin.getProxy().getPluginManager().registerListener(this.plugin, new BungeeListener(this.plugin));
+        this.plugin.getProxy().getConfig().getServers().clear();
     }
 
     @Override
     public void bootstrap() {
+        super.registerNetworkHandler(new BungeeNetworkHandler(this));
+
         super.getPacketManager().registerPacket(new PacketInProxyInfo());
 
         super.bootstrap();
+    }
+
+    @Override
+    public void handleSuccessfulLogin() {
         super.getMinecraftServers().complete(4, TimeUnit.SECONDS).forEach(this::registerServerInfo);
     }
 

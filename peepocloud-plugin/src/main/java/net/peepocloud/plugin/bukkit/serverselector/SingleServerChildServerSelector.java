@@ -62,7 +62,7 @@ public abstract class SingleServerChildServerSelector<Child extends ServerSelect
     @Override
     public void handleServerAdd(MinecraftServerInfo serverInfo) {
         List<Child> freeChildren = this.freeChildren(serverInfo.getGroupName());
-        if(freeChildren.size() > 0) {
+        if(freeChildren.size() > 0 /*&& serverInfo.getState() == MinecraftState.LOBBY*/) {
             this.waitingServers.remove(serverInfo.getComponentName().toLowerCase());
             Child freeChild = freeChildren.get(0);
             freeChild.setServerInfo(serverInfo);

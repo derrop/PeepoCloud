@@ -25,16 +25,23 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
         super(Paths.get("nodeInfo.json"));
         this.plugin = plugin;
 
-        plugin.getServer().getMessenger().registerOutgoingPluginChannel(plugin, "BungeeCord");
-        plugin.getCommand("cloudplugin").setExecutor(this.cloudPluginCommand);
+        this.plugin.getServer().getMessenger().registerOutgoingPluginChannel(this.plugin, "BungeeCord");
+        this.plugin.getCommand("cloudplugin").setExecutor(this.cloudPluginCommand);
     }
 
     @Override
     public void bootstrap() {
+        super.registerNetworkHandler(new BukkitNetworkHandler(this));
+
         super.getPacketManager().registerPacket(new PacketInServerInfo());
         super.getPacketManager().registerPacket(new PacketInAPISignSelector());
 
         super.bootstrap();
+    }
+
+    @Override
+    public void handleSuccessfulLogin() {
+
     }
 
     @Override

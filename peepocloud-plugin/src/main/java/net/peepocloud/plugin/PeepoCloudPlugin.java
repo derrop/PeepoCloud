@@ -81,11 +81,13 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         this.nodeConnector.run();
     }
 
+
     @Override
     public void shutdown() {
         this.nodeConnector.shutdown();
         this.scheduler.disable();
     }
+
 
     @Override
     public abstract boolean isBungee();

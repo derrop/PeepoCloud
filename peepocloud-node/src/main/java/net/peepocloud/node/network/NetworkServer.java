@@ -161,11 +161,13 @@ public class NetworkServer implements Runnable {
 
     public void handleAuth(NetworkParticipant networkParticipant, Auth auth) {
         boolean successful = false;
+        if(networkParticipant.getChannel() == null)
+            return;
 
         if (auth.getAuthKey().equals(PeepoCloudNode.getInstance().getNetworkAuthKey())) {
             switch (auth.getType()) {
                 case NODE: {
-                    if (auth.getParentComponentName() != null || networkParticipant.getChannel() == null)
+                    if (auth.getParentComponentName() != null)
                         break;
 
                     if (!auth.getExtraData().contains("nodeInfo"))
@@ -255,7 +257,7 @@ public class NetworkServer implements Runnable {
                 break;
 
                 case MINECRAFT_SERVER: {
-                    if (auth.getParentComponentName() == null || networkParticipant.getChannel() == null)
+                    if (auth.getParentComponentName() == null)
                         break;
 
                     if (!auth.getParentComponentName().equals(PeepoCloudNode.getInstance().getNodeInfo().getName()))
@@ -289,7 +291,7 @@ public class NetworkServer implements Runnable {
                 break;
 
                 case BUNGEECORD: {
-                    if (auth.getParentComponentName() == null || networkParticipant.getChannel() == null)
+                    if (auth.getParentComponentName() == null)
                         break;
 
                     if (!auth.getParentComponentName().equals(PeepoCloudNode.getInstance().getNodeInfo().getName()))

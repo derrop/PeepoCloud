@@ -8,13 +8,7 @@ public class BungeeLauncher extends Plugin {
 
     @Override
     public void onEnable() {
-        this.getProxy().getPluginManager().registerListener(this, new BungeeListener(this));
-
-        this.getProxy().getConfig().getServers().clear();
-
         this.bungeeAPI = new PeepoBungeePlugin(this);
-        this.bungeeAPI.registerNetworkHandler(new BungeeNetworkHandler(this.bungeeAPI));
-
         this.bungeeAPI.bootstrap();
     }
 
