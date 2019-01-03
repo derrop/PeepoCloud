@@ -11,11 +11,13 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.PacketOutAuth;
+import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.coding.PacketDecoder;
 import net.peepocloud.lib.network.packet.coding.PacketEncoder;
 import net.peepocloud.lib.network.packet.handler.ChannelHandler;
 import net.peepocloud.lib.network.packet.handler.MainChannelHandler;
+import net.peepocloud.lib.utility.network.QueryRequest;
 
 import java.net.InetSocketAddress;
 
@@ -77,6 +79,14 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
 
     public PacketManager getPacketManager() {
         return packetManager;
+    }
+
+    public QueryRequest<Packet> packetQueryAsync(Packet packet) {
+        return this.packetManager.packetQueryAsync(this, packet);
+    }
+
+    public Packet packetQuery(Packet packet) {
+        return this.packetManager.packetQuery(this, packet);
     }
 
     public MainChannelHandler getPipelineHandler() {

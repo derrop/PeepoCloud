@@ -8,12 +8,17 @@ import net.peepocloud.plugin.api.bungee.PeepoCloudBungeeAPI;
 import net.peepocloud.plugin.network.packet.in.PacketInProxyInfo;
 import java.net.InetSocketAddress;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBungeeAPI {
     private BungeeLauncher plugin;
 
     private BungeeCordProxyInfo currentProxyInfo;
+    private Map<String, MinecraftServerInfo> cachedServers = new HashMap<>();
 
     PeepoBungeePlugin(BungeeLauncher plugin) {
         super(Paths.get("nodeInfo.json"));
@@ -30,6 +35,8 @@ public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBun
 
     @Override
     public void registerServerInfo(MinecraftServerInfo serverInfo) {
+        this.cachedServers.put(serverInfo.getComponentName(), serverInfo);
+
         if(!this.plugin.getProxy().getServers().containsKey(serverInfo.getComponentName())) {
             ServerInfo newServer = this.plugin.getProxy().constructServerInfo(serverInfo.getComponentName(),
                     new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort()), serverInfo.getMotd(), false);
@@ -39,7 +46,20 @@ public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBun
 
     @Override
     public void unregisterServerInfo(MinecraftServerInfo serverInfo) {
+        this.cachedServers.remove(serverInfo.getComponentName());
         this.plugin.getProxy().getServers().remove(serverInfo.getComponentName());
+    }
+
+    public Collection<MinecraftServerInfo> getCachedServers() {
+        return this.cachedServers.values();
+    }
+
+    public Collection<MinecraftServerInfo> getCachedServers(String group) {
+        return this.getCachedServers().stream().filter(serverInfo -> serverInfo.getGroupName().equalsIgnoreCase(group)).collect(Collectors.toList());
+    }
+
+    public MinecraftServerInfo getCachedServer(String name) {
+        return this.cachedServers.get(name);
     }
 
     @Override

@@ -105,7 +105,7 @@ public class CommandScreen extends Command implements TabCompletable {
                     sender.sendMessage("screen write <command>");
                     return;
                 }
-                if (this.enabledScreen == null) {
+                if (this.enabledScreen == null || !this.enabledScreen.isRunning()) {
                     sender.sendMessageLanguageKey("command.screen.write.notEnabled");
                     return;
                 }

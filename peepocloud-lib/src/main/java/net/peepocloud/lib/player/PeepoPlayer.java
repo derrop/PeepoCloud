@@ -77,7 +77,7 @@ public class PeepoPlayer implements PacketSerializable {
         dataOutput.writeUTF(name);
         playerConnection.serialize(dataOutput);
         dataOutput.writeUTF(proxyName);
-        dataOutput.writeUTF(serverName);
+        dataOutput.writeUTF(String.valueOf(proxyName));
         dataOutput.writeBoolean(clientSettings != null);
         if (clientSettings != null) {
             clientSettings.serialize(dataOutput);
@@ -92,6 +92,8 @@ public class PeepoPlayer implements PacketSerializable {
         playerConnection.deserialize(dataInput);
         proxyName = dataInput.readUTF();
         serverName = dataInput.readUTF();
+        if (serverName.equals("null"))
+            serverName = null;
         if (dataInput.readBoolean()) {
             clientSettings = new PeepoClientSettings();
             clientSettings.deserialize(dataInput);

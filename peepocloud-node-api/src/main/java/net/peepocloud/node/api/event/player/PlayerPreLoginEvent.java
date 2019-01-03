@@ -15,6 +15,8 @@ import net.peepocloud.node.api.event.Cancellable;
 public class PlayerPreLoginEvent extends PlayerEvent implements Cancellable {
     @Setter
     private boolean cancelled;
+    @Setter
+    private String cancelReason;
 
     public PlayerPreLoginEvent(PeepoPlayer player) {
         super(player);

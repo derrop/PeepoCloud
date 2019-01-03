@@ -4,6 +4,7 @@ package net.peepocloud.plugin.bungee;
  */
 
 import lombok.AllArgsConstructor;
+import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandler;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
@@ -25,6 +26,11 @@ public class BungeeNetworkHandler implements NetworkAPIHandler {
     }
 
     @Override
+    public void handleServerUpdate(MinecraftServerInfo oldInfo, MinecraftServerInfo newInfo) {
+        this.bungeeAPI.registerServerInfo(newInfo);
+    }
+
+    @Override
     public void handleServerQueued(MinecraftServerInfo serverInfo) {
 
     }
@@ -36,6 +42,11 @@ public class BungeeNetworkHandler implements NetworkAPIHandler {
 
     @Override
     public void handleProxyStop(BungeeCordProxyInfo proxyInfo) {
+
+    }
+
+    @Override
+    public void handleProxyUpdate(BungeeCordProxyInfo oldInfo, BungeeCordProxyInfo newInfo) {
 
     }
 
@@ -56,6 +67,21 @@ public class BungeeNetworkHandler implements NetworkAPIHandler {
 
     @Override
     public void handleUserUpdate(User oldUser, User newUser) {
+
+    }
+
+    @Override
+    public void handlePlayerLogin(PeepoPlayer player) {
+
+    }
+
+    @Override
+    public void handlePlayerLogout(PeepoPlayer player) {
+
+    }
+
+    @Override
+    public void handlePlayerUpdate(PeepoPlayer oldPlayer, PeepoPlayer newPlayer) {
 
     }
 }

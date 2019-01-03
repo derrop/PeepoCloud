@@ -24,10 +24,10 @@ public class CommandConfig extends Command implements TabCompletable {
     }
 
     private Collection<Field> bungeeGroupFields = Arrays.stream(BungeeGroup.class.getDeclaredFields())
-            .filter(field -> !field.getName().equals("name") && field.getType().equals(String.class) || field.getType().equals(int.class) || field.getType().equals(GroupMode.class))
+            .filter(field -> !field.getName().equals("name") && field.getType().equals(String.class) || field.getType().equals(int.class) || field.getType().equals(boolean.class) || field.getType().equals(GroupMode.class))
             .collect(Collectors.toList());
     private Collection<Field> minecraftGroupFields = Arrays.stream(MinecraftGroup.class.getDeclaredFields())
-            .filter(field -> !field.getName().equals("name") && field.getType().equals(String.class) || field.getType().equals(int.class) || field.getType().equals(GroupMode.class))
+            .filter(field -> !field.getName().equals("name") && field.getType().equals(String.class) || field.getType().equals(int.class) || field.getType().equals(boolean.class) || field.getType().equals(GroupMode.class))
             .collect(Collectors.toList());
 
     {
@@ -111,6 +111,8 @@ public class CommandConfig extends Command implements TabCompletable {
         String a = group instanceof BungeeGroup ? "bungeegroup" : group instanceof MinecraftGroup ? "minecraftgroup" : null;
         try {
             if (field.getType().equals(String.class)) {
+                if (val.equals("null"))
+                    val = null;
                 field.set(group, val);
                 return true;
             } else if (field.getType().equals(int.class)) {
@@ -119,6 +121,14 @@ public class CommandConfig extends Command implements TabCompletable {
                     return false;
                 }
                 field.set(group, Integer.parseInt(val));
+                return true;
+            } else if (field.getType().equals(boolean.class)) {
+                if (!val.equalsIgnoreCase("yes") && !val.equalsIgnoreCase("no") && !val.equalsIgnoreCase("true") && !val.equalsIgnoreCase("false")) {
+                    sender.createLanguageMessage("command.config.edit." + a + ".noBoolean").replace("%val%", val).send();
+                    return false;
+                }
+                boolean b = val.equalsIgnoreCase("yes") || val.equalsIgnoreCase("true");
+                field.set(group, b);
                 return true;
             } else if (field.getType().equals(GroupMode.class)) {
                 GroupMode groupMode;

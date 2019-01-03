@@ -57,6 +57,15 @@ public class NetworkScreenManager {
                     participant.sendPacket(new PacketOutDispatchProxyCommand(componentName, line));
                 }
             }
+
+            @Override
+            public boolean isRunning() {
+                NodeParticipant participant = PeepoCloudNode.getInstance().getServerNodes().get(parentComponentName);
+                if (participant == null)
+                    return false;
+                return participant.getServers().containsKey(componentName) || participant.getWaitingServers().containsKey(componentName) || participant.getStartingServers().containsKey(componentName) ||
+                        participant.getProxies().containsKey(componentName) || participant.getWaitingProxies().containsKey(componentName) || participant.getStartingProxies().containsKey(componentName);
+            }
         };
     }
 

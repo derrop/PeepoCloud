@@ -21,4 +21,7 @@ public abstract class EnabledScreen {
      * @param line the command to dispatch
      */
     public abstract void write(String line);
+
+    public abstract boolean isRunning();
+
 }

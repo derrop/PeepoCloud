@@ -56,6 +56,11 @@ public class ProcessScreenManager {
             public void write(String line) {
                 process.dispatchCommand(line);
             }
+
+            @Override
+            public boolean isRunning() {
+                return process.isRunning();
+            }
         };
     }
 
