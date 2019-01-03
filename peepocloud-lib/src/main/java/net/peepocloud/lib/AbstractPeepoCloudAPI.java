@@ -4,6 +4,7 @@ package net.peepocloud.lib;
  */
 
 import com.google.common.base.Preconditions;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
@@ -29,15 +30,29 @@ public abstract class AbstractPeepoCloudAPI {
 
     public abstract void debug(String message);
 
+    public abstract void playerChat(UUID uniqueId, String message);
+
+    public abstract void setPlayerTabHeaderFooter(UUID uniqueId, BaseComponent[] header, BaseComponent[] footer);
+
     public abstract void sendPlayerMessage(UUID uniqueId, String message);
+
+    public abstract void sendPlayerMessage(UUID uniqueId, BaseComponent... components);
 
     public abstract void sendPlayer(UUID uniqueId, String server);
 
+    public abstract void sendPlayerFallback(UUID uniqueId);
+
     public abstract void sendPlayerTitle(UUID uniqueId, String title, String subTitle, int fadeIn, int stay, int fadeOut);
+
+    public abstract void sendPlayerTitle(UUID uniqueId, BaseComponent[] title, BaseComponent[] subTitle, int fadeIn, int stay, int fadeOut);
 
     public abstract void kickPlayer(UUID uniqueId, String reason);
 
+    public abstract void kickPlayer(UUID uniqueId, BaseComponent... reason);
+
     public abstract void sendPlayerActionBar(UUID uniqueId, String message);
+
+    public abstract void sendPlayerActionBar(UUID uniqueId, BaseComponent... message);
 
     public abstract MinecraftGroup getMinecraftGroup(String name);
 
