@@ -38,6 +38,7 @@ import net.peepocloud.node.api.event.network.node.NodeConnectEvent;
 import net.peepocloud.node.api.network.NodeParticipant;
 import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.network.packet.auth.PacketInAuth;
+import net.peepocloud.node.network.packet.auth.PacketOutAuthSuccessful;
 import net.peepocloud.node.network.packet.out.PacketOutProxyInfo;
 import net.peepocloud.node.network.packet.out.PacketOutServerInfo;
 import net.peepocloud.node.network.packet.out.server.connection.PacketOutBungeeConnected;
@@ -323,6 +324,7 @@ public class NetworkServer implements Runnable {
             MainChannelHandler channelHandler = networkParticipant.getChannel().pipeline().get(MainChannelHandler.class);
             channelHandler.setChannelHandler(this.defaultHandler);
             channelHandler.setParticipant(networkParticipant);
+            networkParticipant.sendPacket(new PacketOutAuthSuccessful());
 
             if (PeepoCloudNode.getInstance().getLogger().isDebugging()) {
                 networkParticipant.sendPacket(new PacketOutToggleDebug(true));
