@@ -32,9 +32,14 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
         for(SignLayout signLayout : signLayouts)
             this.signLayouts.put(signLayout.getLayoutName().toLowerCase(), signLayout);
 
+
         for(ServerSign serverSign : serverSigns) {
-            serverSign.setBasicLayout(this.signLayouts.get(serverSign.getServerInfo().getGroup().getSignLayoutName()));
-            super.children.add(serverSign);
+            MinecraftGroup minecraftGroup = PeepoCloudPlugin.getInstance().getMinecraftGroup(serverSign.getGroupName());
+            if(minecraftGroup != null) {
+                serverSign.setBasicLayout(this.signLayouts.get(minecraftGroup.getSignLayoutName().toLowerCase()));
+                super.children.add(serverSign);
+            } else
+                System.out.println("Sign at " + serverSign.getPosition() + " does not have a valid group. Removing it ...");
         }
 
         this.loadingLayout = loadingLayout;
@@ -53,13 +58,14 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
             Iterator<ServerSign> signIterator = super.children.iterator();
             while (signIterator.hasNext()) {
                 ServerSign serverSign = signIterator.next();
+                MinecraftServerInfo serverInfo = serverSign.getServerInfo();
 
                 if(this.signProvider.getMinecraftSign(serverSign) == null) {
+                    System.out.println("Sign at " + serverSign.getPosition() + " does not have a minecraft-sign. Removing it ...");
                     signIterator.remove();
                     continue;
                 }
 
-                MinecraftServerInfo serverInfo = serverSign.getServerInfo();
                 if(serverInfo != null && serverInfo.getState() != MinecraftState.LOBBY)
                     serverSign.setServerInfo(null);
 
@@ -80,18 +86,21 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
             return;
 
         SignLayout signLayout = this.getServerSignLayout(serverSign);
+        if(signLayout != null) {
+            for (int i = 0; i < 3; i++) {
+                String signLine = serverInfo != null ? signLayout.getLines()[i]
+                        .replace("%onlinePlayers%", String.valueOf(serverInfo.getPlayers().size()))
+                        .replace("%maxPlayers%", String.valueOf(serverInfo.getMaxPlayers()))
+                        .replace("%motd%", serverInfo.getMotd())
+                        .replace("%serverName%", serverInfo.getComponentName())
+                        .replace("%serverId%", String.valueOf(serverInfo.getComponentId()))
+                        .replace("%serverState%", serverInfo.getState().getName()) : signLayout.getLines()[i];
 
-        for(int i = 0; i < 3; i++) {
-            String signLine = serverInfo != null ? signLayout.getLines()[i]
-                    .replace("%onlinePlayers%", String.valueOf(serverInfo.getPlayers().size()))
-                    .replace("%maxPlayers%", String.valueOf(serverInfo.getMaxPlayers()))
-                    .replace("%motd%", serverInfo.getMotd())
-                    .replace("%serverName%", serverInfo.getComponentName())
-                    .replace("%serverId%", String.valueOf(serverInfo.getComponentId()))
-                    .replace("%serverState%", serverInfo.getState().getName()) : signLayout.getLines()[i];
-
-            minecraftSign.setLine(i, signLine.replace("%groupName%", serverSign.getGroupName()));
-        }
+                minecraftSign.setLine(i, signLine.replace("%groupName%", serverSign.getGroupName()));
+            }
+        } else
+            System.out.println("No SignLayout available for sign at " + serverSign.getPosition() +
+                    ". Does the specific group of the sign have a valid layout set?");
 
         // to avoid concurrent modification
         Bukkit.getScheduler().runTask(PeepoCloudPlugin.getInstance().toBukkit().getPlugin(), () -> {
@@ -104,7 +113,7 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
         MinecraftServerInfo serverInfo = serverSign.getServerInfo();
 
         byte backBlockSubId;
-        if(serverInfo == null)
+        if(serverInfo == null || serverInfo.getGroup() == null)
             backBlockSubId = this.config.getBackBlockNoServerSubId();
         else {
             if(serverInfo.getGroup().isMaintenance())

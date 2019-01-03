@@ -1,10 +1,7 @@
 package net.peepocloud.lib.network;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
@@ -30,7 +27,7 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
     private ChannelHandler firstHandler;
     private Auth auth;
 
-    private Runnable connectedHandler;
+    private Runnable exceptionTask;
 
     public NetworkClient(InetSocketAddress address, PacketManager packetManager, ChannelHandler firstHandler, Auth auth) {
         super(auth.getComponentName(), null, -1);
@@ -62,18 +59,14 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
                                     .addLast(new MainChannelHandler(NetworkClient.this.packetManager, NetworkClient.this.firstHandler));
                         }
                     });
-            super.channel = bootstrap.connect(address).syncUninterruptibly().channel().writeAndFlush(new PacketOutAuth(this.auth)).syncUninterruptibly().channel();
+            super.channel = bootstrap.connect(this.address).sync().channel().writeAndFlush(new PacketOutAuth(this.auth)).syncUninterruptibly().channel();
             super.connectedAt = System.currentTimeMillis();
             System.out.println("&aSuccessfully connected to " + address);
-
-            if(this.connectedHandler != null)
-                this.connectedHandler.run();
-
-            super.channel.closeFuture().syncUninterruptibly();
         } catch (Exception exception) {
             System.err.println("&eError while trying to connect to " + address + ": &e"+ exception.getMessage());
-        } finally {
             eventLoopGroup.shutdownGracefully();
+            if(this.exceptionTask != null)
+                this.exceptionTask.run();
         }
     }
 
@@ -90,7 +83,7 @@ public class NetworkClient extends NetworkParticipant implements Runnable {
         return super.channel.pipeline().get(MainChannelHandler.class);
     }
 
-    public void setConnectedHandler(Runnable connectedHandler) {
-        this.connectedHandler = connectedHandler;
+    public void setExceptionTask(Runnable exceptionTask) {
+        this.exceptionTask = exceptionTask;
     }
 }

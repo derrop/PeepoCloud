@@ -206,9 +206,9 @@ public abstract class PeepoCloudPluginAPI extends AbstractPeepoCloudAPI {
     public abstract QueryRequest<Collection<BungeeCordProxyInfo>> getStartedBungeeProxies(String group);
 
 
-    public abstract QueryRequest<Collection<MinecraftGroup>> getMinecraftGroups();
+    public abstract Collection<MinecraftGroup> getMinecraftGroups();
 
-    public abstract QueryRequest<Collection<BungeeGroup>> getBungeeGroups();
+    public abstract Collection<BungeeGroup> getBungeeGroups();
 
 
     /**

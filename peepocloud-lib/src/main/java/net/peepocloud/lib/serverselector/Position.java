@@ -35,6 +35,11 @@ public class Position {
     }
 
     @Override
+    public String toString() {
+        return String.format("x=%s,y=%s,z=%s,world=%s", this.x, this.y, this.z, this.world);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if(this == obj)
             return true;

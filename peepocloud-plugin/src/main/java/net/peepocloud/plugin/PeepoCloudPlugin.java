@@ -1,7 +1,6 @@
 package net.peepocloud.plugin;
 
 import com.google.gson.reflect.TypeToken;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
@@ -526,52 +525,30 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         return 0;
     }
 
-    @Override
-    public void playerChat(UUID uniqueId, String message) {
-    }
-
-    @Override
-    public void setPlayerTabHeaderFooter(UUID uniqueId, BaseComponent[] header, BaseComponent[] footer) {
-    }
 
     @Override
     public void sendPlayer(UUID uniqueId, String server) {
-    }
 
-    @Override
-    public void sendPlayerFallback(UUID uniqueId) {
     }
 
     @Override
     public void sendPlayerActionBar(UUID uniqueId, String message) {
-    }
 
-    @Override
-    public void sendPlayerActionBar(UUID uniqueId, BaseComponent... message) {
     }
 
     @Override
     public void sendPlayerMessage(UUID uniqueId, String message) {
-    }
 
-    @Override
-    public void sendPlayerMessage(UUID uniqueId, BaseComponent... components) {
     }
 
     @Override
     public void sendPlayerTitle(UUID uniqueId, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-    }
 
-    @Override
-    public void sendPlayerTitle(UUID uniqueId, BaseComponent[] title, BaseComponent[] subTitle, int fadeIn, int stay, int fadeOut) {
     }
 
     @Override
     public void kickPlayer(UUID uniqueId, String reason) {
-    }
 
-    @Override
-    public void kickPlayer(UUID uniqueId, BaseComponent... reason) {
     }
 
     @Override

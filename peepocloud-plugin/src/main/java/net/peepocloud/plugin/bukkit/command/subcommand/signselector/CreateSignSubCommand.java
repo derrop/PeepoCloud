@@ -1,5 +1,6 @@
 package net.peepocloud.plugin.bukkit.command.subcommand.signselector;
 
+import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.serverselector.Position;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.bukkit.command.subcommand.SubCommandExecutor;
@@ -23,15 +24,15 @@ public class CreateSignSubCommand extends SubCommandExecutor {
             if(sender instanceof Player) {
                 Player player = (Player) sender;
                 if(args.length == 1) {
-                    String group = args[0];
-                    if(PeepoCloudPlugin.getInstance().getMinecraftGroup(group) != null) {
+                    MinecraftGroup minecraftGroup = PeepoCloudPlugin.getInstance().getMinecraftGroup(args[0]);
+                    if(minecraftGroup != null) {
                         Block targetBlock = player.getTargetBlock(null, 20);
                         if (targetBlock != null && (targetBlock.getType() == Material.WALL_SIGN
                                 || targetBlock.getType() == Material.SIGN_POST || targetBlock.getType() == Material.SIGN)) {
                             Position position = this.signProvider.fromBukkitLocation(targetBlock.getLocation(),
                                     PeepoCloudPlugin.getInstance().toBukkit().getCurrentServerInfo().getGroupName());
                             if (this.signProvider.getByPosition(position) == null) {
-                                this.signProvider.createSign(position, group);
+                                this.signProvider.createSign(position, minecraftGroup);
                                 player.sendMessage("§7The serverSign was successfully created!");
                             } else
                                 player.sendMessage("§7This sign is already a serverSign!");

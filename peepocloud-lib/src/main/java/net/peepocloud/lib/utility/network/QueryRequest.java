@@ -31,6 +31,7 @@ public class QueryRequest<T> {
         try {
             return this.future.get(timeout, timeUnit);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            System.err.println("Could not get a response for the query in the given time");
             e.printStackTrace();
             return null;
         }

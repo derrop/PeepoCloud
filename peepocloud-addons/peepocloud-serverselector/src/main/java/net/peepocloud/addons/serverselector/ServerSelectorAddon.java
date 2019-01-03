@@ -11,6 +11,7 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.addon.node.NodeAddon;
 import net.peepocloud.node.api.database.Database;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -31,6 +32,7 @@ public class ServerSelectorAddon extends NodeAddon {
             .append("maintenanceLayout", this.maintenanceLayout)
             .append("loadingLayout", this.loadingLayout)
             .append("serverSigns", new ServerSign[0]);
+    private Collection<ServerSign> serverSigns = new ArrayList<>();
 
     @Override
     public void onLoad() {
@@ -57,6 +59,7 @@ public class ServerSelectorAddon extends NodeAddon {
             else {
                 try {
                     this.signSelectorContainer = database.get("signSelector").get();
+                    this.serverSigns = Arrays.asList(this.signSelectorContainer.getObject("serverSigns", ServerSign[].class));
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -70,14 +73,14 @@ public class ServerSelectorAddon extends NodeAddon {
         Database database = super.getNode().getDatabaseManager().getDatabase("serverSelector");
         try {
             this.signSelectorContainer = database.get("signSelector").get();
+            this.serverSigns = Arrays.asList(this.signSelectorContainer.getObject("serverSigns", ServerSign[].class));
 
-            Collection<ServerSign> currentSigns = Arrays.asList(this.signSelectorContainer.getObject("serverSigns", ServerSign[].class));
             Collection<ServerSign> oldGroupSigns = this.getSignsFromGroup(group);
 
-            currentSigns.removeAll(oldGroupSigns);
-            currentSigns.addAll(Arrays.asList(serverSigns));
+            this.serverSigns.removeAll(oldGroupSigns);
+            this.serverSigns.addAll(Arrays.asList(serverSigns));
 
-            this.signSelectorContainer.append("serverSigns", currentSigns);
+            this.signSelectorContainer.append("serverSigns", this.serverSigns);
 
             database.update("signSelector", this.signSelectorContainer);
         } catch (InterruptedException | ExecutionException e) {
@@ -86,8 +89,7 @@ public class ServerSelectorAddon extends NodeAddon {
     }
 
     public Collection<ServerSign> getSignsFromGroup(String group) {
-        return Arrays.stream(this.signSelectorContainer
-                .getObject("serverSigns", ServerSign[].class)).filter(serverSign ->
+        return this.serverSigns.stream().filter(serverSign ->
                 serverSign.getPosition().getSavedOnGroup().equalsIgnoreCase(group)).collect(Collectors.toList());
     }
 
