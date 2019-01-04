@@ -47,7 +47,7 @@ public class BungeeNetworkHandler implements NetworkAPIHandler {
 
     @Override
     public void handleProxyUpdate(BungeeCordProxyInfo oldInfo, BungeeCordProxyInfo newInfo) {
-        if(newInfo.getComponentName().equalsIgnoreCase(this.bungeeAPI.getCurrentProxyInfo().getComponentName()))
+        if(this.bungeeAPI.getCurrentProxyInfo() == null || newInfo.getComponentName().equalsIgnoreCase(this.bungeeAPI.getCurrentProxyInfo().getComponentName()))
             this.bungeeAPI.updateCurrentProxyInfo(newInfo);
     }
 

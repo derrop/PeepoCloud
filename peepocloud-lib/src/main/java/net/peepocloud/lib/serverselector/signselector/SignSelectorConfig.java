@@ -3,6 +3,7 @@ package net.peepocloud.lib.serverselector.signselector;
 
 public class SignSelectorConfig {
     private int updateDelay;
+    private boolean signTitle;
     private String backBlockMaterialName;
     private byte backBlockFullServerSubId;
     private byte backBlockEmptyServerSubId;
@@ -10,8 +11,9 @@ public class SignSelectorConfig {
     private byte backBlockNoServerSubId;
     private byte backBlockMaintenanceSubId;
 
-    public SignSelectorConfig(int updateDelay, String backBlockMaterialName, byte backBlockFullServerSubId, byte backBlockEmptyServerSubId, byte backBlockNormalServerSubId, byte backBlockNoServerSubId, byte backBlockMaintenanceSubId) {
+    public SignSelectorConfig(int updateDelay, boolean signTitle, String backBlockMaterialName, byte backBlockFullServerSubId, byte backBlockEmptyServerSubId, byte backBlockNormalServerSubId, byte backBlockNoServerSubId, byte backBlockMaintenanceSubId) {
         this.updateDelay = updateDelay;
+        this.signTitle = signTitle;
         this.backBlockMaterialName = backBlockMaterialName;
         this.backBlockFullServerSubId = backBlockFullServerSubId;
         this.backBlockEmptyServerSubId = backBlockEmptyServerSubId;
@@ -22,6 +24,10 @@ public class SignSelectorConfig {
 
     public int getUpdateDelay() {
         return updateDelay;
+    }
+
+    public boolean isSignTitle() {
+        return signTitle;
     }
 
     public String getBackBlockMaterialName() {

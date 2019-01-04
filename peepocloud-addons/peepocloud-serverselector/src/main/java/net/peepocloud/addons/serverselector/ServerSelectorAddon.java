@@ -19,16 +19,19 @@ import java.util.stream.Collectors;
 
 public class ServerSelectorAddon extends NodeAddon {
 
-    private SignSelectorConfig signSelectorConfig = new SignSelectorConfig(20, "STAINED_GLASS", (byte) 1, (byte) 5, (byte) 13, (byte) 3, (byte) 14);
+    private SignSelectorConfig signSelectorConfig = new SignSelectorConfig(20, true, "STAINED_GLASS", (byte) 1, (byte) 5, (byte) 13, (byte) 3, (byte) 14);
 
     private AnimatedSignLayout loadingLayout = new AnimatedSignLayout(new SignLayout[]{
-            new SignLayout("loading", new String[]{"%groupName%", "- NO SERVER AVAILABLE - ", "", "%groupName%"})}, 1);
+            new SignLayout("loading", new String[]{"%groupName%", "- Searching - ", "", "%groupName%"},
+                    new String[]{"%groupName%", "Searching"})}, 1);
     private AnimatedSignLayout maintenanceLayout = new AnimatedSignLayout(new SignLayout[]{
-            new SignLayout("maintenance", new String[]{"%groupName%", "- MAINTENANCE - ", "", "%groupName%"})}, 1);
+            new SignLayout("maintenance", new String[]{"%groupName%", "- MAINTENANCE - ", "", "%groupName%"},
+                    new String[]{"%groupName%", "MAINTENANCE"})}, 1);
 
     private SimpleJsonObject signSelectorContainer = new SimpleJsonObject()
             .append("signLayouts", new SignLayout[]{new SignLayout("default",
-                    new String[]{"%groupName% - %serverName%", "%motd%", "%onlinePlayers%/%maxPlayers%", "%serverState%"})})
+                    new String[]{"%groupName% - %serverName%", "%motd%", "%onlinePlayers%/%maxPlayers%", "%serverState%"},
+                    new String[]{"%serverName%", "%onlinePlayers%/%maxPlayers%"})})
             .append("maintenanceLayout", this.maintenanceLayout)
             .append("loadingLayout", this.loadingLayout)
             .append("serverSigns", new ServerSign[0]);
@@ -59,7 +62,7 @@ public class ServerSelectorAddon extends NodeAddon {
             else {
                 try {
                     this.signSelectorContainer = database.get("signSelector").get();
-                    this.serverSigns = Arrays.asList(this.signSelectorContainer.getObject("serverSigns", ServerSign[].class));
+                    this.serverSigns = new ArrayList<>(Arrays.asList(this.signSelectorContainer.getObject("serverSigns", ServerSign[].class)));
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -73,12 +76,12 @@ public class ServerSelectorAddon extends NodeAddon {
         Database database = super.getNode().getDatabaseManager().getDatabase("serverSelector");
         try {
             this.signSelectorContainer = database.get("signSelector").get();
-            this.serverSigns = Arrays.asList(this.signSelectorContainer.getObject("serverSigns", ServerSign[].class));
+            this.serverSigns = new ArrayList<>(Arrays.asList(this.signSelectorContainer.getObject("serverSigns", ServerSign[].class)));
 
             Collection<ServerSign> oldGroupSigns = this.getSignsFromGroup(group);
 
             this.serverSigns.removeAll(oldGroupSigns);
-            this.serverSigns.addAll(Arrays.asList(serverSigns));
+            this.serverSigns.addAll(new ArrayList<>(Arrays.asList(serverSigns)));
 
             this.signSelectorContainer.append("serverSigns", this.serverSigns);
 

@@ -62,8 +62,8 @@ public class BungeeListener implements Listener {
                 event.setCancelReason(TextComponent.fromLegacyText(response.getKickReason()));
             } else {
                 PeepoCloudPlugin.getInstance().getCachedPlayers().put(player.getUniqueId(), player);
-                event.completeIntent(this.plugin);
             }
+            event.completeIntent(this.plugin);
         });
     }
 

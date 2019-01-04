@@ -59,7 +59,7 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
             this.signSelector = signSelector;
             this.registerNetworkHandler(signSelector);
 
-            Bukkit.getPluginManager().registerEvents(new SignListener(signSelector), this.plugin);
+            Bukkit.getPluginManager().registerEvents(new SignListener(this, signSelector), this.plugin);
 
             this.cloudPluginCommand.registerSubCommand(new CreateSignSubCommand(signSelector.getSignProvider()));
             this.cloudPluginCommand.registerSubCommand(new RemoveSignSubCommand(signSelector.getSignProvider()));

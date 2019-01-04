@@ -2,12 +2,14 @@ package net.peepocloud.lib.serverselector.signselector;
 
 
 public class SignLayout {
-    private String[] lines;
     private String layoutName;
+    private String[] lines;
+    private String[] signTitle;
 
-    public SignLayout(String layoutName, String[] lines) {
+    public SignLayout(String layoutName, String[] lines, String[] signTitle) {
         this.layoutName = layoutName;
         this.lines = lines;
+        this.signTitle = signTitle;
     }
 
     public String getLayoutName() {
@@ -16,5 +18,9 @@ public class SignLayout {
 
     public String[] getLines() {
         return lines;
+    }
+
+    public String[] getSignTitle() {
+        return signTitle;
     }
 }

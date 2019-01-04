@@ -79,7 +79,6 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
 
     @Override
     public void update(ServerSign serverSign) {
-        MinecraftServerInfo serverInfo = serverSign.getServerInfo();
         Sign minecraftSign = this.signProvider.getMinecraftSign(serverSign);
 
         if(minecraftSign == null)
@@ -88,15 +87,8 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
         SignLayout signLayout = this.getServerSignLayout(serverSign);
         if(signLayout != null) {
             for (int i = 0; i < 3; i++) {
-                String signLine = serverInfo != null ? signLayout.getLines()[i]
-                        .replace("%onlinePlayers%", String.valueOf(serverInfo.getPlayers().size()))
-                        .replace("%maxPlayers%", String.valueOf(serverInfo.getMaxPlayers()))
-                        .replace("%motd%", serverInfo.getMotd())
-                        .replace("%serverName%", serverInfo.getComponentName())
-                        .replace("%serverId%", String.valueOf(serverInfo.getComponentId()))
-                        .replace("%serverState%", serverInfo.getState().getName()) : signLayout.getLines()[i];
-
-                minecraftSign.setLine(i, signLine.replace("%groupName%", serverSign.getGroupName()));
+                String signLine = this.replacePlaceHolders(serverSign, signLayout.getLines()[i]);
+                minecraftSign.setLine(i, signLine);
             }
         } else
             System.out.println("No SignLayout available for sign at " + serverSign.getPosition() +
@@ -136,6 +128,18 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
         }
     }
 
+    public String replacePlaceHolders(ServerSign serverSign, String text) {
+        MinecraftServerInfo serverInfo = serverSign.getServerInfo();
+        return serverInfo != null ? text
+                .replace("%onlinePlayers%", String.valueOf(serverInfo.getPlayers().size()))
+                .replace("%maxPlayers%", String.valueOf(serverInfo.getMaxPlayers()))
+                .replace("%motd%", serverInfo.getMotd())
+                .replace("%serverName%", serverInfo.getComponentName())
+                .replace("%serverId%", String.valueOf(serverInfo.getComponentId()))
+                .replace("%serverState%", serverInfo.getState().getName())
+                : text.replace("%groupName%", serverSign.getGroupName());
+    }
+
     public SignLayout getServerSignLayout(ServerSign serverSign) {
         if(serverSign.getServerInfo() == null)
             return this.loadingLayout.getCurrentLayout();
@@ -147,6 +151,9 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
         return signGroup.isMaintenance() ? this.maintenanceLayout.getCurrentLayout() : serverSign.getBasicLayout();
     }
 
+    public SignSelectorConfig getConfig() {
+        return config;
+    }
 
     public SignProvider getSignProvider() {
         return signProvider;

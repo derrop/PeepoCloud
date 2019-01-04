@@ -12,7 +12,7 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 public class PacketOutUpdateServerInfo extends JsonPacket {
 
     public PacketOutUpdateServerInfo(MinecraftServerInfo oldInfo, MinecraftServerInfo newInfo) {
-        super(8);
+        super(9);
         super.setSimpleJsonObject(new SimpleJsonObject().append("oldInfo", oldInfo).append("newInfo", newInfo));
     }
 }
