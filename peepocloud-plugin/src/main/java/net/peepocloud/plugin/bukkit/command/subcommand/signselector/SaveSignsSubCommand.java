@@ -17,7 +17,7 @@ public class SaveSignsSubCommand extends SubCommandExecutor {
     public CommandExecutor subExecutor() {
         return (sender, command, label, args) -> {
             this.signProvider.save();
-            sender.sendMessage("The signs were sent to the node.");
+            sender.sendMessage("§7The signs were sent to the node.");
             return true;
         };
     }

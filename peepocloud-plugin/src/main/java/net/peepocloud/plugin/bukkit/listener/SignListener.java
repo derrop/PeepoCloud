@@ -26,8 +26,6 @@ public class SignListener implements Listener {
     public SignListener(PeepoBukkitPlugin bukkitAPI, SignSelector signSelector) {
         this.bukkitAPI = bukkitAPI;
         this.signSelector = signSelector;
-        if(signSelector.getConfig().isSignTitle())
-            this.startTitleScheduler();
     }
 
     @EventHandler
@@ -37,8 +35,7 @@ public class SignListener implements Listener {
             if(block.getState() instanceof Sign) {
                 Location location = block.getLocation();
                 ServerSign serverSign = this.signSelector.getSignProvider().getByPosition(
-                        this.signSelector.getSignProvider().fromBukkitLocation(location, PeepoCloudPlugin
-                                .getInstance().toBukkit().getCurrentServerInfo().getGroupName()));
+                        this.signSelector.getSignProvider().fromBukkitLocation(location));
                 if(serverSign != null) {
                     MinecraftServerInfo serverInfo = serverSign.getServerInfo();
                     if(serverInfo != null && !PeepoCloudPlugin.getInstance().getMinecraftGroup(serverInfo.getGroupName()).isMaintenance()) {
@@ -52,23 +49,22 @@ public class SignListener implements Listener {
         }
     }
 
-    private void startTitleScheduler() {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this.bukkitAPI.getPlugin(), () -> {
+    public Runnable getTitleScheduler() {
+        return () -> {
             for(Player player : Bukkit.getOnlinePlayers()) {
                 Block targetBlock = player.getTargetBlock(null, 10);
                 if(targetBlock != null) {
-                    SignPosition position = this.signSelector.getSignProvider().fromBukkitLocation(
-                            targetBlock.getLocation(), bukkitAPI.getCurrentServerInfo().getGroupName());
+                    SignPosition position = this.signSelector.getSignProvider().fromBukkitLocation(targetBlock.getLocation());
                     ServerSign serverSign = this.signSelector.getSignProvider().getByPosition(position);
                     if(serverSign != null) {
                         SignLayout signLayout = this.signSelector.getServerSignLayout(serverSign);
                         String firstTitle = this.signSelector.replacePlaceHolders(serverSign, signLayout.getSignTitle()[0]);
                         String secondTitle = this.signSelector.replacePlaceHolders(serverSign, signLayout.getSignTitle()[1]);
-                        player.sendTitle(firstTitle, secondTitle, 10, this.signSelector.getConfig().getUpdateDelay() * 20, 20);
+                        player.sendTitle(firstTitle, secondTitle, 0, this.signSelector.getConfig().getUpdateDelay() + 10, 0);
                     }
                 }
             }
-        }, 0, this.signSelector.getConfig().getUpdateDelay());
+        };
     }
 
 

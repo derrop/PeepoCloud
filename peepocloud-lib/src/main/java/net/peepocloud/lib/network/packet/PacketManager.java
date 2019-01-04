@@ -91,9 +91,9 @@ public class PacketManager {
 
     public QueryRequest<Packet> packetQueryAsync(NetworkPacketSender networkParticipant, Packet packet) {
         this.convertToQueryPacket(packet, UUID.randomUUID());
-        networkParticipant.sendPacket(packet);
         QueryRequest<Packet> request = new QueryRequest<>();
         this.pendingQueries.put(packet.getQueryUUID(), request);
+        networkParticipant.sendPacket(packet);
         return request;
     }
 

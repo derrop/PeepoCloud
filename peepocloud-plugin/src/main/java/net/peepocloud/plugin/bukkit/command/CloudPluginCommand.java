@@ -30,7 +30,7 @@ public class CloudPluginCommand implements CommandExecutor {
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage("§7/cloudplugin - Hilfe");
+        sender.sendMessage("§7/cloudplugin - Help");
         for(SubCommandExecutor subCommandExecutor : this.subCommandExecutors.values())
             sender.sendMessage("  §e/cloudplugin " + subCommandExecutor.getUsage() + " §8> §7" + subCommandExecutor.getDescription());
 

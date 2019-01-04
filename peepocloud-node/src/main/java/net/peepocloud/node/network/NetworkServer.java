@@ -32,6 +32,7 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftState;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
+import net.peepocloud.node.api.event.Event;
 import net.peepocloud.node.api.event.network.bungeecord.BungeeConnectEvent;
 import net.peepocloud.node.api.event.network.minecraftserver.ServerConnectEvent;
 import net.peepocloud.node.api.event.network.node.NodeConnectEvent;
@@ -163,7 +164,8 @@ public class NetworkServer implements Runnable {
         boolean successful = false;
         if(networkParticipant.getChannel() == null)
             return;
-
+        
+        Event connectedEvent = null;
         if (auth.getAuthKey().equals(PeepoCloudNode.getInstance().getNetworkAuthKey())) {
             switch (auth.getType()) {
                 case NODE: {
@@ -251,7 +253,7 @@ public class NetworkServer implements Runnable {
                             .replace("%cpu%", Integer.toString(nodeInfo.getCpuCores()))
                     );
 
-                    PeepoCloudNode.getInstance().getEventManager().callEvent(new NodeConnectEvent((NodeParticipantImpl) networkParticipant));
+                    connectedEvent = new NodeConnectEvent((NodeParticipantImpl) networkParticipant);
                     NodeUtils.updateNodeInfoForSupport(null);
                 }
                 break;
@@ -289,7 +291,7 @@ public class NetworkServer implements Runnable {
 
                     networkParticipant.sendPacket(new PacketOutUpdateServerInfo(null, process.getServerInfo()));
 
-                    PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerConnectEvent((MinecraftServerParticipantImpl) networkParticipant));
+                    connectedEvent = new ServerConnectEvent((MinecraftServerParticipantImpl) networkParticipant);
 
                 }
                 break;
@@ -324,7 +326,7 @@ public class NetworkServer implements Runnable {
 
                     networkParticipant.sendPacket(new PacketOutUpdateProxyInfo(null, process.getProxyInfo()));
 
-                    PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeConnectEvent((BungeeCordParticipantImpl) networkParticipant));
+                    connectedEvent = new BungeeConnectEvent((BungeeCordParticipantImpl) networkParticipant);
 
                 }
                 break;
@@ -339,6 +341,9 @@ public class NetworkServer implements Runnable {
             if (PeepoCloudNode.getInstance().getLogger().isDebugging()) {
                 networkParticipant.sendPacket(new PacketOutToggleDebug(true));
             }
+            
+            if(connectedEvent != null)
+                PeepoCloudNode.getInstance().getEventManager().callEvent(connectedEvent);
         } else {
             networkParticipant.getChannel().close();
         }

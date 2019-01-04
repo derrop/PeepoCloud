@@ -5,6 +5,7 @@ import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.serverselector.signselector.sign.ServerSign;
 import net.peepocloud.lib.serverselector.signselector.sign.SignPosition;
 import net.peepocloud.plugin.PeepoCloudPlugin;
+import net.peepocloud.plugin.bukkit.PeepoBukkitPlugin;
 import net.peepocloud.plugin.network.packet.out.PacketOutAPIServerSigns;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,9 +22,9 @@ public class SignProvider {
     }
 
     public void createSign(SignPosition position, MinecraftGroup minecraftGroup) {
-        ServerSign serverSign = new ServerSign(position, minecraftGroup.getName());
-        serverSign.setBasicLayout(PeepoCloudPlugin.getInstance().toBukkit().getSignSelector()
-                .getSignLayouts().get(minecraftGroup.getSignLayoutName().toLowerCase()));
+        PeepoBukkitPlugin bukkitAPI = PeepoCloudPlugin.getInstance().toBukkit();
+        ServerSign serverSign = new ServerSign(position, minecraftGroup.getName(), bukkitAPI.getCurrentServerInfo().getGroupName());
+        serverSign.setBasicLayout(bukkitAPI.getSignSelector().getSignLayouts().get(minecraftGroup.getSignLayoutName().toLowerCase()));
         this.serverSigns.add(serverSign);
         this.save();
     }
@@ -56,7 +57,7 @@ public class SignProvider {
         return new Location(Bukkit.getWorld(position.getWorld()), position.getX(), position.getY(), position.getZ());
     }
 
-    public SignPosition fromBukkitLocation(Location location, String savedOnGroup) {
-        return new SignPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), savedOnGroup);
+    public SignPosition fromBukkitLocation(Location location) {
+        return new SignPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
     }
 }
