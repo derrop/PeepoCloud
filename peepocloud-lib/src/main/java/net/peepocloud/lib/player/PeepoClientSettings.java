@@ -20,8 +20,7 @@ public class PeepoClientSettings implements PacketSerializable {
     private byte viewDistance;
     private int chatFlags;
     private boolean chatColours;
-    private byte difficulty;
-    private byte skinParts;
+    private PeepoPlayerSkinConfiguration skinParts;
     private int mainHand;
 
     @Override
@@ -30,8 +29,7 @@ public class PeepoClientSettings implements PacketSerializable {
         dataOutput.writeByte(viewDistance);
         dataOutput.writeInt(chatFlags);
         dataOutput.writeBoolean(chatColours);
-        dataOutput.writeByte(difficulty);
-        dataOutput.writeByte(skinParts);
+        dataOutput.writeByte(skinParts.toByte());
         dataOutput.writeInt(mainHand);
     }
 
@@ -41,8 +39,7 @@ public class PeepoClientSettings implements PacketSerializable {
         viewDistance = dataInput.readByte();
         chatFlags = dataInput.readInt();
         chatColours = dataInput.readBoolean();
-        difficulty = dataInput.readByte();
-        skinParts = dataInput.readByte();
+        skinParts = PeepoPlayerSkinConfiguration.fromByte(dataInput.readByte());
         mainHand = dataInput.readInt();
     }
 }

@@ -4,19 +4,16 @@ package net.peepocloud.plugin.bungee.listener;
  */
 
 import lombok.AllArgsConstructor;
+import net.md_5.bungee.api.SkinConfiguration;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.LoginEvent;
-import net.md_5.bungee.api.event.PreLoginEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
+import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.peepocloud.lib.network.packet.serialization.SerializationPacket;
-import net.peepocloud.lib.player.PeepoPlayer;
-import net.peepocloud.lib.player.PlayerConnection;
-import net.peepocloud.lib.player.PlayerLoginResponse;
+import net.peepocloud.lib.player.*;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.bungee.BungeeLauncher;
@@ -64,10 +61,33 @@ public class BungeeListener implements Listener {
                 event.setCancelled(true);
                 event.setCancelReason(TextComponent.fromLegacyText(response.getKickReason()));
             } else {
-                //TODO cache player
+                PeepoCloudPlugin.getInstance().getCachedPlayers().put(player.getUniqueId(), player);
                 event.completeIntent(this.plugin);
             }
         });
+    }
+
+    @EventHandler
+    public void handleDisconnect(PlayerDisconnectEvent event) {
+        //TODO send disconnect packet to the cloud
+        PeepoCloudPlugin.getInstance().getCachedPlayers().remove(event.getPlayer().getUniqueId());
+    }
+
+    @EventHandler
+    public void handleSettingsChanged(SettingsChangedEvent event) {
+        ProxiedPlayer proxiedPlayer = event.getPlayer();
+        PeepoPlayer player = PeepoCloudPlugin.getInstance().toBungee().getCachedPlayer(proxiedPlayer.getUniqueId());
+        SkinConfiguration skin = proxiedPlayer.getSkinParts();
+        PeepoClientSettings settings = new PeepoClientSettings(
+                proxiedPlayer.getLocale().getLanguage(),
+                proxiedPlayer.getViewDistance(),
+                proxiedPlayer.getChatMode().ordinal(),
+                proxiedPlayer.hasChatColors(),
+                new PeepoPlayerSkinConfiguration(skin.hasCape(), skin.hasJacket(), skin.hasLeftSleeve(), skin.hasRightSleeve(), skin.hasLeftPants(), skin.hasRightPants(), skin.hasHat()),
+                proxiedPlayer.getMainHand().ordinal()
+        );
+        player.setClientSettings(settings);
+        player.update();
     }
 
     @EventHandler

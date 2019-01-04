@@ -24,6 +24,7 @@ public class PeepoPlayer implements PacketSerializable {
     private String proxyName;
     @Setter
     private String serverName;
+    @Setter
     private PeepoClientSettings clientSettings;
 
     public void sendMessage(BaseComponent... components) {
@@ -68,6 +69,10 @@ public class PeepoPlayer implements PacketSerializable {
 
     public void setTabHeaderFooter(BaseComponent[] header, BaseComponent[] footer) {
         AbstractPeepoCloudAPI.getInstance().setPlayerTabHeaderFooter(this.uniqueId, header, footer);
+    }
+
+    public void update() {
+        AbstractPeepoCloudAPI.getInstance().updatePlayer(this);
     }
 
     @Override
