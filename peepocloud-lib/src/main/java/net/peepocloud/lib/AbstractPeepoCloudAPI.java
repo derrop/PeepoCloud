@@ -72,4 +72,6 @@ public abstract class AbstractPeepoCloudAPI {
 
     public abstract void updatePlayer(PeepoPlayer player);
 
+    public abstract int getOnlineCount();
+
 }

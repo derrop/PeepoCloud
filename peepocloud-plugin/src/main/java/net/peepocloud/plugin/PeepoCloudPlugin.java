@@ -495,6 +495,11 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     }
 
     @Override
+    public int getOnlineCount() {
+        return 0;
+    }
+
+    @Override
     public long getStartupTime() {
         return 0;
     }

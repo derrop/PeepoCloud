@@ -848,6 +848,11 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     }
 
+    @Override
+    public int getOnlineCount() {
+        return this.onlinePlayers.size();
+    }
+
     public void updateServerInfo(MinecraftServerInfo serverInfo) {
         boolean a = false;
         if (this.processManager.getProcesses().containsKey(serverInfo.getComponentName())) {
