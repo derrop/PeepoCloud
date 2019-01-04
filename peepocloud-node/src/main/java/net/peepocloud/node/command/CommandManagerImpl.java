@@ -31,6 +31,7 @@ public class CommandManagerImpl implements CommandManager {
                 try {
                     String line;
                     while (!isInterrupted() && PeepoCloudNode.getInstance().isRunning() && (line = logger.readLine1()) != null) {
+                        line = line.trim();
                         if (!"".equals(line) && !dispatchCommand(console, line)) {
                             System.out.println("Command not found, type &ehelp &rfor a list of all commands");
                         }
