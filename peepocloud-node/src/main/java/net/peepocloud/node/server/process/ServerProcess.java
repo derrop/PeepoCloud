@@ -256,10 +256,15 @@ public class ServerProcess implements CloudProcessImpl {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                this.screenHandlers.clear();
-                this.networkScreenHandler = null;
-                this.cachedLog.clear();
             }
+
+            if (this.process.exitValue() != 0) {
+                this.saveLatestLog();
+            }
+
+            this.screenHandlers.clear();
+            this.networkScreenHandler = null;
+            this.cachedLog.clear();
             if (!save) {
                 SystemUtils.sleepUninterruptedly(500);
                 SystemUtils.deleteDirectory(this.directory);

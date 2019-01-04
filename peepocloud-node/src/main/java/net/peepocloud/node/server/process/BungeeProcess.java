@@ -277,14 +277,21 @@ public class BungeeProcess implements CloudProcessImpl {
         this.shuttingDown = true;
 
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
-            this.dispatchCommand("end");
-            try {
-                if (!this.process.waitFor(8, TimeUnit.SECONDS)) {
-                    this.process.destroyForcibly();
+            if (this.isRunning()) {
+                this.dispatchCommand("end");
+                try {
+                    if (!this.process.waitFor(8, TimeUnit.SECONDS)) {
+                        this.process.destroyForcibly();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+
+            if (this.process.exitValue() != 0) {
+                this.saveLatestLog();
+            }
+
             this.screenHandlers.clear();
             this.networkScreenHandler = null;
             this.cachedLog.clear();
