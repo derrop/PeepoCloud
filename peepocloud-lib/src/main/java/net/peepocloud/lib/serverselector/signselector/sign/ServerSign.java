@@ -1,19 +1,18 @@
 package net.peepocloud.lib.serverselector.signselector.sign;
 
-import net.peepocloud.lib.serverselector.Position;
 import net.peepocloud.lib.serverselector.ServerSelectorChild;
 import net.peepocloud.lib.serverselector.signselector.SignLayout;
 
 public class ServerSign extends ServerSelectorChild {
-    private Position position;
+    private SignPosition position;
     private transient SignLayout basicLayout;
 
-    public ServerSign(Position position, String groupName) {
+    public ServerSign(SignPosition position, String groupName) {
         super(groupName);
         this.position = position;
     }
 
-    public Position getPosition() {
+    public SignPosition getPosition() {
         return position;
     }
 

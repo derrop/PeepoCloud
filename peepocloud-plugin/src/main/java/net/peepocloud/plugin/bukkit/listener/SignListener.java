@@ -1,11 +1,11 @@
-package net.peepocloud.plugin.bukkit.serverselector.signselector;
+package net.peepocloud.plugin.bukkit.listener;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.serverselector.signselector.sign.ServerSign;
-import net.peepocloud.lib.serverselector.Position;
 import net.peepocloud.plugin.PeepoCloudPlugin;
+import net.peepocloud.plugin.bukkit.serverselector.signselector.SignSelector;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;

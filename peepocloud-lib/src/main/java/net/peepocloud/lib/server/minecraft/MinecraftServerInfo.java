@@ -49,6 +49,13 @@ public class MinecraftServerInfo implements PacketSerializable {
         AbstractPeepoCloudAPI.getInstance().stopMinecraftServer(this);
     }
 
+    public void updateFrom(MinecraftServerInfo serverInfo) {
+        this.maxPlayers = serverInfo.maxPlayers;
+        this.motd = serverInfo.motd;
+        this.state = serverInfo.state;
+        this.players = serverInfo.players;
+    }
+
     @Override
     public void serialize(DataOutput dataOutput) throws Exception {
         dataOutput.writeUTF(componentName);

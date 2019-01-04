@@ -1,7 +1,7 @@
 package net.peepocloud.plugin.bukkit.command.subcommand.signselector;
 
 
-import net.peepocloud.lib.serverselector.Position;
+import net.peepocloud.lib.serverselector.signselector.sign.SignPosition;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.bukkit.command.subcommand.SubCommandExecutor;
 import net.peepocloud.plugin.bukkit.serverselector.signselector.SignProvider;
@@ -27,7 +27,7 @@ public class RemoveSignSubCommand extends SubCommandExecutor {
                     Block targetBlock = player.getTargetBlock(null, 20);
                     if (targetBlock != null && (targetBlock.getType() == Material.WALL_SIGN
                             || targetBlock.getType() == Material.SIGN_POST || targetBlock.getType() == Material.SIGN)) {
-                        Position position = this.signProvider.fromBukkitLocation(targetBlock.getLocation(),
+                        SignPosition position = this.signProvider.fromBukkitLocation(targetBlock.getLocation(),
                                 PeepoCloudPlugin.getInstance().toBukkit().getCurrentServerInfo().getGroupName());
                         if(this.signProvider.getByPosition(position) != null) {
                             this.signProvider.removeSign(position);

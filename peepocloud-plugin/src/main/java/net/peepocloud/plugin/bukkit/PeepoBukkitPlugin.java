@@ -7,10 +7,10 @@ import net.peepocloud.plugin.bukkit.command.CloudPluginCommand;
 import net.peepocloud.plugin.bukkit.command.subcommand.signselector.CreateSignSubCommand;
 import net.peepocloud.plugin.bukkit.command.subcommand.signselector.RemoveSignSubCommand;
 import net.peepocloud.plugin.bukkit.command.subcommand.signselector.SaveSignsSubCommand;
-import net.peepocloud.plugin.bukkit.serverselector.signselector.SignListener;
+import net.peepocloud.plugin.bukkit.listener.SignListener;
 import net.peepocloud.plugin.bukkit.serverselector.signselector.SignSelector;
 import net.peepocloud.plugin.network.packet.in.PacketInAPISignSelector;
-import net.peepocloud.plugin.network.packet.in.PacketInServerInfo;
+import net.peepocloud.plugin.network.packet.in.PacketInUpdateServerInfo;
 import org.bukkit.Bukkit;
 import java.nio.file.Paths;
 
@@ -33,7 +33,7 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
     public void bootstrap() {
         super.registerNetworkHandler(new BukkitNetworkHandler(this));
 
-        super.getPacketManager().registerPacket(new PacketInServerInfo());
+        super.getPacketManager().registerPacket(new PacketInUpdateServerInfo());
         super.getPacketManager().registerPacket(new PacketInAPISignSelector());
 
         super.bootstrap();
@@ -72,7 +72,10 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
     }
 
     public void updateCurrentServerInfo(MinecraftServerInfo serverInfo) {
-        this.currentServerInfo = serverInfo;
+        if(this.currentServerInfo == null)
+            this.currentServerInfo = serverInfo;
+        else
+            this.currentServerInfo.updateFrom(serverInfo);
     }
 
     public MinecraftServerInfo getCurrentServerInfo() {

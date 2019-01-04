@@ -4,6 +4,7 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftState;
 import net.peepocloud.lib.serverselector.ServerSelector;
 import net.peepocloud.lib.serverselector.ServerSelectorChild;
+import net.peepocloud.lib.serverselector.signselector.sign.ServerSign;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandlerAdapter;
 import java.util.ArrayList;
@@ -81,6 +82,17 @@ public abstract class SingleServerChildServerSelector<Child extends ServerSelect
             if(current.getComponentName().equalsIgnoreCase(serverInfo.getComponentName()))
                 this.waitingServers.remove(current.getComponentName().toLowerCase());
         }
+    }
+
+    @Override
+    public void handleServerUpdate(MinecraftServerInfo oldInfo, MinecraftServerInfo newInfo) {
+        for(Child child : this.children) {
+            if(child.getServerInfo().getComponentName().equalsIgnoreCase(newInfo.getComponentName()))
+                child.getServerInfo().updateFrom(newInfo);
+        }
+        MinecraftServerInfo waitingServer = this.waitingServers.get(newInfo.getComponentName().toLowerCase());
+        if(waitingServer != null)
+            waitingServer.updateFrom(newInfo);
     }
 
     public List<Child> getChildren() {

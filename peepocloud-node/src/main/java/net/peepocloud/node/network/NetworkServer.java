@@ -39,8 +39,8 @@ import net.peepocloud.node.api.network.NodeParticipant;
 import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.network.packet.auth.PacketInAuth;
 import net.peepocloud.node.network.packet.auth.PacketOutAuthSuccessful;
-import net.peepocloud.node.network.packet.out.PacketOutProxyInfo;
-import net.peepocloud.node.network.packet.out.PacketOutServerInfo;
+import net.peepocloud.node.network.packet.out.PacketOutUpdateProxyInfo;
+import net.peepocloud.node.network.packet.out.PacketOutUpdateServerInfo;
 import net.peepocloud.node.network.packet.out.server.connection.PacketOutBungeeConnected;
 import net.peepocloud.node.network.packet.out.server.connection.PacketOutServerConnected;
 import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
@@ -283,7 +283,7 @@ public class NetworkServer implements Runnable {
                             .replace("%name%", process.getName()).replace("%memory%", Integer.toString(process.getMemory()))
                     );
 
-                    networkParticipant.sendPacket(new PacketOutServerInfo(process.getServerInfo()));
+                    networkParticipant.sendPacket(new PacketOutUpdateServerInfo(null, process.getServerInfo()));
 
                     PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerConnectEvent((MinecraftServerParticipantImpl) networkParticipant));
 
@@ -314,7 +314,7 @@ public class NetworkServer implements Runnable {
                             .replace("%name%", process.getName()).replace("%memory%", Integer.toString(process.getMemory()))
                     );
 
-                    networkParticipant.sendPacket(new PacketOutProxyInfo(process.getProxyInfo()));
+                    networkParticipant.sendPacket(new PacketOutUpdateProxyInfo(null, process.getProxyInfo()));
 
                     PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeConnectEvent((BungeeCordParticipantImpl) networkParticipant));
 

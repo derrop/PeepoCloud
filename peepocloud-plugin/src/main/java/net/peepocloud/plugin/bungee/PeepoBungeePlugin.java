@@ -6,7 +6,7 @@ import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.api.bungee.PeepoCloudBungeeAPI;
 import net.peepocloud.plugin.bungee.listener.BungeeListener;
-import net.peepocloud.plugin.network.packet.in.PacketInProxyInfo;
+import net.peepocloud.plugin.network.packet.in.PacketInUpdateProxyInfo;
 import java.net.InetSocketAddress;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -33,7 +33,7 @@ public class PeepoBungeePlugin extends PeepoCloudPlugin implements PeepoCloudBun
     public void bootstrap() {
         super.registerNetworkHandler(new BungeeNetworkHandler(this));
 
-        super.getPacketManager().registerPacket(new PacketInProxyInfo());
+        super.getPacketManager().registerPacket(new PacketInUpdateProxyInfo());
 
         super.bootstrap();
     }
