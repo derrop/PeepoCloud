@@ -44,6 +44,10 @@ public class BungeeCordProxyInfo implements PacketSerializable {
         AbstractPeepoCloudAPI.getInstance().stopBungeeProxy(this);
     }
 
+    public void updateFrom(BungeeCordProxyInfo proxyInfo) {
+        this.players = proxyInfo.players;
+    }
+
     @Override
     public void serialize(DataOutput dataOutput) throws Exception {
         dataOutput.writeUTF(componentName);

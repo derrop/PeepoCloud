@@ -27,7 +27,8 @@ public class BukkitNetworkHandler implements NetworkAPIHandler {
 
     @Override
     public void handleServerUpdate(MinecraftServerInfo oldInfo, MinecraftServerInfo newInfo) {
-
+        if(newInfo.getComponentName().equalsIgnoreCase(this.bukkitAPI.getCurrentServerInfo().getComponentName()))
+            this.bukkitAPI.updateCurrentServerInfo(newInfo);
     }
 
     @Override

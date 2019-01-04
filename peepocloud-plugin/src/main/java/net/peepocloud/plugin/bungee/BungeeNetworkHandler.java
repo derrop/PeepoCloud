@@ -27,7 +27,7 @@ public class BungeeNetworkHandler implements NetworkAPIHandler {
 
     @Override
     public void handleServerUpdate(MinecraftServerInfo oldInfo, MinecraftServerInfo newInfo) {
-        this.bungeeAPI.registerServerInfo(newInfo);
+       this.bungeeAPI.registerServerInfo(newInfo);
     }
 
     @Override
@@ -47,7 +47,8 @@ public class BungeeNetworkHandler implements NetworkAPIHandler {
 
     @Override
     public void handleProxyUpdate(BungeeCordProxyInfo oldInfo, BungeeCordProxyInfo newInfo) {
-
+        if(newInfo.getComponentName().equalsIgnoreCase(this.bungeeAPI.getCurrentProxyInfo().getComponentName()))
+            this.bungeeAPI.updateCurrentProxyInfo(newInfo);
     }
 
     @Override
