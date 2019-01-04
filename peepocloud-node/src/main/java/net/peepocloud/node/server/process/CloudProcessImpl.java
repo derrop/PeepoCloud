@@ -7,11 +7,15 @@ import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.api.server.CloudProcess;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.Date;
+import java.util.Deque;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public interface CloudProcessImpl extends CloudProcess {
@@ -26,11 +30,14 @@ public interface CloudProcessImpl extends CloudProcess {
         if (!Files.exists(path))
             throw new IllegalStateException("log " + path.toString() + " of server " + getName() + " does not exist");
 
-        Path target = Paths.get("serverLogs/" + getName() + "/" + SystemUtils.DEFAULT_DATE_FORMAT.format(new Date()) + ".log");
+        Path target = Paths.get("serverLogs/" + getName() + "/" + SystemUtils.DEFAULT_FILE_DATE_FORMAT.format(new Date()) + ".log");
         SystemUtils.createParent(target);
+
+        Path consoleTarget = Paths.get("serverLogs/" + getName() + "/" + SystemUtils.DEFAULT_FILE_DATE_FORMAT.format(new Date()) + ".console");
 
         try {
             Files.copy(path, target, StandardCopyOption.REPLACE_EXISTING);
+            Files.write(consoleTarget, this.getCachedLog(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
