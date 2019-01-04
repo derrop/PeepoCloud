@@ -70,4 +70,6 @@ public abstract class AbstractPeepoCloudAPI {
 
     public abstract void updateBungeeGroup(BungeeGroup group);
 
+    public abstract void updatePlayer(PeepoPlayer player);
+
 }

@@ -12,6 +12,8 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.utility.network.DirectQueryRequest;
+import net.peepocloud.lib.utility.network.FunctionalQueryRequest;
 import net.peepocloud.lib.utility.network.QueryRequest;
 import net.peepocloud.plugin.api.PeepoCloudPluginAPI;
 import net.peepocloud.plugin.bungee.PeepoBungeePlugin;
@@ -34,6 +36,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     private static PeepoCloudPlugin instance;
@@ -46,6 +49,8 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
 
     private Map<String, MinecraftGroup> minecraftGroups;
     private Map<String, BungeeGroup> bungeeGroups;
+
+    private Map<UUID, PeepoPlayer> cachedPlayers = new HashMap<>();
 
     public PeepoCloudPlugin(Path nodeInfoFile) {
         instance = this;
@@ -312,144 +317,81 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     }
 
     @Override
+    public void updatePlayer(PeepoPlayer player) {
+
+    }
+
+    @Override
     public QueryRequest<NodeInfo> getBestNodeInfo(int memoryNeeded) {
         return null;
     }
 
     @Override
     public QueryRequest<Collection<MinecraftServerInfo>> getMinecraftServers() {
-        QueryRequest<Collection<MinecraftServerInfo>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos()).onComplete(packet -> {
-            if(packet instanceof JsonPacket) {
-                JsonPacket response = (JsonPacket) packet;
-                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if(simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(), packetToServerInfos());
     }
 
     @Override
     public QueryRequest<Collection<MinecraftServerInfo>> getMinecraftServers(String group) {
-        QueryRequest<Collection<MinecraftServerInfo>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(group)).onComplete(packet -> {
-            if(packet instanceof JsonPacket) {
-                JsonPacket response = (JsonPacket) packet;
-                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if(simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(group), packetToServerInfos());
     }
 
     @Override
     public QueryRequest<Collection<MinecraftServerInfo>> getStartedMinecraftServers() {
-        QueryRequest<Collection<MinecraftServerInfo>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(true)).onComplete(packet -> {
-            if(packet instanceof JsonPacket) {
-                JsonPacket response = (JsonPacket) packet;
-                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if(simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(true), packetToServerInfos());
     }
 
     @Override
     public QueryRequest<Collection<MinecraftServerInfo>> getStartedMinecraftServers(String group) {
-        QueryRequest<Collection<MinecraftServerInfo>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(group, true)).onComplete(packet -> {
-            if(packet instanceof JsonPacket) {
-                JsonPacket response = (JsonPacket) packet;
-                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if(simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryServerInfos(group, true), packetToServerInfos());
     }
 
     @Override
     public QueryRequest<Collection<BungeeCordProxyInfo>> getBungeeProxies() {
-        QueryRequest<Collection<BungeeCordProxyInfo>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos()).onComplete(packet -> {
-            if(packet instanceof JsonPacket) {
-                JsonPacket response = (JsonPacket) packet;
-                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if(simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(), packetToProxyInfos());
     }
 
     @Override
     public QueryRequest<Collection<BungeeCordProxyInfo>> getBungeeProxies(String group) {
-        QueryRequest<Collection<BungeeCordProxyInfo>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(group)).onComplete(packet -> {
-            if(packet instanceof JsonPacket) {
-                JsonPacket response = (JsonPacket) packet;
-                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if(simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(group), packetToProxyInfos());
     }
 
     @Override
     public QueryRequest<Collection<BungeeCordProxyInfo>> getStartedBungeeProxies() {
-        QueryRequest<Collection<BungeeCordProxyInfo>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(true)).onComplete(packet -> {
-            if(packet instanceof JsonPacket) {
-                JsonPacket response = (JsonPacket) packet;
-                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if(simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
-                else
-                    request.setResponse(null);
-            } else
-                request.setResponse(null);
-        });
-        return request;
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(true), packetToProxyInfos());
     }
 
     @Override
     public QueryRequest<Collection<BungeeCordProxyInfo>> getStartedBungeeProxies(String group) {
-        QueryRequest<Collection<BungeeCordProxyInfo>> request = new QueryRequest<>();
-        this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(group, true)).onComplete(packet -> {
-            if(packet instanceof JsonPacket) {
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryProxyInfos(group, true), packetToProxyInfos());
+    }
+
+    private Function<Packet, Collection<BungeeCordProxyInfo>> packetToProxyInfos() {
+        return packet -> {
+            if (packet instanceof JsonPacket) {
                 JsonPacket response = (JsonPacket) packet;
                 SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
-                if(simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
-                    request.setResponse(Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class)));
+                if (simpleJsonObject != null && simpleJsonObject.contains("proxyInfos"))
+                    return Arrays.asList(simpleJsonObject.getObject("proxyInfos", BungeeCordProxyInfo[].class));
                 else
-                    request.setResponse(null);
+                    return null;
             } else
-                request.setResponse(null);
-        });
-        return request;
+                return null;
+        };
+    }
+
+    private Function<Packet, Collection<MinecraftServerInfo>> packetToServerInfos() {
+        return packet -> {
+            if (packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if (simpleJsonObject != null && simpleJsonObject.contains("serverInfos"))
+                    return Arrays.asList(simpleJsonObject.getObject("serverInfos", MinecraftServerInfo[].class));
+                else
+                    return null;
+            } else
+                return null;
+        };
     }
 
     @Override
@@ -517,14 +459,34 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         return null;
     }
 
-    @Override
-    public QueryRequest<PeepoPlayer> getPlayer(UUID uniqueId) {
-        return null;
+    public PeepoPlayer getCachedPlayer(UUID uniqueId) {
+        return this.cachedPlayers.get(uniqueId);
+    }
+
+    public PeepoPlayer getCachedPlayer(String name) {
+        return this.cachedPlayers.values().stream().filter(player -> player.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    public Map<UUID, PeepoPlayer> getCachedPlayers() {
+        return cachedPlayers;
     }
 
     @Override
     public QueryRequest<PeepoPlayer> getPlayer(String name) {
-        return null;
+        PeepoPlayer player = this.getCachedPlayer(name);
+        if (player == null) {
+            //TODO send query packet
+        }
+        return new DirectQueryRequest<>(player);
+    }
+
+    @Override
+    public QueryRequest<PeepoPlayer> getPlayer(UUID uniqueId) {
+        PeepoPlayer player = this.getCachedPlayer(uniqueId);
+        if (player == null) {
+            //TODO send query packet
+        }
+        return new DirectQueryRequest<>(player);
     }
 
     @Override

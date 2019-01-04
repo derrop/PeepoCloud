@@ -4,6 +4,7 @@ package net.peepocloud.lib.network.packet;
 import net.peepocloud.lib.network.NetworkPacketSender;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
 import net.peepocloud.lib.network.packet.serialization.SerializationPacket;
+import net.peepocloud.lib.utility.network.FunctionalQueryRequest;
 import net.peepocloud.lib.utility.network.QueryRequest;
 
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 public class PacketManager {
     private Map<Integer, PacketInfo> registeredPackets = new HashMap<>();
@@ -96,7 +98,21 @@ public class PacketManager {
     }
 
     /**
-     * Sends a query and waits for the result up to 6 seconds
+     * Sends a query and completes the future when the value is available with the result of the {@link Function}
+     *
+     * @param networkParticipant the participant in the network, where the packet will be sent to
+     * @param packet the query-packet
+     * @param function the function where the packet will be applied to
+     * @return future for the result of the function
+     */
+    public <T> QueryRequest<T> packetQueryAsync(NetworkPacketSender networkParticipant, Packet packet, Function<Packet, T> function) {
+        FunctionalQueryRequest<T> request = new FunctionalQueryRequest<>(function);
+        this.packetQueryAsync(networkParticipant, packet).onComplete(request::setResponse);
+        return request;
+    }
+
+    /**
+     * Sends a query and waits for the result up to 4 seconds
      *
      * @param networkParticipant the participant in the network, where the packet will be sent to
      * @param packet the query-packet
@@ -105,6 +121,19 @@ public class PacketManager {
 
     public Packet packetQuery(NetworkPacketSender networkParticipant, Packet packet) {
         return this.packetQueryAsync(networkParticipant, packet).complete(4, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Sends a query and waits for the result up to 4 seconds and applies the result to the {@link Function}
+     *
+     * @param networkParticipant the participant in the network, where the packet will be sent to
+     * @param packet the query-packet
+     * @param function the function where the packet will be applied to
+     * @return the result of the query or null
+     */
+
+    public <T> T packetQuery(NetworkPacketSender networkParticipant, Packet packet, Function<Packet, T> function) {
+        return function.apply(this.packetQuery(networkParticipant, packet));
     }
 
     public QueryRequest<Packet> getQueryAndRemove(UUID uuid) {

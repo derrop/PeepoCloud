@@ -840,6 +840,14 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         this.sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
     }
 
+    @Override
+    public void updatePlayer(PeepoPlayer player) {
+        if (!this.onlinePlayers.containsKey(player.getUniqueId()))
+            return;
+        this.onlinePlayers.put(player.getUniqueId(), player);
+
+    }
+
     public void updateServerInfo(MinecraftServerInfo serverInfo) {
         boolean a = false;
         if (this.processManager.getProcesses().containsKey(serverInfo.getComponentName())) {
