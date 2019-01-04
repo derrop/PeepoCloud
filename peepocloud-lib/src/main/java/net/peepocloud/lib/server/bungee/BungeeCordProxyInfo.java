@@ -28,6 +28,8 @@ public class BungeeCordProxyInfo implements PacketSerializable {
     private int memory;
     private String host;
     private int port;
+    @Setter
+    private int pid;
 
     private Map<UUID, String> players;
 

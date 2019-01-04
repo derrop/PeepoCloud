@@ -22,6 +22,8 @@ import net.peepocloud.lib.network.packet.out.group.PacketOutCreateBungeeGroup;
 import net.peepocloud.lib.network.packet.out.group.PacketOutCreateMinecraftGroup;
 import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateBungee;
 import net.peepocloud.lib.network.packet.out.server.PacketOutUpdateServer;
+import net.peepocloud.lib.network.packet.serialization.PacketSerializable;
+import net.peepocloud.lib.network.packet.serialization.SerializationPacket;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.lib.scheduler.Scheduler;
@@ -33,6 +35,9 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftState;
 import net.peepocloud.lib.users.UserManager;
 import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.lib.utility.network.DirectQueryRequest;
+import net.peepocloud.lib.utility.network.PacketSerializableWrapper;
+import net.peepocloud.lib.utility.network.QueryRequest;
 import net.peepocloud.node.addon.AddonManagerImpl;
 import net.peepocloud.node.addon.defaults.DefaultAddonManagerImpl;
 import net.peepocloud.node.api.PeepoCloudNodeAPI;
@@ -43,6 +48,7 @@ import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.api.event.DefaultEventManager;
 import net.peepocloud.node.api.network.BungeeCordParticipant;
+import net.peepocloud.node.api.network.ClientNode;
 import net.peepocloud.node.api.network.MinecraftServerParticipant;
 import net.peepocloud.node.api.network.NodeParticipant;
 import net.peepocloud.node.api.server.CloudProcess;
@@ -59,6 +65,7 @@ import net.peepocloud.node.network.packet.out.PacketOutSendPacket;
 import net.peepocloud.node.network.packet.out.PacketOutUpdateNodeInfo;
 import net.peepocloud.node.network.packet.out.group.PacketOutBungeeGroupDeleted;
 import net.peepocloud.node.network.packet.out.group.PacketOutMinecraftGroupDeleted;
+import net.peepocloud.node.network.packet.out.server.process.info.PacketOutQueryProcessInfo;
 import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
 import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
 import net.peepocloud.node.screen.ScreenManagerImpl;
@@ -75,6 +82,8 @@ import net.peepocloud.node.utility.NodeUtils;
 import net.peepocloud.node.utility.users.NodeUserManager;
 import net.peepocloud.node.websocket.WebSocketClientImpl;
 import org.reflections.Reflections;
+import oshi.SystemInfo;
+import oshi.software.os.OSProcess;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -146,6 +155,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     private UserManager userManager = new NodeUserManager();
 
     private Collection<TemplateStorage> templateStorages = new ArrayList<>(Arrays.asList(new TemplateLocalStorage()));
+
+    private SystemInfo systemInfo = new SystemInfo();
 
     private Map<String, MinecraftServerParticipant> serversOnThisNode = new HashMap<String, MinecraftServerParticipant>() {
         @Override
@@ -389,7 +400,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                 new CommandList(),
                 new CommandShutdown(),
                 new CommandDelete(),
-                new CommandDebug()
+                new CommandDebug(),
+                new CommandInfo()
         );
 
         this.logger.debug("Registered " + this.commandManager.getCommands().size() + " commands");
@@ -842,10 +854,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     @Override
     public void updatePlayer(PeepoPlayer player) {
-        if (!this.onlinePlayers.containsKey(player.getUniqueId()))
-            return;
         this.onlinePlayers.put(player.getUniqueId(), player);
-
+        //TODO send packet to other nodes
     }
 
     @Override
@@ -1107,6 +1117,34 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         return false;
     }
 
+    public QueryRequest<OSProcess> getProcessOfServerInfo(MinecraftServerInfo serverInfo) {
+        return this.getProcessByPid(serverInfo.getParentComponentName(), serverInfo.getPid());
+    }
+
+    public QueryRequest<OSProcess> getProcessOfProxyInfo(BungeeCordProxyInfo proxyInfo) {
+        return this.getProcessByPid(proxyInfo.getParentComponentName(), proxyInfo.getPid());
+    }
+
+    private QueryRequest<OSProcess> getProcessByPid(String parentComponentName, int pid) {
+        if (pid == -1)
+            return new DirectQueryRequest<>(null);
+        if (parentComponentName.equals(this.nodeInfo.getName()))
+            return new DirectQueryRequest<>(this.systemInfo.getOperatingSystem().getProcess(pid));
+        ClientNode node = this.getConnectedNode(parentComponentName);
+        if (node == null)
+            return new DirectQueryRequest<>(null);
+        return this.packetManager.packetQueryAsync(node, new PacketOutQueryProcessInfo(pid), packet -> {
+            if (packet instanceof SerializationPacket) {
+                PacketSerializable packetSerializable = ((SerializationPacket) packet).getSerializable();
+                if (packetSerializable instanceof OSProcess)
+                    return (OSProcess) packetSerializable;
+                if (packetSerializable instanceof PacketSerializableWrapper && ((PacketSerializableWrapper) packetSerializable).getSerializable() instanceof OSProcess)
+                    return (OSProcess) ((PacketSerializableWrapper) packetSerializable).getSerializable();
+            }
+            return null;
+        });
+    }
+
     public MinecraftServerInfo getMinecraftServerInfo(String name) {
         if (this.processManager.getProcesses().containsKey(name)) {
             CloudProcess process = this.processManager.getProcesses().get(name);
@@ -1201,6 +1239,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     memory,
                     this.cloudConfig.getHost().getHost(),
                     this.findServerPort(group),
+                    -1,
                     group.getMaxPlayers(),
                     group.getMotd(),
                     MinecraftState.OFFLINE,
@@ -1223,6 +1262,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     memory,
                     channel.getAddress(),
                     this.findServerPort(group),
+                    -1,
                     group.getMaxPlayers(),
                     group.getMotd(),
                     MinecraftState.OFFLINE,
@@ -1353,6 +1393,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     memory,
                     this.cloudConfig.getHost().getHost(),
                     group.getStartPort() + nextId,
+                    -1,
                     new HashMap<>(),
                     template,
                     -1L
@@ -1372,6 +1413,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     memory,
                     channel.getAddress(),
                     group.getStartPort() + nextId,
+                    -1,
                     new HashMap<>(),
                     template,
                     -1L

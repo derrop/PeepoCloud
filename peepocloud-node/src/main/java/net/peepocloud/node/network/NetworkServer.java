@@ -270,8 +270,12 @@ public class NetworkServer implements Runnable {
 
                     networkParticipant = new MinecraftServerParticipantImpl(networkParticipant.getChannel(), auth);
 
-                    ((MinecraftServerParticipantImpl) networkParticipant).setServerInfo(process.getServerInfo());
+                    if (auth.getExtraData().contains("pid")) {
+                        process.getServerInfo().setPid(Integer.parseInt(auth.getExtraData().getString("pid")));
+                    }
+
                     process.getServerInfo().setState(MinecraftState.LOBBY);
+                    ((MinecraftServerParticipantImpl) networkParticipant).setServerInfo(process.getServerInfo());
                     PeepoCloudNode.getInstance().updateServerInfo(process.getServerInfo());
 
                     PeepoCloudNode.getInstance().getServersOnThisNode().put(auth.getComponentName(), (MinecraftServerParticipantImpl) networkParticipant);
@@ -303,6 +307,10 @@ public class NetworkServer implements Runnable {
                         break;
 
                     networkParticipant = new BungeeCordParticipantImpl(networkParticipant.getChannel(), auth);
+
+                    if (auth.getExtraData().contains("pid")) {
+                        process.getProxyInfo().setPid(Integer.parseInt(auth.getExtraData().getString("pid")));
+                    }
 
                     ((BungeeCordParticipantImpl) networkParticipant).setProxyInfo(process.getProxyInfo());
 

@@ -26,6 +26,8 @@ public class MinecraftServerInfo implements PacketSerializable {
     private int memory;
     private String host;
     private int port;
+    @Setter
+    private int pid;
 
     @Setter
     private int maxPlayers;

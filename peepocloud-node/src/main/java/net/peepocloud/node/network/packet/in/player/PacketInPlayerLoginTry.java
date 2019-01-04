@@ -53,7 +53,7 @@ public class PacketInPlayerLoginTry implements PacketHandler<SerializationPacket
         proxyInfo.getPlayers().put(player.getUniqueId(), player.getName());
         PeepoCloudNode.getInstance().updateProxyInfo(proxyInfo);
 
-        PeepoCloudNode.getInstance().getOnlinePlayers().put(player.getUniqueId(), player);
+        PeepoCloudNode.getInstance().updatePlayer(player);
 
         queryResponse.accept(new SerializationPacket(99999, new PlayerLoginResponse(true, null)));
 

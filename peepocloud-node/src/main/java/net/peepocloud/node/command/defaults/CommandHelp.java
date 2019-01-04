@@ -7,8 +7,10 @@ import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.command.Command;
 import net.peepocloud.node.api.command.CommandSender;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class CommandHelp extends Command {
     public CommandHelp() {
@@ -25,11 +27,7 @@ public class CommandHelp extends Command {
                 sender.createLanguageMessage("command.help.permission").replace("%permission%", command.getPermission()).send();
             }
             if (command.getAliases() != null && command.getAliases().length != 0) {
-                StringBuilder aliasesBuilder = new StringBuilder();
-                for (String alias : command.getAliases()) {
-                    aliasesBuilder.append(alias).append(", ");
-                }
-                sender.createLanguageMessage("command.help.aliases").replace("%aliases%", aliasesBuilder.substring(0, aliasesBuilder.length() - 2)).send();
+                sender.createLanguageMessage("command.help.aliases").replace("%aliases%", Arrays.stream(command.getAliases()).collect(Collectors.joining(", "))).send();
             }
             String usage = command.getUsage();
             if (usage != null)

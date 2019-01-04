@@ -26,8 +26,8 @@ public class CommandList extends Command {
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
         sender.sendMessage("Memory on this node: " + PeepoCloudNode.getInstance().getMemoryUsedOnThisInstance() + "/" + PeepoCloudNode.getInstance().getCloudConfig().getMaxMemory() + " MB");
-        sender.sendMessage("CPU on this node process: " + SystemUtils.cpuUsageProcess());
-        sender.sendMessage("CPU on this system: " + SystemUtils.cpuUsageSystem());
+        sender.sendMessage("CPU on this node process: " + String.format("%.2f", SystemUtils.cpuUsageProcess()));
+        sender.sendMessage("CPU on this system: " + String.format("%.2f", SystemUtils.cpuUsageSystem()));
 
         this.sendNodeInfo(sender, PeepoCloudNode.getInstance().getProcessManager());
         sender.sendMessage("Memory global: " + PeepoCloudNode.getInstance().getMemoryUsed() + "/" + PeepoCloudNode.getInstance().getMaxMemory() + " MB");

@@ -33,6 +33,7 @@ import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryGroups;
 import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryProxyInfos;
 import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryServerInfos;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -61,8 +62,10 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
             throw new NullPointerException("nodeInfoFile not specified");
         }
         SimpleJsonObject nodeInfo = SimpleJsonObject.load(nodeInfoFile);
+        Auth auth = nodeInfo.getObject("auth", Auth.class);
+        auth.getExtraData().append("pid", ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
         this.nodeConnector = new NetworkClient(nodeInfo.getObject("networkAddress", NetworkAddress.class)
-                .toInetSocketAddress(), this.packetManager, new ChannelHandlerAdapter(), nodeInfo.getObject("auth", Auth.class));
+                .toInetSocketAddress(), this.packetManager, new ChannelHandlerAdapter(), auth);
         this.nodeConnector.setExceptionTask(this::shutdown);
 
         // deleting the file because the info has been read
