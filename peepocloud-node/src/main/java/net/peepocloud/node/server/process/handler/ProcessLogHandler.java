@@ -11,6 +11,7 @@ import net.peepocloud.node.server.process.ProcessManager;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
@@ -22,7 +23,11 @@ public class ProcessLogHandler implements Runnable {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            for (CloudProcessImpl value : this.processManager.getProcesses().values()) {
+            if (this.processManager.getProcesses().isEmpty()) {
+                SystemUtils.sleepUninterruptedly(500);
+                continue;
+            }
+            for (CloudProcessImpl value : new ArrayList<>(this.processManager.getProcesses().values())) {
                 this.readLog(value);
             }
             SystemUtils.sleepUninterruptedly(50);
