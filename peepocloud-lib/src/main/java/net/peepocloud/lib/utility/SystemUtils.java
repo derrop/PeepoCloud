@@ -37,6 +37,7 @@ public class SystemUtils {
     public static final String CENTRAL_SERVER_URL_WS_GSTATS = "ws://derrupen.ddns.net:1351";
 
     public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy-mm:hh");
+    public static final DateFormat DEFAULT_FILE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy-mm_hh");
 
     private static final char[] values = "abcdefghijklmnopqrstuvwxyzäöüABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ1234567890".toCharArray();
 
