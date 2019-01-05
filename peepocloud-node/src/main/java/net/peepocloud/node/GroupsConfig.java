@@ -7,9 +7,11 @@ import com.google.gson.JsonElement;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.packet.out.group.PacketOutCreateBungeeGroup;
 import net.peepocloud.lib.network.packet.out.group.PacketOutCreateMinecraftGroup;
+import net.peepocloud.lib.server.Template;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.node.api.database.Database;
+import net.peepocloud.node.api.server.TemplateStorage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -99,11 +101,23 @@ public class GroupsConfig {
     private void loadGroup(BungeeGroup group) {
         System.out.println("&aLoading BungeeGroup &e" + group.getName() + "&a...");
         this.bungeeGroups.put(group.getName(), group);
+        for (Template template : group.getTemplates()) {
+            TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
+            if (storage == null)
+                storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
+            storage.createTemplate(group, template);
+        }
     }
 
     private void loadGroup(MinecraftGroup group) {
         System.out.println("&aLoading MinecraftGroup &e" + group.getName() + "&a...");
         this.minecraftGroups.put(group.getName(), group);
+        for (Template template : group.getTemplates()) {
+            TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
+            if (storage == null)
+                storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
+            storage.createTemplate(group, template);
+        }
     }
 
 }
