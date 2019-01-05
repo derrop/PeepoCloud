@@ -17,6 +17,7 @@ import net.peepocloud.lib.player.*;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.bungee.BungeeLauncher;
+import net.peepocloud.plugin.bungee.PeepoBungeePlugin;
 import net.peepocloud.plugin.network.packet.out.PacketOutPlayerLoginTry;
 
 import java.util.ArrayList;
@@ -24,13 +25,13 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @AllArgsConstructor
-public class BungeeListener implements Listener {
+public class BungeePlayerListener implements Listener {
 
-    private BungeeLauncher plugin;
+    private PeepoBungeePlugin bungeeAPI;
 
     @EventHandler
     public void handleLogin(LoginEvent event) {
-        event.registerIntent(this.plugin);
+        event.registerIntent(this.bungeeAPI.getPlugin());
 
         PendingConnection connection = event.getConnection();
 
@@ -51,7 +52,7 @@ public class BungeeListener implements Listener {
             if (!(packet instanceof SerializationPacket) || !(((SerializationPacket) packet).getSerializable() instanceof PlayerLoginResponse)) {
                 event.setCancelled(true);
                 event.setCancelReason(TextComponent.fromLegacyText("§cAn internal error occurred")); //TODO make configurable
-                event.completeIntent(this.plugin);
+                event.completeIntent(this.bungeeAPI.getPlugin());
                 return;
             }
 
@@ -60,11 +61,11 @@ public class BungeeListener implements Listener {
             if (!response.isAllowed()) {
                 event.setCancelled(true);
                 event.setCancelReason(TextComponent.fromLegacyText(response.getKickReason()));
-                event.completeIntent(this.plugin);
+                event.completeIntent(this.bungeeAPI.getPlugin());
             } else {
                 PeepoCloudPlugin.getInstance().getCachedPlayers().put(player.getUniqueId(), player);
             }
-            event.completeIntent(this.plugin);
+            event.completeIntent(this.bungeeAPI.getPlugin());
         });
     }
 
@@ -99,7 +100,7 @@ public class BungeeListener implements Listener {
             case SERVER_DOWN_REDIRECT:
             case JOIN_PROXY:
             {
-                ServerInfo serverInfo = fallback(event.getPlayer());
+                ServerInfo serverInfo = bungeeAPI.getPlayerFallback(event.getPlayer());
                 if (serverInfo == null) {
                     event.setCancelled(true);
                     event.getPlayer().disconnect(TextComponent.fromLegacyText("§cNo fallback-server found")); //TODO configurable
@@ -113,22 +114,5 @@ public class BungeeListener implements Listener {
         }
     }
 
-    private ServerInfo fallback(ProxiedPlayer player) {
-        List<MinecraftServerInfo> availableServers = new ArrayList<>();
-        PeepoCloudPlugin.getInstance().getMinecraftGroups().forEach(group -> {
-            if (group.isFallback()) {
-                if (group.getFallbackPermission() == null || player.hasPermission(group.getFallbackPermission())) {
-                    availableServers.addAll(PeepoCloudPlugin.getInstance().toBungee().getCachedServers(group.getName()));
-                }
-            }
-        });
-        if (availableServers.isEmpty()) {
-            return null;
-        }
-        MinecraftServerInfo serverInfo = availableServers.get(ThreadLocalRandom.current().nextInt(availableServers.size()));
-        if (serverInfo == null)
-            return null;
-        return this.plugin.getProxy().getServerInfo(serverInfo.getComponentName());
-    }
 
 }
