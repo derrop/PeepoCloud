@@ -16,6 +16,8 @@ public abstract class TemplateStorage {
 
     public abstract String getName();
 
+    public abstract boolean isWorking();
+
     /**
      * Copies the template of the given group to the {@code target} directory
      *
@@ -23,7 +25,16 @@ public abstract class TemplateStorage {
      * @param template the template to copy
      * @param target   the {@link Path} where the files should be copied to
      */
-    public abstract void copyToPath(String group, Template template, Path target);
+    public abstract void copyToPath(MinecraftGroup group, Template template, Path target);
+
+    /**
+     * Copies the template of the given group to the {@code target} directory
+     *
+     * @param group    the group of the {@link Template}
+     * @param template the template to copy
+     * @param target   the {@link Path} where the files should be copied to
+     */
+    public abstract void copyToPath(BungeeGroup group, Template template, Path target);
 
     /**
      * Copies the {@code directory} where the {@link MinecraftServerInfo} is running to the {@link Template} of the group by the server

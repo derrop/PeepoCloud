@@ -25,7 +25,21 @@ public class TemplateLocalStorage extends TemplateStorage {
     }
 
     @Override
-    public void copyToPath(String group, Template template, Path target) {
+    public boolean isWorking() {
+        return true;
+    }
+
+    @Override
+    public void copyToPath(MinecraftGroup group, Template template, Path target) {
+        this.copyToPath(group.getName(), template, target);
+    }
+
+    @Override
+    public void copyToPath(BungeeGroup group, Template template, Path target) {
+        this.copyToPath(group.getName(), template, target);
+    }
+
+    private void copyToPath(String group, Template template, Path target) {
         Path dir = Paths.get("templates/" + group + "/" + template.getName());
         if (!Files.exists(dir)) {
             this.create(group, template);
