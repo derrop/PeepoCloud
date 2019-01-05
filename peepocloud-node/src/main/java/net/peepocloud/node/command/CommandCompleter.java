@@ -23,14 +23,16 @@ public class CommandCompleter implements Completer {
     public int complete(String buffer, int cursor, List<CharSequence> candidates) {
         if (buffer.isEmpty() || buffer.indexOf(' ') == -1) {
 
+            Collection<String> a;
             if (this.logger.getRunningSetup() != null && this.logger.getRunningSetup().getCurrentAvailable() != null) {
-                candidates.addAll(this.logger.getRunningSetup().getCurrentAvailable());
+                a = this.logger.getRunningSetup().getCurrentAvailable();
             } else {
-                String s = buffer.toLowerCase();
-                for (String command : this.commandManager.getCommands().keySet()) {
-                    if (command.toLowerCase().startsWith(s)) {
-                        candidates.add(command);
-                    }
+                a = this.commandManager.getCommands().keySet();
+            }
+            String s = buffer.toLowerCase();
+            for (String command : a) {
+                if (command.toLowerCase().startsWith(s)) {
+                    candidates.add(command);
                 }
             }
 
