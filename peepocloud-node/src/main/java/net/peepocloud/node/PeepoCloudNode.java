@@ -419,7 +419,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         if (this.processManager != null)
             this.processManager.shutdown();
 
-        this.nodeAddonManager.disableAndUnloadAddons();
+        this.nodeAddonManager.shutdown();
 
         this.connectedNodes.values().forEach(NetworkParticipant::close);
         this.getServerNodes().values().forEach(NodeParticipant::closeConnection);

@@ -36,7 +36,7 @@ public class DatabaseLoaderImpl extends DatabaseLoader {
     }
 
     public void shutdown() {
-        this.addonManager.disableAndUnloadAddons();
+        this.addonManager.shutdown();
     }
 
     private void connectFailed(String name) {

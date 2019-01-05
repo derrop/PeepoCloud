@@ -93,7 +93,7 @@ public class AddonManagerImpl<Addon extends net.peepocloud.node.api.addon.Addon>
                         configuration.contains("reloadType") ? AddonConfig.ReloadType.valueOf(configuration.getString("reloadType")) : AddonConfig.ReloadType.ALWAYS
                 );
                 if (this.loadedAddons.containsKey(config.getName()))
-                    return this.loadedAddons.get(config.getName());
+                    throw new IllegalStateException("addon " + config.getName() + " was already loaded");
 
                 System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("addons.loadingAddon")
                         .replace("%name%", config.getName()).replace("%author%", config.getAuthor()).replace("%version%", config.getVersion()));
