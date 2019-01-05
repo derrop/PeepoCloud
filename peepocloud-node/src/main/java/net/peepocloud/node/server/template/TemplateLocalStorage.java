@@ -12,6 +12,7 @@ import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.api.server.TemplateStorage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,6 +52,26 @@ public class TemplateLocalStorage extends TemplateStorage {
     @Override
     public void copyFilesToTemplate(BungeeCordProxyInfo proxyInfo, Path directory, Template template, String[] files) {
         this.copyFilesToTemplate(directory, proxyInfo.getGroupName(), template, files);
+    }
+
+    @Override
+    public void copyStreamToTemplate(MinecraftGroup group, Template template, InputStream inputStream, String path) {
+        copyStreamToTemplate0(template, inputStream, path, group.getName());
+    }
+
+    @Override
+    public void copyStreamToTemplate(BungeeGroup group, Template template, InputStream inputStream, String path) {
+        copyStreamToTemplate0(template, inputStream, path, group.getName());
+    }
+
+    private void copyStreamToTemplate0(Template template, InputStream inputStream, String path, String group) {
+        Path target = Paths.get("templates/" + group + "/" + template.getName(), path);
+        SystemUtils.createParent(target);
+        try {
+            Files.copy(inputStream, target);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void copyToTemplate(Path directory, String group, Template template) {
