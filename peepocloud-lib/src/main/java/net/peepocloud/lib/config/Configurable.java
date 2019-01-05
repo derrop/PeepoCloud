@@ -36,6 +36,8 @@ public interface Configurable<V extends Configurable> {
 
     long getLong(String key);
 
+    double getDouble(String key);
+
     BigInteger getBigInteger(String key);
 
     BigDecimal getBigDecimal(String key);

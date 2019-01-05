@@ -122,6 +122,15 @@ public class PropertiesConfigurable implements Configurable<PropertiesConfigurab
     }
 
     @Override
+    public double getDouble(String key) {
+        try {
+            return Double.parseDouble(this.properties.getProperty(key));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    @Override
     public BigInteger getBigInteger(String key) {
         try {
             return new BigInteger(this.properties.getProperty(key));

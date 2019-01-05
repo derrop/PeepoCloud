@@ -131,6 +131,11 @@ public class SimpleJsonObject implements Configurable<SimpleJsonObject> {
         return contains(key) ? get(key).getAsLong() : -1;
     }
 
+    @Override
+    public double getDouble(String key) {
+        return contains(key) ? get(key).getAsDouble() : -1;
+    }
+
     public BigInteger getBigInteger(String key) {
         return contains(key) ? get(key).getAsBigInteger() : null;
     }

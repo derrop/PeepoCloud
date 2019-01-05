@@ -81,6 +81,11 @@ public class UnmodifiableConfigurable<T extends Configurable> implements Configu
     }
 
     @Override
+    public double getDouble(String key) {
+        return this.configurable.getDouble(key);
+    }
+
+    @Override
     public BigInteger getBigInteger(String key) {
         return this.configurable.getBigInteger(key);
     }

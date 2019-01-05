@@ -93,32 +93,37 @@ public class YamlConfigurable implements Configurable<YamlConfigurable> {
 
     @Override
     public boolean getBoolean(String key) {
-        return this.configuration.getBoolean(key);
+        return this.configuration.getBoolean(key, false);
     }
 
     @Override
     public char getCharacter(String key) {
-        return this.configuration.getChar(key);
+        return this.configuration.getChar(key, (char) -1);
     }
 
     @Override
     public byte getByte(String key) {
-        return this.configuration.getByte(key);
+        return this.configuration.getByte(key, (byte) -1);
     }
 
     @Override
     public short getShort(String key) {
-        return this.configuration.getShort(key);
+        return this.configuration.getShort(key, (short) -1);
     }
 
     @Override
     public int getInt(String key) {
-        return this.configuration.getInt(key);
+        return this.configuration.getInt(key, -1);
     }
 
     @Override
     public long getLong(String key) {
-        return this.configuration.getLong(key);
+        return this.configuration.getLong(key, -1L);
+    }
+
+    @Override
+    public double getDouble(String key) {
+        return this.configuration.getDouble(key, -1D);
     }
 
     @Override
