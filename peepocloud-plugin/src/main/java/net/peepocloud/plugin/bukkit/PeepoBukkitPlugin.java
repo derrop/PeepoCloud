@@ -7,6 +7,7 @@ import net.peepocloud.plugin.bukkit.command.CloudPluginCommand;
 import net.peepocloud.plugin.bukkit.command.subcommand.signselector.CreateSignSubCommand;
 import net.peepocloud.plugin.bukkit.command.subcommand.signselector.RemoveSignSubCommand;
 import net.peepocloud.plugin.bukkit.command.subcommand.signselector.SaveSignsSubCommand;
+import net.peepocloud.plugin.bukkit.listener.BukkitPluginChannelMessageListener;
 import net.peepocloud.plugin.bukkit.listener.SignListener;
 import net.peepocloud.plugin.bukkit.serverselector.signselector.SignSelector;
 import net.peepocloud.plugin.network.packet.in.PacketInAPISignSelector;
@@ -25,8 +26,9 @@ public class PeepoBukkitPlugin extends PeepoCloudPlugin implements PeepoCloudBuk
         super(Paths.get("nodeInfo.json"));
         this.plugin = plugin;
 
-        this.plugin.getServer().getMessenger().registerOutgoingPluginChannel(this.plugin, "BungeeCord");
+        this.plugin.getServer().getPluginManager().registerEvents(new BukkitPluginChannelMessageListener(), this.plugin);
         this.plugin.getCommand("cloudplugin").setExecutor(this.cloudPluginCommand);
+        this.plugin.getServer().getMessenger().registerOutgoingPluginChannel(this.plugin, "BungeeCord");
     }
 
     @Override

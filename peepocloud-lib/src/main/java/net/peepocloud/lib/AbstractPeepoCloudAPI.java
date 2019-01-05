@@ -56,6 +56,10 @@ public abstract class AbstractPeepoCloudAPI {
 
     public abstract void sendPlayerActionBar(UUID uniqueId, BaseComponent... message);
 
+    public abstract void playPlayerSound(UUID uniqueId, String sound, long volume, long pitch);
+
+    public abstract void playerPlayerEffect(UUID uniqueId, String effect, int data);
+
     public abstract MinecraftGroup getMinecraftGroup(String name);
 
     public abstract BungeeGroup getBungeeGroup(String name);

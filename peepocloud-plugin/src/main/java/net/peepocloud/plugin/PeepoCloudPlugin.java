@@ -659,7 +659,24 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         }
     }
 
+    @Override
+    public void playPlayerSound(UUID uniqueId, String sound, long volume, long pitch) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerSound",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("sound", sound).append("volume", volume)
+                    .append("pitch", pitch), new String[]{player.getServerName()});
+        }
+    }
 
+    @Override
+    public void playerPlayerEffect(UUID uniqueId, String effect, int data) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerEffect",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("effect", effect).append("data", data), new String[]{player.getServerName()});
+        }
+    }
 
     @Override
     public NetworkClient getNodeConnector() {

@@ -884,6 +884,25 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         }
     }
 
+    @Override
+    public void playPlayerSound(UUID uniqueId, String sound, long volume, long pitch) {
+        PeepoPlayer player = this.getPlayer(uniqueId);
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerSound",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("sound", sound).append("volume", volume)
+                            .append("pitch", pitch), new String[]{player.getServerName()});
+        }
+    }
+
+    @Override
+    public void playerPlayerEffect(UUID uniqueId, String effect, int data) {
+        PeepoPlayer player = this.getPlayer(uniqueId);
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerEffect",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("effect", effect).append("data", data), new String[]{player.getServerName()});
+        }
+    }
+
     public MinecraftGroup getMinecraftGroup(String name) {
         return this.minecraftGroups.get(name);
     }
