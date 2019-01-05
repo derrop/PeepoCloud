@@ -44,7 +44,7 @@ public abstract class Addon {
         configurable.saveAsFile(this.configFile);
     }
 
-    public Configurable loadConfig() {
+    public YamlConfigurable loadConfig() {
         return YamlConfigurable.load(this.configFile);
     }
 
