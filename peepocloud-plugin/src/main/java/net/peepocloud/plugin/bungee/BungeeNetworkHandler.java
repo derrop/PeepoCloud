@@ -4,11 +4,13 @@ package net.peepocloud.plugin.bungee;
  */
 
 import lombok.AllArgsConstructor;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandler;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.users.User;
+import net.peepocloud.plugin.bungee.event.BungeeCordPluginChannelMessageEvent;
 
 @AllArgsConstructor
 public class BungeeNetworkHandler implements NetworkAPIHandler {
@@ -84,5 +86,10 @@ public class BungeeNetworkHandler implements NetworkAPIHandler {
     @Override
     public void handlePlayerUpdate(PeepoPlayer oldPlayer, PeepoPlayer newPlayer) {
 
+    }
+
+    @Override
+    public void handlePluginChannelMessage(String senderComponent, String identifier, String message, SimpleJsonObject data) {
+        this.bungeeAPI.getPlugin().getProxy().getPluginManager().callEvent(new BungeeCordPluginChannelMessageEvent(senderComponent, identifier, message, data));
     }
 }

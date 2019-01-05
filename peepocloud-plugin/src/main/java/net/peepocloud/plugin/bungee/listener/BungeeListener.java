@@ -17,7 +17,7 @@ import net.peepocloud.lib.player.*;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.PeepoCloudPlugin;
 import net.peepocloud.plugin.bungee.BungeeLauncher;
-import net.peepocloud.plugin.bungee.network.packet.out.PacketOutPlayerLoginTry;
+import net.peepocloud.plugin.network.packet.out.PacketOutPlayerLoginTry;
 
 import java.util.ArrayList;
 import java.util.List;

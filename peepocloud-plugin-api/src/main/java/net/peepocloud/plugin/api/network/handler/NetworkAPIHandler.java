@@ -3,6 +3,7 @@ package net.peepocloud.plugin.api.network.handler;
  * Created by Mc_Ruben on 22.12.2018
  */
 
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
@@ -38,5 +39,6 @@ public interface NetworkAPIHandler {
 
     void handlePlayerUpdate(PeepoPlayer oldPlayer, PeepoPlayer newPlayer);
 
+    void handlePluginChannelMessage(String senderComponent, String identifier, String message, SimpleJsonObject data);
 
 }

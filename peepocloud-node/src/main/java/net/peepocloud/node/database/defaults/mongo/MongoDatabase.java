@@ -22,7 +22,7 @@ public class MongoDatabase implements Database {
 
     @Override
     public void insert(String name, SimpleJsonObject jsonObject) {
-        collection.insertOne(new Document("name", name).append("value", jsonObject.toString()));
+        collection.insertOne(SimpleJsonObject.GSON.get().fromJson(jsonObject.toJson(), Document.class).append("name", name));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class MongoDatabase implements Database {
 
     @Override
     public void update(String name, SimpleJsonObject jsonObject) {
-        collection.updateOne(Filters.eq("name", name), new Document("$set", new Document("value", jsonObject.toString())));
+        collection.updateOne(Filters.eq("name", name), SimpleJsonObject.GSON.get().fromJson(jsonObject.toJson(), Document.class).append("name", name));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MongoDatabase implements Database {
         PeepoCloudNode.getInstance().getExecutorService().execute(() -> {
             Document document = collection.find(Filters.eq("name", name)).first();
             if (document != null) {
-                future.complete(new SimpleJsonObject(document.getString("value")));
+                future.complete(new SimpleJsonObject(document.toJson()));
             } else {
                 future.complete(null);
             }

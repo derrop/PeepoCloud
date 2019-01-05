@@ -7,6 +7,7 @@ import net.peepocloud.lib.network.NetworkClient;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.player.PeepoPlayer;
+import net.peepocloud.lib.pluginchannelmessage.PluginChannelMessageManager;
 import net.peepocloud.lib.scheduler.Scheduler;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
@@ -43,6 +44,9 @@ public abstract class PeepoCloudPluginAPI extends AbstractPeepoCloudAPI {
     public abstract boolean isBungee();
     public abstract PeepoCloudBukkitAPI toBukkit();
     public abstract PeepoCloudBungeeAPI toBungee();
+
+    public abstract String getComponentName();
+    public abstract String getParentComponentName();
 
     public abstract void registerNetworkHandler(NetworkAPIHandler handler);
     public abstract boolean unregisterNetworkHandler(NetworkAPIHandler handler);
@@ -252,6 +256,7 @@ public abstract class PeepoCloudPluginAPI extends AbstractPeepoCloudAPI {
 
     public abstract PacketManager getPacketManager();
     public abstract NetworkClient getNodeConnector();
+    public abstract PluginChannelMessageManager getPluginChannelMessageManager();
     public abstract Collection<NetworkAPIHandler> getNetworkHandlers();
     public abstract Scheduler getScheduler();
 
