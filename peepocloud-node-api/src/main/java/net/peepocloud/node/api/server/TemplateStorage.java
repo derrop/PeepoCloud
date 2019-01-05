@@ -9,6 +9,7 @@ import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 
+import java.io.InputStream;
 import java.nio.file.Path;
 
 public abstract class TemplateStorage {
@@ -61,6 +62,26 @@ public abstract class TemplateStorage {
      * @param template  the {@link Template} of the group to copy the files to
      */
     public abstract void copyFilesToTemplate(BungeeCordProxyInfo proxyInfo, Path directory, Template template, String[] files);
+
+    /**
+     * Copies the {@link InputStream} to the {@link Template} of the given {@link MinecraftGroup}
+     *
+     * @param group       the group of the template
+     * @param template    the template where the stream should be copied to
+     * @param inputStream the stream from which the file is copied
+     * @param path        the path relative to the template of the new file
+     */
+    public abstract void copyStreamToTemplate(MinecraftGroup group, Template template, InputStream inputStream, String path);
+
+    /**
+     * Copies the {@link InputStream} to the {@link Template} of the given {@link BungeeGroup}
+     *
+     * @param group       the group of the template
+     * @param template    the template where the stream should be copied to
+     * @param inputStream the stream from which the file is copied
+     * @param path        the path relative to the template of the new file
+     */
+    public abstract void copyStreamToTemplate(BungeeGroup group, Template template, InputStream inputStream, String path);
 
     /**
      * Deletes the template of the given {@link MinecraftGroup}
