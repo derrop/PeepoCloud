@@ -201,6 +201,14 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
     public abstract TemplateStorage getTemplateStorage(String name);
 
     /**
+     * Registers a new {@link TemplateStorage} to this Node
+     *
+     * @param storage the {@link TemplateStorage} to register
+     * @return {@code false} if a storage with that name already exists, or else {@code true}
+     */
+    public abstract boolean registerTemplateStorage(TemplateStorage storage);
+
+    /**
      * Updates a {@link MinecraftGroup} to the database
      *
      * @param group the group to update
@@ -474,6 +482,15 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
      * @param template the {@link Template} to copy
      * @param target   the target where the files are copied in
      */
-    public abstract void copyTemplate(String group, Template template, Path target);
+    public abstract void copyTemplate(MinecraftGroup group, Template template, Path target);
+
+    /**
+     * Copies a template by the loaded {@link TemplateStorage} specified in the {@link Template} or if not found the local storage to the given {@link Path}
+     *
+     * @param group    the group of the server/proxy
+     * @param template the {@link Template} to copy
+     * @param target   the target where the files are copied in
+     */
+    public abstract void copyTemplate(BungeeGroup group, Template template, Path target);
 
 }
