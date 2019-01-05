@@ -81,7 +81,7 @@ public class ServerSelectorAddon extends NodeAddon {
             Collection<ServerSign> oldGroupSigns = this.getSignsFromGroup(group);
 
             this.serverSigns.removeAll(oldGroupSigns);
-            this.serverSigns.addAll(new ArrayList<>(Arrays.asList(serverSigns)));
+            this.serverSigns.addAll(Arrays.asList(serverSigns));
 
             this.signSelectorContainer.append("serverSigns", this.serverSigns);
 
@@ -93,7 +93,7 @@ public class ServerSelectorAddon extends NodeAddon {
 
     public Collection<ServerSign> getSignsFromGroup(String group) {
         return this.serverSigns.stream().filter(serverSign ->
-                serverSign.getPosition().getSavedOnGroup().equalsIgnoreCase(group)).collect(Collectors.toList());
+                serverSign.getSavedOnGroup().equalsIgnoreCase(group)).collect(Collectors.toList());
     }
 
     public SignSelectorConfig getSignSelectorConfig() {

@@ -7,8 +7,8 @@ public class ServerSign extends ServerSelectorChild {
     private SignPosition position;
     private transient SignLayout basicLayout;
 
-    public ServerSign(SignPosition position, String groupName) {
-        super(groupName);
+    public ServerSign(SignPosition position, String groupName, String savedOnGroup) {
+        super(groupName, savedOnGroup);
         this.position = position;
     }
 

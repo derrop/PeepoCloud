@@ -17,7 +17,7 @@ public class AnimatedSignLayout {
 
     public void nextStep() {
         this.currentStep++;
-        if(this.currentStep >= this.animationStepCount - 1)
+        if(this.currentStep >= this.animationStepCount)
             this.currentStep = 0;
     }
 
@@ -26,7 +26,7 @@ public class AnimatedSignLayout {
     }
 
     public SignLayout getCurrentLayout() {
-        return this.animationSteps[this.getCurrentStep()];
+        return this.animationSteps[this.currentStep];
     }
 
     public int getAnimationStepCount() {

@@ -24,6 +24,7 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
     private Map<String, SignLayout> signLayouts = new HashMap<>();
     private AnimatedSignLayout loadingLayout;
     private AnimatedSignLayout maintenanceLayout;
+    private Runnable titleRunnable;
 
     public SignSelector(SignSelectorConfig config, ServerSign[] serverSigns, SignLayout[] signLayouts, AnimatedSignLayout loadingLayout, AnimatedSignLayout maintenanceLayout) {
         this.config = config;
@@ -49,8 +50,14 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
             super.waitingServers.put(startedServer.getComponentName().toLowerCase(), startedServer);
     }
 
+    public void setTitleRunnable(Runnable runnable) {
+        this.titleRunnable = runnable;
+    }
+
     @Override
     public void handleStart(Scheduler scheduler) {
+        if(!this.config.isSignTitle())
+            this.titleRunnable = null;
         scheduler.repeat(() -> {
             this.loadingLayout.nextStep();
             this.maintenanceLayout.nextStep();
@@ -73,7 +80,8 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
             }
 
             super.waitingServers.values().forEach(super::handleServerAdd);
-
+            if(this.titleRunnable != null)
+                titleRunnable.run();
         }, 0, this.config.getUpdateDelay(), true);
     }
 
@@ -130,14 +138,14 @@ public class SignSelector extends SingleServerChildServerSelector<ServerSign> {
 
     public String replacePlaceHolders(ServerSign serverSign, String text) {
         MinecraftServerInfo serverInfo = serverSign.getServerInfo();
-        return serverInfo != null ? text
+        String replacedServerInfoText =  serverInfo != null ? text
                 .replace("%onlinePlayers%", String.valueOf(serverInfo.getPlayers().size()))
                 .replace("%maxPlayers%", String.valueOf(serverInfo.getMaxPlayers()))
                 .replace("%motd%", serverInfo.getMotd())
                 .replace("%serverName%", serverInfo.getComponentName())
                 .replace("%serverId%", String.valueOf(serverInfo.getComponentId()))
-                .replace("%serverState%", serverInfo.getState().getName())
-                : text.replace("%groupName%", serverSign.getGroupName());
+                .replace("%serverState%", serverInfo.getState().getName()): text;
+        return replacedServerInfoText.replace("%groupName%", serverSign.getGroupName());
     }
 
     public SignLayout getServerSignLayout(ServerSign serverSign) {

@@ -4,14 +4,12 @@ package net.peepocloud.lib.serverselector.signselector.sign;
 public class SignPosition {
     private int x, y, z;
     private String world;
-    private String savedOnGroup;
 
-    public SignPosition(int x, int y, int z, String world, String savedOnGroup) {
+    public SignPosition(int x, int y, int z, String world) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.world = world;
-        this.savedOnGroup = savedOnGroup;
     }
 
     public int getX() {
@@ -28,10 +26,6 @@ public class SignPosition {
 
     public String getWorld() {
         return world;
-    }
-
-    public String getSavedOnGroup() {
-        return savedOnGroup;
     }
 
     @Override

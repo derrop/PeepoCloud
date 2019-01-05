@@ -27,8 +27,7 @@ public class RemoveSignSubCommand extends SubCommandExecutor {
                     Block targetBlock = player.getTargetBlock(null, 20);
                     if (targetBlock != null && (targetBlock.getType() == Material.WALL_SIGN
                             || targetBlock.getType() == Material.SIGN_POST || targetBlock.getType() == Material.SIGN)) {
-                        SignPosition position = this.signProvider.fromBukkitLocation(targetBlock.getLocation(),
-                                PeepoCloudPlugin.getInstance().toBukkit().getCurrentServerInfo().getGroupName());
+                        SignPosition position = this.signProvider.fromBukkitLocation(targetBlock.getLocation());
                         if(this.signProvider.getByPosition(position) != null) {
                             this.signProvider.removeSign(position);
                             player.sendMessage("§7The serverSign was successfully removed!");
