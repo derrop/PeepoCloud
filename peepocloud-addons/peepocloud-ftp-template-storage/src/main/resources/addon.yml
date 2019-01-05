@@ -1,0 +1,5 @@
+name: PeepoCloud-FTP-TemplateStorage
+version: ${cloud.version}
+main: net.peepocloud.addons.templates.ftp.FtpTemplatesAddon
+author: derrupen & Panamo
+reloadType: NEVER

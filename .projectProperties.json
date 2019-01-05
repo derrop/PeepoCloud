@@ -15,6 +15,17 @@
         "Panamo"
       ],
       "path": "peepocloud-addons/peepocloud-serverselector/target/PeepoCloud-ServerSelector.jar"
+    },
+    {
+      "name": "FTP-TemplateStorage",
+      "version": "1.0",
+      "versions": [
+        "1.0"
+      ],
+      "authors": [
+        "derrupen"
+      ],
+      "path": "peepocloud-addons/peepocloud-ftp-template-storage/target/PeepoCloud-FTP-TemplateStorage.jar"
     }
   ],
   "build": {

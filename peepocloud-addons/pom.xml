@@ -15,6 +15,7 @@
     <modules>
         <module>peepocloud-acp</module>
         <module>peepocloud-serverselector</module>
+        <module>peepocloud-ftp-template-storage</module>
     </modules>
 
 
