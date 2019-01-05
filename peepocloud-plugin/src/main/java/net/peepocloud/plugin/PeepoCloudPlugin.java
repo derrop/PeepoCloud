@@ -13,9 +13,9 @@ import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.utility.network.DirectQueryRequest;
-import net.peepocloud.lib.utility.network.FunctionalQueryRequest;
 import net.peepocloud.lib.utility.network.QueryRequest;
 import net.peepocloud.plugin.api.PeepoCloudPluginAPI;
+import net.peepocloud.plugin.pluginchannelmessage.PluginPluginChannelMessageManager;
 import net.peepocloud.plugin.bungee.PeepoBungeePlugin;
 import net.peepocloud.plugin.bukkit.PeepoBukkitPlugin;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandler;
@@ -25,13 +25,14 @@ import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.lib.utility.network.NetworkAddress;
+import net.peepocloud.plugin.network.packet.in.PacketInPluginChannelMessage;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIProxyStarted;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIProxyStopped;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIServerStarted;
 import net.peepocloud.plugin.network.packet.in.server.PacketInAPIServerStopped;
-import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryGroups;
-import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryProxyInfos;
-import net.peepocloud.plugin.network.packet.out.PacketOutAPIQueryServerInfos;
+import net.peepocloud.plugin.network.packet.out.query.PacketOutAPIQueryGroups;
+import net.peepocloud.plugin.network.packet.out.query.PacketOutAPIQueryProxyInfos;
+import net.peepocloud.plugin.network.packet.out.query.PacketOutAPIQueryServerInfos;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
@@ -44,14 +45,18 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
 
     protected PacketManager packetManager = new PacketManager();
     protected NetworkClient nodeConnector;
+    protected PluginPluginChannelMessageManager pluginChannelMessageManager;
     protected Collection<NetworkAPIHandler> networkHandlers = new ArrayList<>();
     protected Scheduler scheduler = new Scheduler();
-    private boolean debugging = false;
+    protected boolean debugging = false;
 
-    private Map<String, MinecraftGroup> minecraftGroups;
-    private Map<String, BungeeGroup> bungeeGroups;
+    protected String componentName;
+    protected String parentComponentName;
 
-    private Map<UUID, PeepoPlayer> cachedPlayers = new HashMap<>();
+    protected Map<String, MinecraftGroup> minecraftGroups;
+    protected Map<String, BungeeGroup> bungeeGroups;
+
+    protected Map<UUID, PeepoPlayer> cachedPlayers = new HashMap<>();
 
     public PeepoCloudPlugin(Path nodeInfoFile) {
         instance = this;
@@ -63,6 +68,10 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         }
         SimpleJsonObject nodeInfo = SimpleJsonObject.load(nodeInfoFile);
         Auth auth = nodeInfo.getObject("auth", Auth.class);
+
+        this.componentName = auth.getComponentName();
+        this.parentComponentName = auth.getParentComponentName();
+
         auth.getExtraData().append("pid", ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
         this.nodeConnector = new NetworkClient(nodeInfo.getObject("networkAddress", NetworkAddress.class)
                 .toInetSocketAddress(), this.packetManager, new ChannelHandlerAdapter(), auth);
@@ -85,6 +94,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         this.packetManager.registerPacket(new PacketInAPIProxyStarted());
         this.packetManager.registerPacket(new PacketInAPIProxyStopped());
         this.packetManager.registerPacket(new PacketInToggleDebug());
+        this.packetManager.registerPacket(new PacketInPluginChannelMessage());
 
         this.nodeConnector.run();
     }
@@ -115,6 +125,16 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
         if (this.isBungee())
             return (PeepoBungeePlugin) this;
         throw new UnsupportedOperationException("This instance does not support bungeecord");
+    }
+
+    @Override
+    public String getComponentName() {
+        return componentName;
+    }
+
+    @Override
+    public String getParentComponentName() {
+        return parentComponentName;
     }
 
     @Override
@@ -568,10 +588,6 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
 
     }
 
-    @Override
-    public Collection<NetworkAPIHandler> getNetworkHandlers() {
-        return networkHandlers;
-    }
 
     @Override
     public NetworkClient getNodeConnector() {
@@ -581,6 +597,16 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     @Override
     public PacketManager getPacketManager() {
         return packetManager;
+    }
+
+    @Override
+    public PluginPluginChannelMessageManager getPluginChannelMessageManager() {
+        return pluginChannelMessageManager;
+    }
+
+    @Override
+    public Collection<NetworkAPIHandler> getNetworkHandlers() {
+        return networkHandlers;
     }
 
     @Override

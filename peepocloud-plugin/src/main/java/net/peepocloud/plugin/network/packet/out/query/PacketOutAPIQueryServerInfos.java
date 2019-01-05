@@ -1,4 +1,4 @@
-package net.peepocloud.plugin.network.packet.out;
+package net.peepocloud.plugin.network.packet.out.query;
 
 
 import net.peepocloud.lib.config.json.SimpleJsonObject;

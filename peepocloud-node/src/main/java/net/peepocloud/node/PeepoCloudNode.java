@@ -65,6 +65,7 @@ import net.peepocloud.node.network.packet.out.group.PacketOutMinecraftGroupDelet
 import net.peepocloud.node.network.packet.out.server.process.info.PacketOutQueryProcessInfo;
 import net.peepocloud.node.network.participant.BungeeCordParticipantImpl;
 import net.peepocloud.node.network.participant.MinecraftServerParticipantImpl;
+import net.peepocloud.node.pluginchannelmessage.NodePluginChannelMessageManager;
 import net.peepocloud.node.screen.ScreenManagerImpl;
 import net.peepocloud.node.server.ServerFilesLoader;
 import net.peepocloud.node.server.process.BungeeProcess;
@@ -154,6 +155,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     private Collection<TemplateStorage> templateStorages = new ArrayList<>(Arrays.asList(new TemplateLocalStorage()));
 
     private SystemInfo systemInfo = new SystemInfo();
+
+    private NodePluginChannelMessageManager pluginChannelMessageManager = new NodePluginChannelMessageManager();
 
     private Map<String, MinecraftServerParticipant> serversOnThisNode = new HashMap<String, MinecraftServerParticipant>() {
         @Override

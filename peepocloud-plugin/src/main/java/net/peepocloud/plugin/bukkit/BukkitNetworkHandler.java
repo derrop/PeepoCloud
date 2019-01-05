@@ -4,11 +4,13 @@ package net.peepocloud.plugin.bukkit;
  */
 
 import lombok.AllArgsConstructor;
+import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.player.PeepoPlayer;
 import net.peepocloud.plugin.api.network.handler.NetworkAPIHandler;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.users.User;
+import net.peepocloud.plugin.bukkit.event.BukkitPluginChannelMessageEvent;
 
 @AllArgsConstructor
 public class BukkitNetworkHandler implements NetworkAPIHandler {
@@ -84,5 +86,10 @@ public class BukkitNetworkHandler implements NetworkAPIHandler {
     @Override
     public void handlePlayerUpdate(PeepoPlayer oldPlayer, PeepoPlayer newPlayer) {
 
+    }
+
+    @Override
+    public void handlePluginChannelMessage(String senderComponent, String identifier, String message, SimpleJsonObject data) {
+        this.bukkitAPI.getPlugin().getServer().getPluginManager().callEvent(new BukkitPluginChannelMessageEvent(senderComponent, identifier, message, data));
     }
 }

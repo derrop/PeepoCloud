@@ -1,4 +1,4 @@
-package net.peepocloud.plugin.bungee.network.packet.out;
+package net.peepocloud.plugin.network.packet.out;
 /*
  * Created by Mc_Ruben on 03.01.2019
  */
