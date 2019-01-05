@@ -12,7 +12,6 @@ import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.NetworkParticipant;
 import net.peepocloud.lib.network.auth.Auth;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
-import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.lib.network.packet.handler.ChannelHandlerAdapter;
 import net.peepocloud.lib.network.packet.handler.PacketHandler;
@@ -50,6 +49,7 @@ import net.peepocloud.node.api.event.DefaultEventManager;
 import net.peepocloud.node.api.network.*;
 import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.api.server.TemplateStorage;
+import net.peepocloud.node.api.statistic.StatisticsManager;
 import net.peepocloud.node.command.CommandManagerImpl;
 import net.peepocloud.node.command.defaults.*;
 import net.peepocloud.node.database.DatabaseLoaderImpl;
@@ -59,7 +59,6 @@ import net.peepocloud.node.network.ClientNodeImpl;
 import net.peepocloud.node.network.ConnectableNode;
 import net.peepocloud.node.network.NetworkManagerImpl;
 import net.peepocloud.node.network.NetworkServer;
-import net.peepocloud.node.network.packet.out.PacketOutSendPacket;
 import net.peepocloud.node.network.packet.out.PacketOutUpdateNodeInfo;
 import net.peepocloud.node.network.packet.out.group.PacketOutBungeeGroupDeleted;
 import net.peepocloud.node.network.packet.out.group.PacketOutMinecraftGroupDeleted;
@@ -72,7 +71,6 @@ import net.peepocloud.node.server.process.BungeeProcess;
 import net.peepocloud.node.server.process.ProcessManager;
 import net.peepocloud.node.server.process.ServerProcess;
 import net.peepocloud.node.server.template.TemplateLocalStorage;
-import net.peepocloud.node.api.statistic.StatisticsManager;
 import net.peepocloud.node.setup.SetupImpl;
 import net.peepocloud.node.updater.AutoUpdaterManager;
 import net.peepocloud.node.updater.UpdateCheckResponse;
@@ -322,25 +320,21 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         this.autoUpdaterManager = new AutoUpdaterManager();
 
         this.initCommands(this.commandManager);
-        this.initPacketHandlers();
 
         this.nodeAddonManager = new AddonManagerImpl<>();
+
+        this.initPacketHandlers();
 
         if (this.cloudConfig.isAutoUpdate()) {
             this.installUpdatesSync(this.commandManager.getConsole());
         }
-
-        this.scheduler.repeat(() -> {
-            this.nodeInfo.setUsedMemory(this.getMemoryUsedOnThisInstance());
-            this.nodeInfo.setCpuUsage(SystemUtils.cpuUsageProcess());
-            this.networkManager.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
-        }, 10, 30, false);
 
         try {
             this.nodeAddonManager.loadAddons("nodeAddons");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.nodeAddonManager.getLoadedAddons().values().forEach(nodeAddon -> nodeAddon.initPacketHandlers(this.packetManager));
 
         this.minecraftGroups = this.groupsConfig.loadMinecraftGroups();
         this.bungeeGroups = this.groupsConfig.loadBungeeGroups();
@@ -350,6 +344,12 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                 server -> this.memoryUsedOnThisInstanceByServer += server,
                 this.cloudConfig
         );
+
+        this.scheduler.repeat(() -> {
+            this.nodeInfo.setUsedMemory(this.getMemoryUsedOnThisInstance());
+            this.nodeInfo.setCpuUsage(SystemUtils.cpuUsageProcess());
+            this.networkManager.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
+        }, 10, 30, false);
 
         this.startupTime = System.currentTimeMillis();
 
@@ -366,6 +366,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     }
 
     private void initPacketHandlers() {
+        this.packetManager.clearPacketHandlers();
+
         new Reflections("net.peepocloud.node.network.packet.in").getSubTypesOf(PacketHandler.class)
                 .forEach(aClass -> {
                     try {
@@ -374,6 +376,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     }
                 });
         this.packetManager.registerPacket(new PacketInToggleDebug());
+
+        this.nodeAddonManager.getLoadedAddons().values().forEach(nodeAddon -> nodeAddon.initPacketHandlers(this.packetManager));
+
         this.logger.debug("Registered " + this.packetManager.getRegisteredPackets().size() + " packet handlers");
     }
 
@@ -572,13 +577,19 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     public TemplateStorage getTemplateStorage(String name) {
         for (TemplateStorage storage : this.templateStorages)
-            if (storage.getName() != null && storage.getName().equals(name))
+            if (storage.getName() != null && storage.getName().equals(name) && storage.isWorking())
                 return storage;
         return null;
     }
 
-    public void registerTemplateStorage(TemplateStorage storage) {
+    public boolean registerTemplateStorage(TemplateStorage storage) {
+        for (TemplateStorage templateStorage : this.templateStorages) {
+            if (templateStorage.getName() != null && templateStorage.getName().equals(storage.getName())) {
+                return false;
+            }
+        }
         this.templateStorages.add(storage);
+        return true;
     }
 
     public boolean unregisterTemplateStorage(TemplateStorage storage) {
@@ -599,8 +610,15 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         return false;
     }
 
-    public void copyTemplate(String group, Template template, Path target) {
-        TemplateStorage storage = this.getTemplateStorage(template.getName());
+    public void copyTemplate(MinecraftGroup group, Template template, Path target) {
+        TemplateStorage storage = this.getTemplateStorage(template.getStorage());
+        if (storage == null)
+            storage = this.getTemplateStorage("local");
+        storage.copyToPath(group, template, target);
+    }
+
+    public void copyTemplate(BungeeGroup group, Template template, Path target) {
+        TemplateStorage storage = this.getTemplateStorage(template.getStorage());
         if (storage == null)
             storage = this.getTemplateStorage("local");
         storage.copyToPath(group, template, target);
@@ -678,6 +696,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.initPacketHandlers();
         this.nodeAddonManager.enableAddons();
     }
 

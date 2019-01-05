@@ -194,7 +194,7 @@ public class BungeeProcess implements CloudProcessImpl {
         if (copyEvent.getInputStream() != null) {
             ZipUtils.unzipDirectory(copyEvent.getInputStream(), this.directory.toString());
         } else {
-            PeepoCloudNode.getInstance().copyTemplate(this.proxyInfo.getGroupName(), this.proxyInfo.getTemplate(), this.directory);
+            PeepoCloudNode.getInstance().copyTemplate(this.proxyInfo.getGroup(), this.proxyInfo.getTemplate(), this.directory);
         }
         PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeCordPostTemplateCopyEvent(this));
     }

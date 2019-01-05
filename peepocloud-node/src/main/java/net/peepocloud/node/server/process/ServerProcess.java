@@ -189,7 +189,7 @@ public class ServerProcess implements CloudProcessImpl {
         if (copyEvent.getInputStream() != null) {
             ZipUtils.unzipDirectory(copyEvent.getInputStream(), this.directory.toString());
         } else {
-            PeepoCloudNode.getInstance().copyTemplate(this.serverInfo.getGroupName(), this.serverInfo.getTemplate(), this.directory);
+            PeepoCloudNode.getInstance().copyTemplate(this.serverInfo.getGroup(), this.serverInfo.getTemplate(), this.directory);
         }
         PeepoCloudNode.getInstance().getEventManager().callEvent(new MinecraftServerPostTemplateCopyEvent(this));
     }
