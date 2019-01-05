@@ -37,7 +37,7 @@ public class PacketInSendPacket implements PacketHandler<PacketOutSendPacket> {
         if (packet.getPacket() == null)
             return;
         if (packet.getTargets().isEmpty()) {
-            PeepoCloudNode.getInstance().sendPacketToServersAndProxies(packet.getPacket());
+            PeepoCloudNode.getInstance().getNetworkManager().sendPacketToServersAndProxiesOnThisNode(packet.getPacket());
         } else {
             for (PacketOutSendPacket.PacketReceiver target : packet.getTargets()) {
                 if (target.getName() == null) {

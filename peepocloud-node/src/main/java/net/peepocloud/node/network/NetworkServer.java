@@ -279,7 +279,7 @@ public class NetworkServer implements Runnable {
                     PeepoCloudNode.getInstance().updateServerInfo(process.getServerInfo());
 
                     PeepoCloudNode.getInstance().getServersOnThisNode().put(auth.getComponentName(), (MinecraftServerParticipantImpl) networkParticipant);
-                    PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerConnected(process.getServerInfo()));
+                    PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutServerConnected(process.getServerInfo()));
 
                     successful = true;
 
@@ -315,7 +315,7 @@ public class NetworkServer implements Runnable {
                     ((BungeeCordParticipantImpl) networkParticipant).setProxyInfo(process.getProxyInfo());
 
                     PeepoCloudNode.getInstance().getProxiesOnThisNode().put(auth.getComponentName(), (BungeeCordParticipantImpl) networkParticipant);
-                    PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeConnected(process.getProxyInfo()));
+                    PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutBungeeConnected(process.getProxyInfo()));
 
                     successful = true;
                     System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.connect.bungee")

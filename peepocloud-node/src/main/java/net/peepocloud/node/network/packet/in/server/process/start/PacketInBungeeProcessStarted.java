@@ -26,7 +26,7 @@ public class PacketInBungeeProcessStarted extends JsonPacketHandler {
             ((NodeParticipantImpl) networkParticipant).getWaitingProxies().remove(proxyInfo.getComponentName());
         }
         PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeStartEvent(proxyInfo));
-        PeepoCloudNode.getInstance().sendPacketToServersAndProxies(new PacketOutAPIProxyStarted(proxyInfo));
+        PeepoCloudNode.getInstance().getNetworkManager().sendPacketToServersAndProxiesOnThisNode(new PacketOutAPIProxyStarted(proxyInfo));
     }
 
     @Override

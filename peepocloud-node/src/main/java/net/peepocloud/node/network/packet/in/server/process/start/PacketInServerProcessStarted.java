@@ -27,7 +27,7 @@ public class PacketInServerProcessStarted extends JsonPacketHandler {
             ((NodeParticipantImpl) networkParticipant).getWaitingServers().remove(serverInfo.getComponentName());
         }
         PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerStartEvent(serverInfo));
-        PeepoCloudNode.getInstance().sendPacketToServersAndProxies(new PacketOutAPIServerStarted(serverInfo));
+        PeepoCloudNode.getInstance().getNetworkManager().sendPacketToServersAndProxiesOnThisNode(new PacketOutAPIServerStarted(serverInfo));
     }
 
     @Override

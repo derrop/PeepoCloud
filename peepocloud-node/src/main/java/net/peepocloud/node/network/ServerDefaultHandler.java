@@ -38,7 +38,7 @@ public class ServerDefaultHandler extends ChannelHandlerAdapter {
             BungeeCordParticipantImpl participant = (BungeeCordParticipantImpl) networkParticipant;
             PeepoCloudNode.getInstance().getProxiesOnThisNode().remove(participant.getName());
 
-            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeDisconnected(participant.getProxyInfo()));
+            PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutBungeeDisconnected(participant.getProxyInfo()));
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.disconnect.bungee")
                     .replace("%name%", participant.getName()).replace("%memory%", Integer.toString(participant.getProxyInfo().getMemory()))
             );
@@ -48,7 +48,7 @@ public class ServerDefaultHandler extends ChannelHandlerAdapter {
             MinecraftServerParticipantImpl participant = (MinecraftServerParticipantImpl) networkParticipant;
             PeepoCloudNode.getInstance().getServersOnThisNode().remove(participant.getName());
 
-            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerDisconnected(participant.getServerInfo()));
+            PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutServerDisconnected(participant.getServerInfo()));
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.disconnect.server")
                     .replace("%name%", participant.getName()).replace("%memory%", Integer.toString(participant.getServerInfo().getMemory()))
             );

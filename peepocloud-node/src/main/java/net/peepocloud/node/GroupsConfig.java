@@ -50,7 +50,7 @@ public class GroupsConfig {
         doCreate(aBoolean -> {
             if (aBoolean) {
                 this.loadGroup(group);
-                PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
+                PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
             }
             success.accept(aBoolean);
         }, database, group.getName(), SimpleJsonObject.GSON.get().toJsonTree(group));
@@ -61,7 +61,7 @@ public class GroupsConfig {
         doCreate(aBoolean -> {
             if (aBoolean) {
                 this.loadGroup(group);
-                PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutCreateMinecraftGroup(group));
+                PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutCreateMinecraftGroup(group));
             }
             success.accept(aBoolean);
         }, database, group.getName(), SimpleJsonObject.GSON.get().toJsonTree(group));

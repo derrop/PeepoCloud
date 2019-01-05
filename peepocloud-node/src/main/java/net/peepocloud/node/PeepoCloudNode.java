@@ -47,10 +47,7 @@ import net.peepocloud.node.api.addon.node.NodeAddon;
 import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.api.event.DefaultEventManager;
-import net.peepocloud.node.api.network.BungeeCordParticipant;
-import net.peepocloud.node.api.network.ClientNode;
-import net.peepocloud.node.api.network.MinecraftServerParticipant;
-import net.peepocloud.node.api.network.NodeParticipant;
+import net.peepocloud.node.api.network.*;
 import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.command.CommandManagerImpl;
@@ -60,6 +57,7 @@ import net.peepocloud.node.languagesystem.LanguagesManagerImpl;
 import net.peepocloud.node.logging.ColoredLogger;
 import net.peepocloud.node.network.ClientNodeImpl;
 import net.peepocloud.node.network.ConnectableNode;
+import net.peepocloud.node.network.NetworkManagerImpl;
 import net.peepocloud.node.network.NetworkServer;
 import net.peepocloud.node.network.packet.out.PacketOutSendPacket;
 import net.peepocloud.node.network.packet.out.PacketOutUpdateNodeInfo;
@@ -119,6 +117,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     private DatabaseLoaderImpl databaseLoader;
 
     private LanguagesManagerImpl languagesManager;
+    private NetworkManager networkManager = new NetworkManagerImpl(this);
 
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(20);
@@ -334,7 +333,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         this.scheduler.repeat(() -> {
             this.nodeInfo.setUsedMemory(this.getMemoryUsedOnThisInstance());
             this.nodeInfo.setCpuUsage(SystemUtils.cpuUsageProcess());
-            this.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
+            this.networkManager.sendPacketToNodes(new PacketOutUpdateNodeInfo(this.nodeInfo));
         }, 10, 30, false);
 
         try {
@@ -800,20 +799,20 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     public void deleteMinecraftGroup(String name) {
         this.groupsConfig.deleteMinecraftGroup(name);
         this.minecraftGroups.remove(name);
-        this.sendPacketToNodes(new PacketOutMinecraftGroupDeleted(name));
+        this.networkManager.sendPacketToNodes(new PacketOutMinecraftGroupDeleted(name));
     }
 
     @Override
     public void deleteBungeeGroup(String name) {
         this.groupsConfig.deleteBungeeGroup(name);
         this.bungeeGroups.remove(name);
-        this.sendPacketToNodes(new PacketOutBungeeGroupDeleted(name));
+        this.networkManager.sendPacketToNodes(new PacketOutBungeeGroupDeleted(name));
     }
 
     @Override
     public void setDebugging(boolean enabled) {
         this.setDebuggingOnThisComponent(enabled);
-        this.sendPacketToAll(new PacketOutToggleDebug(enabled));
+        this.networkManager.sendPacketToAll(new PacketOutToggleDebug(enabled));
     }
 
     @Override
@@ -821,35 +820,16 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         return this.logger.isDebugging();
     }
 
-    public void sendPacketToNodes(Packet packet) {
-        this.connectedNodes.values().forEach(networkClient -> networkClient.sendPacket(packet));
-    }
-
-    public void sendPacketToServersAndProxies(Packet packet) {
-        this.serversOnThisNode.values().forEach(minecraftServerParticipant -> minecraftServerParticipant.sendPacket(packet));
-        this.proxiesOnThisNode.values().forEach(bungeeCordParticipant -> bungeeCordParticipant.sendPacket(packet));
-    }
-
-    public void sendPacketToAllOnThisNode(Packet packet) {
-        this.sendPacketToNodes(packet);
-        this.sendPacketToServersAndProxies(packet);
-    }
-
-    public void sendPacketToAll(Packet packet) {
-        this.sendPacketToAllOnThisNode(packet);
-        this.sendPacketToNodes(new PacketOutSendPacket(packet));
-    }
-
     public void updateMinecraftGroup(MinecraftGroup group) {
         this.minecraftGroups.put(group.getName(), group);
         this.groupsConfig.update(group);
-        this.sendPacketToNodes(new PacketOutCreateMinecraftGroup(group));
+        this.networkManager.sendPacketToNodes(new PacketOutCreateMinecraftGroup(group));
     }
 
     public void updateBungeeGroup(BungeeGroup group) {
         this.bungeeGroups.put(group.getName(), group);
         this.groupsConfig.update(group);
-        this.sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
+        this.networkManager.sendPacketToNodes(new PacketOutCreateBungeeGroup(group));
     }
 
     @Override

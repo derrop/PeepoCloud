@@ -25,6 +25,7 @@ import net.peepocloud.node.api.event.process.server.MinecraftServerPluginCopyEve
 import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.network.packet.out.api.server.PacketOutAPIProxyStarted;
 import net.peepocloud.node.network.packet.out.api.server.PacketOutAPIServerStarted;
+import net.peepocloud.node.network.packet.out.server.process.start.PacketOutBungeeProcessStarted;
 import net.peepocloud.node.server.ServerFilesLoader;
 
 import java.io.IOException;
@@ -149,7 +150,8 @@ public class BungeeProcess implements CloudProcessImpl {
             this.wasRunning = true;
 
             PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeStartEvent(this.proxyInfo));
-            PeepoCloudNode.getInstance().sendPacketToServersAndProxies(new PacketOutAPIProxyStarted(this.proxyInfo));
+            PeepoCloudNode.getInstance().getNetworkManager().sendPacketToServersAndProxiesOnThisNode(new PacketOutAPIProxyStarted(this.proxyInfo));
+            PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutBungeeProcessStarted(this.proxyInfo));
         } catch (IOException e) {
             e.printStackTrace();
         }

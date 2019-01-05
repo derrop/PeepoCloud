@@ -55,10 +55,10 @@ public class ServerQueue implements Runnable {
         System.out.println("&aServer process queued [" + process + "]");
 
         if (process.isProxy()) {
-            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutBungeeQueued(process.getProxyInfo()));
+            PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutBungeeQueued(process.getProxyInfo()));
             PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeQueuedEvent(process, process.getProxyInfo()));
         } else if (process.isServer()){
-            PeepoCloudNode.getInstance().sendPacketToNodes(new PacketOutServerQueued(process.getServerInfo()));
+            PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutServerQueued(process.getServerInfo()));
             PeepoCloudNode.getInstance().getEventManager().callEvent(new ServerQueuedEvent(process, process.getServerInfo()));
         }
     }
