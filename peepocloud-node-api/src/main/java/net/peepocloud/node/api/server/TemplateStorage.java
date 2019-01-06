@@ -126,4 +126,11 @@ public abstract class TemplateStorage {
      */
     public abstract void createTemplate(BungeeGroup group, Template template);
 
+    /**
+     * Copies the global directory to the given {@link Path}
+     *
+     * @param target the {@link Path} where the files should be copied to
+     */
+    public abstract void copyGlobal(Path target);
+
 }

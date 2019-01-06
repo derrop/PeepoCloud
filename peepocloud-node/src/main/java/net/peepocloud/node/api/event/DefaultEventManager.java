@@ -85,7 +85,7 @@ public class DefaultEventManager implements EventManager {
     public void unregisterAll(Addon addon) {
         for (Map.Entry<Class<? extends Event>, List<ListenerMethod>> entry : new HashMap<>(this.eventMethods).entrySet()) {
             Collection<ListenerMethod> value = entry.getValue();
-            value.stream().filter(listenerMethod -> listenerMethod.getAddon().getAddonConfig().getName().equals(addon.getAddonConfig().getName())).collect(Collectors.toList()).forEach(value::remove);
+            value.stream().filter(listenerMethod -> listenerMethod.getAddon() != null && listenerMethod.getAddon().getAddonConfig().getName().equals(addon.getAddonConfig().getName())).collect(Collectors.toList()).forEach(value::remove);
             if (value.isEmpty()) {
                 this.eventMethods.remove(entry.getKey());
             }

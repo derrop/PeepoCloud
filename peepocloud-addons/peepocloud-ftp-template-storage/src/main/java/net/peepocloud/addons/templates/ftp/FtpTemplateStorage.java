@@ -159,6 +159,20 @@ public class FtpTemplateStorage extends TemplateStorage {
             this.getFtpClient().createDirectories(path);
     }
 
+    @Override
+    public void copyGlobal(Path target) {
+        String remote = this.addon.getTemplateDir() + "global";
+        if (!this.getFtpClient().existsDirectory(remote)) {
+            this.getFtpClient().createDirectories(remote);
+            return;
+        }
+        String cache = this.cacheDir + "global";
+        if (!Files.exists(Paths.get(cache))) {
+            this.getFtpClient().downloadDirectory(remote, cache);
+        }
+        SystemUtils.copyDirectory(Paths.get(cache), target.toString());
+    }
+
     public void clearCache() {
         SystemUtils.deleteDirectory(Paths.get(this.cacheDir));
     }

@@ -18,7 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class TemplateLocalStorage extends TemplateStorage {
+public class LocalTemplateStorage extends TemplateStorage {
     @Override
     public String getName() {
         return "local";
@@ -133,6 +133,21 @@ public class TemplateLocalStorage extends TemplateStorage {
     @Override
     public void createTemplate(BungeeGroup group, Template template) {
         this.create(group.getName(), template);
+    }
+
+    @Override
+    public void copyGlobal(Path target) {
+        Path path = Paths.get("files/global");
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        SystemUtils.copyDirectory(path, target.toString());
     }
 
     private void create(String group, Template template) {

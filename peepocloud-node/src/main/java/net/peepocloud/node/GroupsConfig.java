@@ -103,8 +103,6 @@ public class GroupsConfig {
         this.bungeeGroups.put(group.getName(), group);
         for (Template template : group.getTemplates()) {
             TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
-            if (storage == null)
-                storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
             storage.createTemplate(group, template);
         }
     }
@@ -114,8 +112,6 @@ public class GroupsConfig {
         this.minecraftGroups.put(group.getName(), group);
         for (Template template : group.getTemplates()) {
             TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
-            if (storage == null)
-                storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
             storage.createTemplate(group, template);
         }
     }

@@ -103,8 +103,6 @@ public class BungeeProcess implements CloudProcessImpl {
     public void copyToTemplate(Template template) {
         TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
         if (storage == null)
-            storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
-        if (storage == null)
             return;
         storage.copyToTemplate(this.proxyInfo, this.directory, template);
     }
@@ -114,8 +112,6 @@ public class BungeeProcess implements CloudProcessImpl {
         if (files.length == 0)
             return;
         TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(template.getStorage());
-        if (storage == null)
-            storage = PeepoCloudNode.getInstance().getTemplateStorage("local");
         if (storage == null)
             return;
         storage.copyFilesToTemplate(this.proxyInfo, this.directory, template, files);
@@ -197,6 +193,9 @@ public class BungeeProcess implements CloudProcessImpl {
             PeepoCloudNode.getInstance().copyTemplate(this.proxyInfo.getGroup(), this.proxyInfo.getTemplate(), this.directory);
         }
         PeepoCloudNode.getInstance().getEventManager().callEvent(new BungeeCordPostTemplateCopyEvent(this));
+
+        TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(this.proxyInfo.getTemplate().getStorage());
+        storage.copyGlobal(this.directory);
     }
 
     private void loadServerConfig() {

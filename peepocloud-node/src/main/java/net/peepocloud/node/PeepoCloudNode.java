@@ -73,7 +73,7 @@ import net.peepocloud.node.server.ServerFilesLoader;
 import net.peepocloud.node.server.process.BungeeProcess;
 import net.peepocloud.node.server.process.ProcessManager;
 import net.peepocloud.node.server.process.ServerProcess;
-import net.peepocloud.node.server.template.TemplateLocalStorage;
+import net.peepocloud.node.server.template.LocalTemplateStorage;
 import net.peepocloud.node.setup.SetupImpl;
 import net.peepocloud.node.updater.AutoUpdaterManager;
 import net.peepocloud.node.updater.UpdateCheckResponse;
@@ -153,7 +153,7 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     private UserManager userManager = new NodeUserManager();
 
-    private Collection<TemplateStorage> templateStorages = new ArrayList<>(Arrays.asList(new TemplateLocalStorage()));
+    private Collection<TemplateStorage> templateStorages = new ArrayList<>(Arrays.asList(new LocalTemplateStorage()));
 
     private SystemInfo systemInfo = new SystemInfo();
 
@@ -605,10 +605,9 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
 
     public TemplateStorage getTemplateStorage(String name) {
-        for (TemplateStorage storage : this.templateStorages)
-            if (storage.getName() != null && storage.getName().equals(name) && storage.isWorking())
-                return storage;
-        return null;
+        return this.templateStorages.stream().filter(storage -> storage.getName().equals(name)).findFirst().orElse(
+                this.templateStorages.stream().filter(storage -> storage.getName().equals("local")).findFirst().orElse(null)
+        );
     }
 
     public boolean registerTemplateStorage(TemplateStorage storage) {
@@ -641,15 +640,11 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     public void copyTemplate(MinecraftGroup group, Template template, Path target) {
         TemplateStorage storage = this.getTemplateStorage(template.getStorage());
-        if (storage == null)
-            storage = this.getTemplateStorage("local");
         storage.copyToPath(group, template, target);
     }
 
     public void copyTemplate(BungeeGroup group, Template template, Path target) {
         TemplateStorage storage = this.getTemplateStorage(template.getStorage());
-        if (storage == null)
-            storage = this.getTemplateStorage("local");
         storage.copyToPath(group, template, target);
     }
 
