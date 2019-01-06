@@ -41,6 +41,25 @@ public class PacketUtils {
         }
     }
 
+    public static <T extends PacketSerializable> T deserializeObject(DataInput dataInput) {
+        try {
+            Class<? extends T> clazz = (Class<? extends T>) Class.forName(dataInput.readUTF());
+            return deserializeObject(dataInput, clazz);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void serializeObjectWithClass(DataOutput dataOutput, PacketSerializable serializable) {
+        try {
+            dataOutput.writeUTF(serializable.getClass().getName());
+            serializable.serialize(dataOutput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void writeString(ByteBuf byteBuf, String string) {
         byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
 
