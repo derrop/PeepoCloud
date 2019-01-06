@@ -14,6 +14,9 @@ import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.database.Database;
+import net.peepocloud.node.network.packet.out.api.user.PacketOutAPIUserCreated;
+import net.peepocloud.node.network.packet.out.api.user.PacketOutAPIUserDeleted;
+import net.peepocloud.node.network.packet.out.api.user.PacketOutAPIUserUpdated;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,6 +67,7 @@ public class NodeUserManager implements UserManager { //TODO send on user update
             users.add(user);
             this.save(users);
             PeepoCloudNode.getInstance().getEventManager().callEvent(new UserCreateEvent(user));
+            PeepoCloudNode.getInstance().getNetworkManager().sendPacketToAll(new PacketOutAPIUserCreated(user));
         });
     }
 
@@ -82,6 +86,7 @@ public class NodeUserManager implements UserManager { //TODO send on user update
                 users.add(newUser);
                 this.save(users);
                 PeepoCloudNode.getInstance().getEventManager().callEvent(new UserUpdateEvent(user, newUser));
+                PeepoCloudNode.getInstance().getNetworkManager().sendPacketToAll(new PacketOutAPIUserUpdated(user, newUser));
             }
         });
     }
@@ -104,6 +109,7 @@ public class NodeUserManager implements UserManager { //TODO send on user update
             if (a && users.remove(user)) {
                 this.save(users);
                 PeepoCloudNode.getInstance().getEventManager().callEvent(new UserDeleteEvent(user));
+                PeepoCloudNode.getInstance().getNetworkManager().sendPacketToAll(new PacketOutAPIUserDeleted(user));
             }
         });
     }
