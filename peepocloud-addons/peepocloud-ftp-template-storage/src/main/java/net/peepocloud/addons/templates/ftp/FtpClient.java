@@ -4,6 +4,7 @@ package net.peepocloud.addons.templates.ftp;
  */
 
 import com.jcraft.jsch.*;
+import net.peepocloud.lib.utility.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -145,7 +146,7 @@ public class FtpClient implements AutoCloseable {
 
             Path dir = Paths.get(localPath);
             if (Files.exists(dir)) {
-                //TODO delete using SystemUtils.deleteDirectory
+                SystemUtils.deleteDirectory(dir);
             }
             Files.createDirectories(dir);
 
