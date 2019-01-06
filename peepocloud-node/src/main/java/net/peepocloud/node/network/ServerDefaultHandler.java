@@ -27,6 +27,8 @@ public class ServerDefaultHandler extends ChannelHandlerAdapter {
             NodeUtils.updateNodeInfoForSupport(null);
 
             NodeInfo nodeInfo = ((NodeParticipantImpl) networkParticipant).getNodeInfo();
+            if (nodeInfo == null)
+                return;
             System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("network.disconnect.node")
                     .replace("%name%", nodeInfo.getName()).replace("%memory%", Integer.toString(nodeInfo.getMaxMemory()))
                     .replace("%cpu%", Integer.toString(nodeInfo.getCpuCores()))
