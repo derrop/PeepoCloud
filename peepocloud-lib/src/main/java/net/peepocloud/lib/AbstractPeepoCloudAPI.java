@@ -32,6 +32,8 @@ public abstract class AbstractPeepoCloudAPI {
 
     public abstract void playerChat(UUID uniqueId, String message);
 
+    public abstract void setPlayerTabHeaderFooter(UUID uniqueId, String header, String footer);
+
     public abstract void setPlayerTabHeaderFooter(UUID uniqueId, BaseComponent[] header, BaseComponent[] footer);
 
     public abstract void sendPlayerMessage(UUID uniqueId, String message);
@@ -53,6 +55,10 @@ public abstract class AbstractPeepoCloudAPI {
     public abstract void sendPlayerActionBar(UUID uniqueId, String message);
 
     public abstract void sendPlayerActionBar(UUID uniqueId, BaseComponent... message);
+
+    public abstract void playPlayerSound(UUID uniqueId, String sound, long volume, long pitch);
+
+    public abstract void playerPlayerEffect(UUID uniqueId, String effect, int data);
 
     public abstract MinecraftGroup getMinecraftGroup(String name);
 

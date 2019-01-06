@@ -1,6 +1,5 @@
 package net.peepocloud.node.pluginchannelmessage;
 
-
 import net.peepocloud.lib.config.json.SimpleJsonObject;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.network.packet.out.PacketOutPluginChannelMessage;
@@ -10,7 +9,6 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.network.ClientNode;
 import net.peepocloud.node.network.packet.out.PacketOutSendPacket;
-
 import java.util.Arrays;
 
 public class NodePluginChannelMessageManager implements PluginChannelMessageManager {

@@ -1,6 +1,8 @@
 package net.peepocloud.plugin;
 
+import com.google.gson.JsonElement;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
 import net.peepocloud.lib.network.packet.JsonPacket;
 import net.peepocloud.lib.network.packet.Packet;
@@ -529,65 +531,152 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
 
 
     @Override
-    public void sendPlayer(UUID uniqueId, String server) {
-
-    }
-
-    @Override
-    public void sendPlayerActionBar(UUID uniqueId, BaseComponent... message) {
-
-    }
-
-    @Override
-    public void sendPlayerMessage(UUID uniqueId, BaseComponent... components) {
-
-    }
-
-    @Override
-    public void sendPlayerFallback(UUID uniqueId) {
-
-    }
-
-    @Override
-    public void sendPlayerTitle(UUID uniqueId, BaseComponent[] title, BaseComponent[] subTitle, int fadeIn, int stay, int fadeOut) {
-
-    }
-
-    @Override
     public void playerChat(UUID uniqueId, String message) {
-
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerChat",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("message", message), new String[]{player.getProxyName()});
+        }
     }
 
     @Override
-    public void kickPlayer(UUID uniqueId, BaseComponent... reason) {
-
+    public void setPlayerTabHeaderFooter(UUID uniqueId, String header, String footer) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud","playerTab",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("header", header).append("footer", footer), new String[]{player.getProxyName()});
+        }
     }
 
     @Override
     public void setPlayerTabHeaderFooter(UUID uniqueId, BaseComponent[] header, BaseComponent[] footer) {
-
-    }
-
-    @Override
-    public void sendPlayerActionBar(UUID uniqueId, String message) {
-
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            JsonElement headerComponents = ComponentSerializer.toJsonTree(header);
+            JsonElement footerComponents = ComponentSerializer.toJsonTree(footer);
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud","playerTab",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("headerComponents", headerComponents)
+                            .append("footerComponents", footerComponents), new String[]{player.getProxyName()});
+        }
     }
 
     @Override
     public void sendPlayerMessage(UUID uniqueId, String message) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerMessage",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("message", message), new String[]{player.getProxyName()});
+        }
+    }
 
+
+    @Override
+    public void sendPlayerMessage(UUID uniqueId, BaseComponent... components) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            JsonElement jsonComponents = ComponentSerializer.toJsonTree(components);
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerMessage",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("messageComponents", jsonComponents), new String[]{player.getProxyName()});
+        }
+    }
+
+    @Override
+    public void sendPlayer(UUID uniqueId, String server) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "sendPlayer",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("server", server), new String[]{player.getProxyName()});
+        }
+    }
+
+    @Override
+    public void sendPlayerFallback(UUID uniqueId) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerFallback",
+                    new SimpleJsonObject().append("uniqueId", uniqueId), new String[]{player.getProxyName()});
+        }
     }
 
     @Override
     public void sendPlayerTitle(UUID uniqueId, String title, String subTitle, int fadeIn, int stay, int fadeOut) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerTitle",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("title", title).append("subTitle", subTitle)
+                            .append("fadeIn", fadeIn).append("stay", stay).append("fadeOut", fadeOut), new String[]{player.getProxyName()});
+        }
+    }
 
+    @Override
+    public void sendPlayerTitle(UUID uniqueId, BaseComponent[] title, BaseComponent[] subTitle, int fadeIn, int stay, int fadeOut) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            JsonElement titleComponents = ComponentSerializer.toJsonTree(title);
+            JsonElement subTitleComponents = ComponentSerializer.toJsonTree(subTitle);
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerTitle",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("titleComponents", titleComponents).append("subTitleComponents", subTitleComponents)
+                            .append("fadeIn", fadeIn).append("stay", stay).append("fadeOut", fadeOut), new String[]{player.getProxyName()});
+        }
     }
 
     @Override
     public void kickPlayer(UUID uniqueId, String reason) {
-
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud","kickPlayer",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("reason", reason), new String[]{player.getProxyName()});
+        }
     }
 
+    @Override
+    public void kickPlayer(UUID uniqueId, BaseComponent... reason) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            JsonElement jsonComponents = ComponentSerializer.toJsonTree(reason);
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud","kickPlayer",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("reasonComponents", jsonComponents), new String[]{player.getProxyName()});
+        }
+    }
+
+
+    @Override
+    public void sendPlayerActionBar(UUID uniqueId, String message) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "actionBar",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("message", message), new String[]{player.getProxyName()});
+        }
+    }
+
+    @Override
+    public void sendPlayerActionBar(UUID uniqueId, BaseComponent... components) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            JsonElement jsonComponents = ComponentSerializer.toJsonTree(components);
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "actionBar",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("messageComponents", jsonComponents), new String[]{player.getProxyName()});
+        }
+    }
+
+    @Override
+    public void playPlayerSound(UUID uniqueId, String sound, long volume, long pitch) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerSound",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("sound", sound).append("volume", volume)
+                    .append("pitch", pitch), new String[]{player.getServerName()});
+        }
+    }
+
+    @Override
+    public void playerPlayerEffect(UUID uniqueId, String effect, int data) {
+        PeepoPlayer player = this.getPlayer(uniqueId).complete();
+        if(player != null) {
+            this.pluginChannelMessageManager.sendBungeeCordPluginChannelMessage("peepoCloud", "playerEffect",
+                    new SimpleJsonObject().append("uniqueId", uniqueId).append("effect", effect).append("data", data), new String[]{player.getServerName()});
+        }
+    }
 
     @Override
     public NetworkClient getNodeConnector() {
