@@ -50,6 +50,7 @@ public class ServerProcess implements CloudProcessImpl {
     @Setter
     private Consumer<String> networkScreenHandler;
     private GroupMode groupMode;
+    private boolean firstStart = false;
 
     ServerProcess(MinecraftServerInfo serverInfo, ProcessManager processManager) {
         this.serverInfo = serverInfo;
@@ -65,6 +66,7 @@ public class ServerProcess implements CloudProcessImpl {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            this.firstStart = true;
         }
     }
 
@@ -118,7 +120,8 @@ public class ServerProcess implements CloudProcessImpl {
 
         this.processManager.handleProcessStart(this);
 
-        this.loadTemplate();
+        if (this.groupMode == GroupMode.DELETE || this.firstStart)
+            this.loadTemplate();
         this.loadSpigot();
         this.loadPlugin();
         this.loadServerConfig();

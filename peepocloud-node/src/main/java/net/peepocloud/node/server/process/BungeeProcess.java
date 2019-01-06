@@ -56,6 +56,7 @@ public class BungeeProcess implements CloudProcessImpl {
     @Setter
     private Consumer<String> networkScreenHandler;
     private GroupMode groupMode;
+    private boolean firstStart = false;
 
     BungeeProcess(BungeeCordProxyInfo proxyInfo, ProcessManager processManager) {
         this.proxyInfo = proxyInfo;
@@ -71,6 +72,7 @@ public class BungeeProcess implements CloudProcessImpl {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            this.firstStart = true;
         }
     }
 
@@ -124,7 +126,8 @@ public class BungeeProcess implements CloudProcessImpl {
 
         this.processManager.handleProcessStart(this);
 
-        this.loadTemplate();
+        if (this.groupMode == GroupMode.DELETE || this.firstStart)
+            this.loadTemplate();
         this.loadBungee();
         this.loadPlugin();
         this.loadServerConfig();
