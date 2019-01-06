@@ -14,6 +14,7 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.lib.utility.network.QueryRequest;
 import net.peepocloud.node.api.addon.AddonManager;
 import net.peepocloud.node.api.addon.node.NodeAddon;
 import net.peepocloud.node.api.command.Command;
@@ -191,6 +192,22 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
      * @return all players by their UniqueId
      */
     public abstract Map<UUID, PeepoPlayer> getOnlinePlayers();
+
+    /**
+     * Gets all online players on a certain bungeeGroup
+     *
+     * @param group the group
+     * @return all players by their UniqueId
+     */
+    public abstract Map<UUID, PeepoPlayer> getOnlinePlayers(BungeeGroup group);
+
+    /**
+     * Gets all online players on a certain minecraftGroup
+     *
+     * @param group the group
+     * @return all players by their UniqueId
+     */
+    public abstract Map<UUID, PeepoPlayer> getOnlinePlayers(MinecraftGroup group);
 
     /**
      * Gets the {@link TemplateStorage} registered in this Node by the given {@code name}

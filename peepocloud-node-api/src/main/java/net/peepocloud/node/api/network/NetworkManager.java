@@ -4,6 +4,8 @@ package net.peepocloud.node.api.network;
  */
 
 import net.peepocloud.lib.network.packet.Packet;
+import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
+import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 
 public interface NetworkManager {
 
@@ -12,37 +14,41 @@ public interface NetworkManager {
      *
      * @param packet the packet to send
      */
-    public void sendPacketToNodes(Packet packet);
+    void sendPacketToNodes(Packet packet);
 
     /**
      * Sends the given {@link Packet} to all servers and proxies that are CONNECTED TO THIS NODE
      *
      * @param packet the packet to send
      */
-    public void sendPacketToServersAndProxiesOnThisNode(Packet packet);
+   void sendPacketToServersAndProxiesOnThisNode(Packet packet);
 
-    public void sendPacketToServersOnThisNode(Packet packet);
+    void sendPacketToServersOnThisNode(Packet packet);
 
-    public void sendPacketToProxiesOnThisNode(Packet packet);
+    void sendPacketToProxiesOnThisNode(Packet packet);
 
-    public void sendPacketToServersAndProxies(Packet packet);
+    void sendPacketToServersAndProxies(Packet packet);
 
-    public void sendPacketToServers(Packet packet);
+    void sendPacketToServers(Packet packet);
 
-    public void sendPacketToProxies(Packet packet);
+    void sendPacketToProxies(Packet packet);
+
+    void sendPacketToServer(MinecraftServerInfo serverInfo, Packet packet);
+
+    void sendPacketToProxy(BungeeCordProxyInfo proxyInfo, Packet packet);
 
     /**
      * Sends the given {@link Packet} to all servers, proxies and nodes that are CONNECTED TO THIS NODE
      *
      * @param packet the packet to send
      */
-    public void sendPacketToAllOnThisNode(Packet packet);
+    void sendPacketToAllOnThisNode(Packet packet);
 
     /**
      * Sends the given {@link Packet} to all servers, proxies and nodes IN THE NETWORK
      *
      * @param packet the packet to send
      */
-    public void sendPacketToAll(Packet packet);
+    void sendPacketToAll(Packet packet);
 
 }

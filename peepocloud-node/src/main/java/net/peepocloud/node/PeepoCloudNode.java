@@ -83,7 +83,6 @@ import net.peepocloud.node.websocket.WebSocketClientImpl;
 import org.reflections.Reflections;
 import oshi.SystemInfo;
 import oshi.software.os.OSProcess;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -579,6 +578,31 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     public PeepoPlayer getPlayer(String name) {
         return this.onlinePlayers.values().stream().filter(peepoPlayer -> peepoPlayer.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
+
+    @Override
+    public Map<UUID, PeepoPlayer> getOnlinePlayers(BungeeGroup group) {
+        Map<UUID, PeepoPlayer> onlinePlayers = new HashMap<>();
+
+        if(group != null) {
+            for (BungeeCordProxyInfo proxyInfo : this.getStartedBungeeProxies(group.getName()))
+                proxyInfo.getPlayers().keySet().forEach(uuid -> onlinePlayers.put(uuid, this.onlinePlayers.get(uuid)));
+        }
+
+        return onlinePlayers;
+    }
+
+    @Override
+    public Map<UUID, PeepoPlayer> getOnlinePlayers(MinecraftGroup group) {
+        Map<UUID, PeepoPlayer> onlinePlayers = new HashMap<>();
+
+        if(group != null) {
+            for (MinecraftServerInfo serverInfo : this.getStartedMinecraftServers(group.getName()))
+                serverInfo.getPlayers().keySet().forEach(uuid -> onlinePlayers.put(uuid, this.onlinePlayers.get(uuid)));
+        }
+
+        return onlinePlayers;
+    }
+
 
     public TemplateStorage getTemplateStorage(String name) {
         for (TemplateStorage storage : this.templateStorages)

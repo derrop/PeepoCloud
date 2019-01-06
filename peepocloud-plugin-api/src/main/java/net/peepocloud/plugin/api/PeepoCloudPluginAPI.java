@@ -248,6 +248,22 @@ public abstract class PeepoCloudPluginAPI extends AbstractPeepoCloudAPI {
     public abstract QueryRequest<Map<UUID, PeepoPlayer>> getOnlinePlayers();
 
     /**
+     * Gets all online players on a certain bungeeGroup
+     *
+     * @param group the group
+     * @return all players by their UniqueId
+     */
+    public abstract QueryRequest<Map<UUID, PeepoPlayer>> getOnlinePlayers(BungeeGroup group);
+
+    /**
+     * Gets all online players on a certain minecraftGroup
+     *
+     * @param group the group
+     * @return all players by their UniqueId
+     */
+    public abstract QueryRequest<Map<UUID, PeepoPlayer>> getOnlinePlayers(MinecraftGroup group);
+
+    /**
      * Gets the time the Node on which this server/proxy has been started in milliseconds
      *
      * @return the time when this Node was started

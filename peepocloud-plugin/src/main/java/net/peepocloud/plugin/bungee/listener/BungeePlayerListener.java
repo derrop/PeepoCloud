@@ -14,15 +14,9 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.peepocloud.lib.network.packet.serialization.SerializationPacket;
 import net.peepocloud.lib.player.*;
-import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.plugin.PeepoCloudPlugin;
-import net.peepocloud.plugin.bungee.BungeeLauncher;
 import net.peepocloud.plugin.bungee.PeepoBungeePlugin;
 import net.peepocloud.plugin.network.packet.out.PacketOutPlayerLoginTry;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @AllArgsConstructor
 public class BungeePlayerListener implements Listener {
@@ -61,7 +55,6 @@ public class BungeePlayerListener implements Listener {
             if (!response.isAllowed()) {
                 event.setCancelled(true);
                 event.setCancelReason(TextComponent.fromLegacyText(response.getKickReason()));
-                event.completeIntent(this.bungeeAPI.getPlugin());
             } else {
                 PeepoCloudPlugin.getInstance().getCachedPlayers().put(player.getUniqueId(), player);
             }

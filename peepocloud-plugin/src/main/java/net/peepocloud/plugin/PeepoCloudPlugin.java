@@ -1,6 +1,7 @@
 package net.peepocloud.plugin;
 
 import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.peepocloud.lib.network.auth.NetworkComponentType;
@@ -9,6 +10,7 @@ import net.peepocloud.lib.network.packet.Packet;
 import net.peepocloud.lib.network.packet.in.PacketInToggleDebug;
 import net.peepocloud.lib.node.NodeInfo;
 import net.peepocloud.lib.player.PeepoPlayer;
+import net.peepocloud.lib.pluginchannelmessage.PluginChannelMessageManager;
 import net.peepocloud.lib.scheduler.Scheduler;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
@@ -17,6 +19,7 @@ import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.utility.network.DirectQueryRequest;
 import net.peepocloud.lib.utility.network.QueryRequest;
 import net.peepocloud.plugin.api.PeepoCloudPluginAPI;
+import net.peepocloud.plugin.network.packet.out.query.PacketOutAPIQueryOnlinePlayers;
 import net.peepocloud.plugin.pluginchannelmessage.PluginPluginChannelMessageManager;
 import net.peepocloud.plugin.bungee.PeepoBungeePlugin;
 import net.peepocloud.plugin.bukkit.PeepoBukkitPlugin;
@@ -45,9 +48,9 @@ import java.util.function.Function;
 public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     private static PeepoCloudPlugin instance;
 
-    protected PacketManager packetManager = new PacketManager();
     protected NetworkClient nodeConnector;
-    protected PluginPluginChannelMessageManager pluginChannelMessageManager;
+    protected PacketManager packetManager = new PacketManager();
+    protected PluginChannelMessageManager pluginChannelMessageManager = new PluginPluginChannelMessageManager(this);
     protected Collection<NetworkAPIHandler> networkHandlers = new ArrayList<>();
     protected Scheduler scheduler = new Scheduler();
     protected boolean debugging = false;
@@ -499,24 +502,58 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     @Override
     public QueryRequest<PeepoPlayer> getPlayer(String name) {
         PeepoPlayer player = this.getCachedPlayer(name);
-        if (player == null) {
-            //TODO send query packet
-        }
+        if (player == null)
+            return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryOnlinePlayers(name), playerFunction());
         return new DirectQueryRequest<>(player);
     }
 
     @Override
     public QueryRequest<PeepoPlayer> getPlayer(UUID uniqueId) {
         PeepoPlayer player = this.getCachedPlayer(uniqueId);
-        if (player == null) {
-            //TODO send query packet
-        }
+        if (player == null)
+            return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryOnlinePlayers(uniqueId), playerFunction());
         return new DirectQueryRequest<>(player);
+    }
+
+    private Function<Packet, PeepoPlayer> playerFunction() {
+        return packet ->  {
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("player"))
+                    return simpleJsonObject.getObject("player", PeepoPlayer.class);
+                return null;
+            }
+            return null;
+        };
     }
 
     @Override
     public QueryRequest<Map<UUID, PeepoPlayer>> getOnlinePlayers() {
-        return null;
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryOnlinePlayers(), playersFunction());
+    }
+
+    @Override
+    public QueryRequest<Map<UUID, PeepoPlayer>> getOnlinePlayers(BungeeGroup group) {
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryOnlinePlayers(group), playersFunction());
+    }
+
+    @Override
+    public QueryRequest<Map<UUID, PeepoPlayer>> getOnlinePlayers(MinecraftGroup group) {
+        return this.packetManager.packetQueryAsync(this.nodeConnector, new PacketOutAPIQueryOnlinePlayers(group), playersFunction());
+    }
+
+    private Function<Packet, Map<UUID, PeepoPlayer>> playersFunction() {
+        return packet ->  {
+            if(packet instanceof JsonPacket) {
+                JsonPacket response = (JsonPacket) packet;
+                SimpleJsonObject simpleJsonObject = response.getSimpleJsonObject();
+                if(simpleJsonObject != null && simpleJsonObject.contains("players"))
+                    return simpleJsonObject.getObject("players", new TypeToken<Map<UUID, PeepoCloudPlugin>>(){}.getType());
+                return null;
+            }
+            return null;
+        };
     }
 
     @Override
@@ -689,7 +726,7 @@ public abstract class PeepoCloudPlugin extends PeepoCloudPluginAPI {
     }
 
     @Override
-    public PluginPluginChannelMessageManager getPluginChannelMessageManager() {
+    public PluginChannelMessageManager getPluginChannelMessageManager() {
         return pluginChannelMessageManager;
     }
 
