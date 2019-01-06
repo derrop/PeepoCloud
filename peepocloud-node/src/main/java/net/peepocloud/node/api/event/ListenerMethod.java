@@ -16,6 +16,7 @@ class ListenerMethod {
     private Object listener;
     private Method method;
     private Addon addon;
+    private byte priority;
 
     void invoke(Event event) {
         try {
@@ -24,4 +25,11 @@ class ListenerMethod {
             e.printStackTrace();
         }
     }
+
+    String name() {
+        return addon == null ?
+                listener.getClass().getName() + ":" + method.getName() :
+                listener.getClass().getName() + ":" + method.getName() + "@" + addon.getAddonConfig().getName();
+    }
+
 }
