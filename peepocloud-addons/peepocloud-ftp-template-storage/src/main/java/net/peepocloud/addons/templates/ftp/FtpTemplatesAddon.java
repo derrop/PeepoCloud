@@ -4,6 +4,7 @@ package net.peepocloud.addons.templates.ftp;
  */
 
 import lombok.Getter;
+import net.peepocloud.addons.templates.ftp.command.CommandFtpClearCache;
 import net.peepocloud.addons.templates.ftp.network.packet.in.PacketFtpInTemplateUpdated;
 import net.peepocloud.lib.config.yaml.YamlConfigurable;
 import net.peepocloud.lib.network.packet.PacketManager;
@@ -48,6 +49,8 @@ public class FtpTemplatesAddon extends NodeAddon {
         } else {
             System.out.println("&cCould not register FTP TemplateStorage, there is already one with that name registered");
         }
+
+        this.getNode().getCommandManager().registerCommand(this, new CommandFtpClearCache());
     }
 
     private boolean loadFtp() {
