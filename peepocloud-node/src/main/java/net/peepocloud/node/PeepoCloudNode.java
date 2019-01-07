@@ -366,6 +366,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
             }
         }));
 
+        this.networkServer.run();
+
         this.nodeAddonManager.enableAddons();
     }
 
@@ -464,7 +466,6 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         if (this.networkServer == null) {
             this.networkServer = new NetworkServer(this.cloudConfig.getHost().getHost().equals("*") ? new InetSocketAddress(this.cloudConfig.getHost().getPort())
                     : new InetSocketAddress(this.cloudConfig.getHost().getHost(), this.cloudConfig.getHost().getPort()), this.packetManager);
-            this.networkServer.run();
         }
 
         if (oldNodes == null || !oldNodes.equals(newNodes)) {
