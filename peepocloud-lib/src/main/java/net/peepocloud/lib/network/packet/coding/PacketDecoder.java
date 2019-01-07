@@ -33,6 +33,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
             ByteArrayDataInput byteArrayDataInput = ByteStreams.newDataInput(bytes);
             int id = byteArrayDataInput.readInt();
+            AbstractPeepoCloudAPI.getInstance().debug("Decoding packet " + id + "...");
             boolean isQuery = byteArrayDataInput.readBoolean();
             UUID queryUUID = isQuery ? PacketUtils.readUUID(byteArrayDataInput) : null;
 
@@ -51,6 +52,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
                 else
                     packetClass = packetInfo.getPacketClass();
             }
+            AbstractPeepoCloudAPI.getInstance().debug("Class for packet " + id + " (" + isQuery + ") is " + (packetClass == null ? "null" : packetClass.getName()));
 
             if (packetClass == null) {
                 AbstractPeepoCloudAPI.getInstance().debug("Received invalid/unregistered packet from " + channelHandlerContext.channel().localAddress()
