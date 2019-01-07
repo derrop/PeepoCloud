@@ -25,7 +25,7 @@ public class CommandShutdown extends Command implements TabCompletable {
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
         if (args.length != 1) {
-            sender.sendMessage("&eshutdown <server|bungee|node>");
+            sender.sendMessage("&eshutdown <group|server|bungee|node>");
             return;
         }
 
