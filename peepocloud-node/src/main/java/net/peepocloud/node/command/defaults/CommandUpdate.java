@@ -6,6 +6,7 @@ package net.peepocloud.node.command.defaults;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.command.Command;
 import net.peepocloud.node.api.command.CommandSender;
+import net.peepocloud.node.network.packet.out.node.PacketOutNodeUpdate;
 
 public class CommandUpdate extends Command {
     public CommandUpdate() {
@@ -14,6 +15,7 @@ public class CommandUpdate extends Command {
 
     @Override
     public void execute(CommandSender sender, String commandLine, String[] args) {
+        PeepoCloudNode.getInstance().getNetworkManager().sendPacketToNodes(new PacketOutNodeUpdate());
         PeepoCloudNode.getInstance().installUpdates(sender);
     }
 }
