@@ -27,6 +27,7 @@ public class BungeeGroup implements ReflectivePacketSerializable {
     private int maxServers;
     private int startPort;
     private boolean maintenance;
+    private boolean saveLogsAfterShutdown;
 
     public void update() {
         AbstractPeepoCloudAPI.getInstance().updateBungeeGroup(this);

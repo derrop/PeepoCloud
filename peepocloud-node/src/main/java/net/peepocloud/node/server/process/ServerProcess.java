@@ -193,7 +193,8 @@ public class ServerProcess implements CloudProcessImpl {
         PeepoCloudNode.getInstance().getEventManager().callEvent(new MinecraftServerPostTemplateCopyEvent(this));
 
         TemplateStorage storage = PeepoCloudNode.getInstance().getTemplateStorage(this.serverInfo.getTemplate().getStorage());
-        storage.copyGlobal(this.directory);
+        if (storage.isWorking())
+            storage.copyGlobal(this.directory);
     }
 
     private void loadServerConfig() {
@@ -262,8 +263,9 @@ public class ServerProcess implements CloudProcessImpl {
                 }
             }
 
-            if (this.process.exitValue() != 0) {
-                this.saveLatestLog();
+            if (this.process.exitValue() != 0 ||
+                    (this.serverInfo.getGroup() != null && this.serverInfo.getGroup().isSaveLogsAfterShutdown())) {
+                this.saveLogs();
             }
 
             this.screenHandlers.clear();
@@ -284,7 +286,7 @@ public class ServerProcess implements CloudProcessImpl {
 
     @Override
     public String getLatestLogPath() {
-        return "logs/latest.log";
+        return "logs/";
     }
 
 }

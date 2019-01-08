@@ -644,12 +644,14 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     public void copyTemplate(MinecraftGroup group, Template template, Path target) {
         TemplateStorage storage = this.getTemplateStorage(template.getStorage());
-        storage.copyToPath(group, template, target);
+        if (storage.isWorking())
+            storage.copyToPath(group, template, target);
     }
 
     public void copyTemplate(BungeeGroup group, Template template, Path target) {
         TemplateStorage storage = this.getTemplateStorage(template.getStorage());
-        storage.copyToPath(group, template, target);
+        if (storage.isWorking())
+            storage.copyToPath(group, template, target);
     }
 
     /**

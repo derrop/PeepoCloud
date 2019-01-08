@@ -25,18 +25,22 @@ public interface CloudProcessImpl extends CloudProcess {
     String getLatestLogPath();
 
     @Override
-    default void saveLatestLog() {
+    default void saveLogs() {
         Path path = Paths.get(getDirectory().toString(), getLatestLogPath());
         if (!Files.exists(path))
             throw new IllegalStateException("log " + path.toString() + " of server " + getName() + " does not exist");
 
-        Path target = Paths.get("serverLogs/" + getName() + "/" + SystemUtils.DEFAULT_FILE_DATE_FORMAT.format(new Date()) + ".log");
+        Path target = Paths.get("serverLogs/" + getName() + "/" + SystemUtils.DEFAULT_FILE_DATE_FORMAT.format(new Date()));
         SystemUtils.createParent(target);
 
         Path consoleTarget = Paths.get("serverLogs/" + getName() + "/" + SystemUtils.DEFAULT_FILE_DATE_FORMAT.format(new Date()) + ".console");
 
         try {
-            Files.copy(path, target, StandardCopyOption.REPLACE_EXISTING);
+            if (Files.isDirectory(path)) {
+                SystemUtils.copyDirectory(path, target.toString());
+            } else {
+                Files.copy(Paths.get("serverLogs/" + getName() + "/" + SystemUtils.DEFAULT_FILE_DATE_FORMAT.format(new Date()) + ".log"), target, StandardCopyOption.REPLACE_EXISTING);
+            }
             Files.write(consoleTarget, this.getCachedLog(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();

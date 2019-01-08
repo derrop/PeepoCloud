@@ -115,7 +115,7 @@ public class CommandCreate extends Command implements TabCompletable {
                     );
                     int startPort = setup.getData().getInt("startPort");
 
-                    BungeeGroup group = new BungeeGroup(name, groupMode, templates, memory, minServers, maxServers, startPort, false);
+                    BungeeGroup group = new BungeeGroup(name, groupMode, templates, memory, minServers, maxServers, startPort, false, false);
 
                     PeepoCloudNode.getInstance().getGroupsConfig().createGroup(group, success -> {
                         if (success) {
@@ -245,7 +245,7 @@ public class CommandCreate extends Command implements TabCompletable {
                     }
                     String fallbackPermission = setup.getData().getString("fallbackPermission");
 
-                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort, false, "default", fallback, fallbackPermission);
+                    MinecraftGroup group = new MinecraftGroup(name, groupMode, templates, memory, minServers, maxServers, maxPlayers, motd, startPort, false, "default", fallback, fallbackPermission, false);
 
                     PeepoCloudNode.getInstance().getGroupsConfig().createGroup(group, success -> {
                         if (success) {

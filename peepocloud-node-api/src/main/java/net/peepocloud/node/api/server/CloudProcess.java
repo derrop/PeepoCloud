@@ -24,9 +24,9 @@ public interface CloudProcess {
     Process getProcess();
 
     /**
-     * Copies the latest log of this {@link Process} to "serverLogs/[name]/dd.MM.yyyy-mm:hh.log"
+     * Copies the latest log of this {@link Process} to "serverLogs/[name]/dd.MM.yyyy-mm:hh"
      */
-    void saveLatestLog();
+    void saveLogs();
 
     /**
      * Gets all lines of the console of this process

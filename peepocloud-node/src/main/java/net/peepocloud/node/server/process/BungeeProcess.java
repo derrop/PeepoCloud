@@ -292,8 +292,9 @@ public class BungeeProcess implements CloudProcessImpl {
                 }
             }
 
-            if (this.process.exitValue() != 0) {
-                this.saveLatestLog();
+            if (this.process.exitValue() != 0 ||
+                    (this.proxyInfo.getGroup() != null && this.proxyInfo.getGroup().isSaveLogsAfterShutdown())) {
+                this.saveLogs();
             }
 
             this.screenHandlers.clear();

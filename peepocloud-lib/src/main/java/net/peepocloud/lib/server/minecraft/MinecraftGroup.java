@@ -32,6 +32,7 @@ public class MinecraftGroup implements ReflectivePacketSerializable {
     private String signLayoutName;
     private boolean fallback;
     private String fallbackPermission;
+    private boolean saveLogsAfterShutdown;
 
     public void update() {
         AbstractPeepoCloudAPI.getInstance().updateMinecraftGroup(this);
