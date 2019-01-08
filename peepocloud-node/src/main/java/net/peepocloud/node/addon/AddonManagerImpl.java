@@ -107,7 +107,11 @@ public class AddonManagerImpl<Addon extends net.peepocloud.node.api.addon.Addon>
                     this.loadedAddons.put(config.getName(), addon);
                     if (preLoadAddon != null)
                         preLoadAddon.accept(addon);
-                    addon.onLoad();
+                    try {
+                        addon.onLoad();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("addons.successfullyLoadedAddon")
                             .replace("%name%", config.getName()).replace("%author%", config.getAuthor()).replace("%version%", config.getVersion())
                             .replace("%time%", String.valueOf(System.nanoTime() - start)));
@@ -157,7 +161,11 @@ public class AddonManagerImpl<Addon extends net.peepocloud.node.api.addon.Addon>
                 .replace("%name%", addon.getAddonConfig().getName()).replace("%author%", addon.getAddonConfig().getAuthor())
                 .replace("%version%", addon.getAddonConfig().getVersion()));
         addon.setEnabled(false);
-        addon.onDisable();
+        try {
+            addon.onDisable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         PeepoCloudNode.getInstance().getEventManager().unregisterAll(addon);
         PeepoCloudNode.getInstance().getCommandManager().unregisterCommands(addon);
         System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("addons.disabledAddon")
@@ -186,7 +194,11 @@ public class AddonManagerImpl<Addon extends net.peepocloud.node.api.addon.Addon>
                 .replace("%name%", addon.getAddonConfig().getName()).replace("%author%", addon.getAddonConfig().getAuthor())
                 .replace("%version%", addon.getAddonConfig().getVersion()));
         addon.setEnabled(true);
-        addon.onEnable();
+        try {
+            addon.onEnable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("addons.enabledAddon")
                 .replace("%name%", addon.getAddonConfig().getName()).replace("%author%", addon.getAddonConfig().getAuthor())
                 .replace("%version%", addon.getAddonConfig().getVersion()).replace("%time%", String.valueOf(System.nanoTime() - start)));
