@@ -4,7 +4,6 @@ package net.peepocloud.node;
  */
 
 import com.sun.management.OperatingSystemMXBean;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import net.md_5.bungee.config.Configuration;
@@ -15,10 +14,12 @@ import net.peepocloud.lib.utility.SystemUtils;
 import net.peepocloud.lib.utility.network.NetworkAddress;
 import net.peepocloud.node.api.NodeConfig;
 import net.peepocloud.node.network.ConnectableNode;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.management.ManagementFactory;
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -57,6 +58,13 @@ public class CloudConfig extends NodeConfig {
     private String apiToken;
 
     private boolean useGlobalStats;
+
+    //RestAPI
+    private boolean restAPIEnabled;
+    private boolean restAPIRateLimitEnabled;
+    private long restAPIConnectionsTillRateLimit;
+    private long restAPIRateLimitTime;
+    private InetSocketAddress restAPIHostAddress;
 
     NodeInfo loadNodeInfo(int usedMemory) {
         return new NodeInfo(this.nodeName, this.maxMemory, usedMemory, Runtime.getRuntime().availableProcessors(), SystemUtils.cpuUsageProcess());
@@ -132,7 +140,25 @@ public class CloudConfig extends NodeConfig {
             configurable = new YamlConfigurable()
                     .append("autoUpdate", true)
                     .append("maxMemoryForServers", ((OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean()).getTotalPhysicalMemorySize() / 1024 / 1024 - 2048)
-                    .append("disableGlobalStats", !gStats);
+                    .append("disableGlobalStats", !gStats)
+                    .append("restAPI",
+                            new YamlConfigurable()
+                                    .append("enabled", true)
+                                    .append("rateLimit",
+                                            new YamlConfigurable()
+                                                    .append("enabled", true)
+                                                    .append("timePerRateLimit", 30000)
+                                                    .append("connectionsUntilRateLimitIn5Seconds", 15)
+                                                    .asConfiguration()
+                                    )
+                                    .append("host",
+                                            new YamlConfigurable()
+                                                    .append("host", PeepoCloudNode.getInstance().getLocalAddress())
+                                                    .append("port", 2585)
+                                                    .asConfiguration()
+                                    )
+                                    .asConfiguration()
+                    );
             configurable.saveAsFile(mainPath);
         }
 
@@ -145,6 +171,22 @@ public class CloudConfig extends NodeConfig {
         if (this.maxMemory < 1024) {
             System.err.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("config.memory.notEnough").replace("%memory%", String.valueOf(this.maxMemory)));
         }
+
+        {
+            YamlConfigurable restAPI = configurable.getYamlConfigurable("restAPI");
+            boolean enabled = restAPI.getBoolean("enabled");
+            YamlConfigurable rateLimit = restAPI.getYamlConfigurable("rateLimit");
+            boolean rateLimitEnabled = rateLimit.getBoolean("enabled");
+            long timePerRateLimit = rateLimit.getLong("timePerRateLimit");
+            long connectionsUntilRateLimit = rateLimit.getLong("connectionsUntilRateLimitIn5Seconds");
+            YamlConfigurable net = restAPI.getYamlConfigurable("host");
+            InetSocketAddress host = net.getString("host").equals("*") ?
+                    new InetSocketAddress(net.getInt("port")) :
+                    new InetSocketAddress(net.getString("host"), net.getInt("port"));
+
+            PeepoCloudNode.getInstance().getRestAPIProvider().load(enabled, rateLimitEnabled, connectionsUntilRateLimit, timePerRateLimit, host);
+        }
+
     }
 
     private void loadNetwork() {

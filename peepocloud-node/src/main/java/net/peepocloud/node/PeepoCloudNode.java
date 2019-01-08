@@ -49,6 +49,7 @@ import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.api.event.DefaultEventManager;
 import net.peepocloud.node.api.network.*;
+import net.peepocloud.node.api.restful.RestAPIProviderImpl;
 import net.peepocloud.node.api.server.CloudProcess;
 import net.peepocloud.node.api.server.TemplateStorage;
 import net.peepocloud.node.api.statistic.StatisticsManager;
@@ -156,6 +157,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     private Collection<TemplateStorage> templateStorages = new ArrayList<>(Arrays.asList(new LocalTemplateStorage()));
 
     private SystemInfo systemInfo = new SystemInfo();
+
+    private RestAPIProviderImpl restAPIProvider = new RestAPIProviderImpl();
 
     private NodePluginChannelMessageManager pluginChannelMessageManager = new NodePluginChannelMessageManager();
 

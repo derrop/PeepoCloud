@@ -14,7 +14,6 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
-import net.peepocloud.lib.utility.network.QueryRequest;
 import net.peepocloud.node.api.addon.AddonManager;
 import net.peepocloud.node.api.addon.node.NodeAddon;
 import net.peepocloud.node.api.command.Command;
@@ -26,6 +25,7 @@ import net.peepocloud.node.api.event.EventManager;
 import net.peepocloud.node.api.languagesystem.Language;
 import net.peepocloud.node.api.languagesystem.LanguagesManager;
 import net.peepocloud.node.api.network.*;
+import net.peepocloud.node.api.restful.RestAPIProvider;
 import net.peepocloud.node.api.server.TemplateStorage;
 
 import java.nio.file.Path;
@@ -67,9 +67,12 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
 
     /**
      * Gets the configuration instance of this Node containing the data of all configs of the cloud in the directory where this instance is running (not of sub directories)
+     *
      * @return the {@link NodeConfig} of this Node
      */
     public abstract NodeConfig getCloudConfig();
+
+    public abstract RestAPIProvider getRestAPIProvider();
 
     /**
      * Gets the {@link ExecutorService} (cached thread pool) of this instance.
