@@ -431,6 +431,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         this.getServerNodes().values().forEach(NodeParticipant::closeConnection);
         this.networkServer.close();
 
+        this.restAPIProvider.close();
+
         this.commandManager.shutdown();
         this.databaseLoader.shutdown();
         this.databaseManager.shutdown();
