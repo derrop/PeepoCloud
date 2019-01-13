@@ -24,8 +24,6 @@ public interface RestAPIClient {
 
     void setResponseHeader(String key, String value);
 
-    RestAPIResponseBody getResponseBody();
-
     RestAPIRequestBody getRequestBody();
 
     void sendResponse(int code, InputStream inputStream);

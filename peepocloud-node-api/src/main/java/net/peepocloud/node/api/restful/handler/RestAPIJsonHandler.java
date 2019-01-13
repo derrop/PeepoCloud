@@ -1,10 +1,11 @@
-package net.peepocloud.node.api.restful;
+package net.peepocloud.node.api.restful.handler;
 /*
  * Created by Mc_Ruben on 07.01.2019
  */
 
 import com.google.gson.JsonParseException;
 import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.node.api.restful.RestAPIClient;
 
 import java.nio.charset.StandardCharsets;
 

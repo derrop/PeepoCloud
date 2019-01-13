@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Map;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DefaultRestAPIClient implements RestAPIClient {
 
-    private DefaultRestAPIResponseBody responseBody;
     private DefaultRestAPIRequestBody requestBody;
     private final HttpExchange httpExchange;
     private final Map<String, String> query;
@@ -55,11 +55,6 @@ public class DefaultRestAPIClient implements RestAPIClient {
     }
 
     @Override
-    public DefaultRestAPIResponseBody getResponseBody() {
-        return this.responseBody != null ? this.responseBody : (this.responseBody = new DefaultRestAPIResponseBody(this.httpExchange.getResponseBody()));
-    }
-
-    @Override
     public RestAPIRequestBody getRequestBody() {
         return this.requestBody != null ? this.requestBody : (this.requestBody = new DefaultRestAPIRequestBody(this.httpExchange.getRequestBody()));
     }
@@ -72,7 +67,7 @@ public class DefaultRestAPIClient implements RestAPIClient {
             e.printStackTrace();
         }
         try {
-            DefaultRestAPIResponseBody body = this.getResponseBody();
+            OutputStream body = this.httpExchange.getResponseBody();
             int b;
             while ((b = inputStream.read()) != -1) {
                 body.write(b);
@@ -90,15 +85,17 @@ public class DefaultRestAPIClient implements RestAPIClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        DefaultRestAPIResponseBody body = this.getResponseBody();
-        body.write(bytes);
-        body.close();
+        OutputStream body = this.httpExchange.getResponseBody();
+        try {
+            body.write(bytes);
+            body.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void sendResponse(int code, int fullLength) {
-        if (this.responseBody != null)
-            this.responseBody.close();
         try {
             this.httpExchange.sendResponseHeaders(code, fullLength);
         } catch (IOException e) {

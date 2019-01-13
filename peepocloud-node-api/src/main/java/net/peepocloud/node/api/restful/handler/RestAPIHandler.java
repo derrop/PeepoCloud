@@ -1,7 +1,10 @@
-package net.peepocloud.node.api.restful;
+package net.peepocloud.node.api.restful.handler;
 /*
  * Created by Mc_Ruben on 07.01.2019
  */
+
+import net.peepocloud.node.api.restful.RestAPIClient;
+import net.peepocloud.node.api.restful.RestAPIRequestMethod;
 
 import java.util.Collection;
 

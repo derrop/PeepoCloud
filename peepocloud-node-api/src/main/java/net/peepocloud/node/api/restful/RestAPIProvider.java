@@ -4,6 +4,7 @@ package net.peepocloud.node.api.restful;
  */
 
 import net.peepocloud.node.api.addon.Addon;
+import net.peepocloud.node.api.restful.handler.RestAPIHandler;
 
 import java.net.InetSocketAddress;
 

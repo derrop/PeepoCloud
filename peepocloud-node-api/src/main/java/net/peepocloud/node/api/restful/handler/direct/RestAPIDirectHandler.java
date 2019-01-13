@@ -1,22 +1,22 @@
-package net.peepocloud.node.api.restful;
+package net.peepocloud.node.api.restful.handler.direct;
 /*
  * Created by Mc_Ruben on 08.01.2019
  */
 
 import lombok.AllArgsConstructor;
-import net.peepocloud.lib.config.json.SimpleJsonObject;
+import net.peepocloud.node.api.restful.RestAPIRequestMethod;
+import net.peepocloud.node.api.restful.handler.RestAPIHandler;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 @AllArgsConstructor
-public abstract class RestAPIDirectJsonHandler implements RestAPIJsonHandler {
+public abstract class RestAPIDirectHandler implements RestAPIHandler {
 
-    public RestAPIDirectJsonHandler(String path, boolean usesRatelimit, Collection<String> requiredHeaders, RestAPIRequestMethod... supportedMethods) {
+    public RestAPIDirectHandler(String path, boolean usesRatelimit, Collection<String> requiredHeaders, RestAPIRequestMethod... supportedMethods) {
         this(path, usesRatelimit, -1, requiredHeaders, supportedMethods);
     }
 
-    public RestAPIDirectJsonHandler(String path, boolean usesRatelimit, RestAPIRequestMethod... supportedMethods) {
+    public RestAPIDirectHandler(String path, boolean usesRatelimit, RestAPIRequestMethod... supportedMethods) {
         this(path, usesRatelimit, null, supportedMethods);
     }
 
@@ -51,12 +51,4 @@ public abstract class RestAPIDirectJsonHandler implements RestAPIJsonHandler {
         return overrideRatelimit;
     }
 
-    public final void handleJson(RestAPIClient client, SimpleJsonObject jsonObject) {
-        SimpleJsonObject response = this.handle(client, jsonObject);
-        if (response != null) {
-            client.sendResponse(200, response.toBytes());
-        }
-    }
-
-    public abstract SimpleJsonObject handle(RestAPIClient client, SimpleJsonObject jsonObject);
 }
