@@ -4,6 +4,8 @@ package net.peepocloud.node.server.process;
  */
 
 import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.node.api.PeepoCloudNodeAPI;
+import net.peepocloud.node.api.installableplugins.InstallablePlugin;
 import net.peepocloud.node.api.server.CloudProcess;
 
 import java.io.IOException;
@@ -45,6 +47,14 @@ public interface CloudProcessImpl extends CloudProcess {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    default boolean installPlugin(InstallablePlugin plugin) throws IllegalStateException {
+        if (this.isRunning())
+            throw new IllegalStateException("cannot install plugins after a process has been started");
+        Path target = Paths.get(this.getDirectory().toString(), "plugins", plugin.getName());
+        return PeepoCloudNodeAPI.getInstance().getPluginLoader().loadPlugin(plugin, target);
     }
 
     Consumer<String> getNetworkScreenHandler();

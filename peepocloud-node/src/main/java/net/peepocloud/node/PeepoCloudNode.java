@@ -48,6 +48,7 @@ import net.peepocloud.node.api.addon.node.NodeAddon;
 import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.api.event.DefaultEventManager;
+import net.peepocloud.node.api.installableplugins.InstallablePluginLoader;
 import net.peepocloud.node.api.network.*;
 import net.peepocloud.node.api.restful.RestAPIProviderImpl;
 import net.peepocloud.node.api.server.CloudProcess;
@@ -56,6 +57,7 @@ import net.peepocloud.node.api.statistic.StatisticsManager;
 import net.peepocloud.node.command.CommandManagerImpl;
 import net.peepocloud.node.command.defaults.*;
 import net.peepocloud.node.database.DatabaseLoaderImpl;
+import net.peepocloud.node.installableplugins.InstallablePluginLoaderImpl;
 import net.peepocloud.node.languagesystem.LanguagesManagerImpl;
 import net.peepocloud.node.logging.ColoredLogger;
 import net.peepocloud.node.network.ClientNodeImpl;
@@ -153,6 +155,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
     private ProcessManager processManager;
 
     private UserManager userManager = new NodeUserManager();
+
+    private InstallablePluginLoaderImpl pluginLoader = new InstallablePluginLoaderImpl();
 
     private Collection<TemplateStorage> templateStorages = new ArrayList<>(Arrays.asList(new LocalTemplateStorage()));
 
@@ -567,6 +571,11 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
                     @Override
                     public void disconnected(NetworkParticipant networkParticipant) {
                         connectedNodes.remove(node.getName());
+                    }
+
+                    @Override
+                    public void connected(NetworkParticipant networkParticipant) {
+                        pluginLoader.handleNodeConnect(connectedNodes.get(node.getName()));
                     }
                 },
                 new Auth(this.networkAuthKey, this.cloudConfig.getNodeName(), NetworkComponentType.NODE, null, authData),

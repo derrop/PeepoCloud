@@ -7,6 +7,7 @@ import net.peepocloud.lib.server.GroupMode;
 import net.peepocloud.lib.server.Template;
 import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.node.api.installableplugins.InstallablePlugin;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,6 +28,16 @@ public interface CloudProcess {
      * Copies the latest log of this {@link Process} to "serverLogs/[name]/dd.MM.yyyy-mm:hh"
      */
     void saveLogs();
+
+    /**
+     * Installs the given {@link InstallablePlugin} on this Process.
+     * Must be called before this Process has been started
+     *
+     * @param plugin the plugin to install
+     * @return {@code true} if the plugin was successfully put into the plugins folder (or if the {@link TemplateStorage} fails) or {@code false} if the plugin does not exist
+     * @throws IllegalStateException when this method is called after this Process has been started
+     */
+    boolean installPlugin(InstallablePlugin plugin) throws IllegalStateException;
 
     /**
      * Gets all lines of the console of this process

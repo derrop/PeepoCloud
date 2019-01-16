@@ -22,6 +22,7 @@ import net.peepocloud.node.api.database.DatabaseAddon;
 import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.api.event.Event;
 import net.peepocloud.node.api.event.EventManager;
+import net.peepocloud.node.api.installableplugins.InstallablePluginLoader;
 import net.peepocloud.node.api.languagesystem.Language;
 import net.peepocloud.node.api.languagesystem.LanguagesManager;
 import net.peepocloud.node.api.network.*;
@@ -102,6 +103,13 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
      * @return the {@link AddonManager} of this Node
      */
     public abstract AddonManager<NodeAddon> getNodeAddonManager();
+
+    /**
+     * Gets the {@link InstallablePluginLoader} instance
+     *
+     * @return the {@link InstallablePluginLoader} instance in this Node
+     */
+    public abstract InstallablePluginLoader getPluginLoader();
 
     /**
      * Gets the {@link DatabaseManager} of this Node which can be loaded directly in the Node or by {@link DatabaseAddon}s

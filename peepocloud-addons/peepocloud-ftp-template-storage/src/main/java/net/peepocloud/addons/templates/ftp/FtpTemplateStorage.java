@@ -12,6 +12,7 @@ import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.node.api.installableplugins.InstallablePlugin;
 import net.peepocloud.node.api.server.TemplateStorage;
 
 import java.io.IOException;
@@ -27,6 +28,18 @@ public class FtpTemplateStorage extends TemplateStorage {
     private final FtpTemplatesAddon addon;
     @Getter
     private String cacheDir = "internal/cache/ftp/";
+
+    private String getTemplateDir() {
+        return this.getTemplateDir() + "templates";
+    }
+
+    private String getGlobalDir() {
+        return this.getTemplateDir() + "global";
+    }
+
+    private String getPluginsDir() {
+        return this.getTemplateDir() + "plugins";
+    }
 
     public FtpClient getFtpClient() {
         return this.addon.getFtpClient();
@@ -70,7 +83,7 @@ public class FtpTemplateStorage extends TemplateStorage {
     }
 
     private void copyToTemplate(Path directory, String group, String template) {
-        this.getFtpClient().uploadDirectory(directory, this.addon.getTemplateDir() + group + "/" + template);
+        this.getFtpClient().uploadDirectory(directory, this.getTemplateDir() + group + "/" + template);
         SystemUtils.copyDirectory(directory, this.cacheDir + group + "/" + template);
         this.sendTemplateUpdate(group, template);
     }
@@ -87,7 +100,7 @@ public class FtpTemplateStorage extends TemplateStorage {
 
     private void copyFilesToTemplate(Path directory, String group, String template, String[] files) {
         boolean a = false;
-        String prefix = this.addon.getTemplateDir() + group + "/" + template + "/";
+        String prefix = this.getTemplateDir() + group + "/" + template + "/";
         for (String file : files) {
             Path path = Paths.get(directory.toString(), file);
             if (!Files.exists(path))
@@ -124,7 +137,7 @@ public class FtpTemplateStorage extends TemplateStorage {
             e.printStackTrace();
         }
 
-        this.getFtpClient().uploadFile(cache, this.addon.getTemplateDir() + fullPath);
+        this.getFtpClient().uploadFile(cache, this.getTemplateDir() + fullPath);
     }
 
     @Override
@@ -140,7 +153,7 @@ public class FtpTemplateStorage extends TemplateStorage {
     private void deleteTemplate(String group, Template template) {
         String path = group + "/" + template.getName();
         SystemUtils.deleteDirectory(Paths.get(this.cacheDir + path));
-        this.getFtpClient().deleteDirectory(this.addon.getTemplateDir() + path);
+        this.getFtpClient().deleteDirectory(this.getTemplateDir() + path);
     }
 
     @Override
@@ -154,14 +167,14 @@ public class FtpTemplateStorage extends TemplateStorage {
     }
 
     private void createTemplate(String group, Template template) {
-        String path = this.addon.getTemplateDir() + group + "/" + template.getName();
+        String path = this.getTemplateDir() + group + "/" + template.getName();
         if (!this.getFtpClient().existsDirectory(path))
             this.getFtpClient().createDirectories(path);
     }
 
     @Override
     public void copyGlobal(Path target) {
-        String remote = this.addon.getTemplateDir() + "global";
+        String remote = this.getGlobalDir();
         if (!this.getFtpClient().existsDirectory(remote)) {
             this.getFtpClient().createDirectories(remote);
             return;
@@ -173,6 +186,26 @@ public class FtpTemplateStorage extends TemplateStorage {
         SystemUtils.copyDirectory(Paths.get(cache), target.toString());
     }
 
+    @Override
+    public void copyInstallablePlugin(InstallablePlugin plugin, Path target) {
+        String cache = this.cacheDir + "plugins";
+        Path path = Paths.get(cache);
+        if (!Files.exists(path)) {
+            String remote = this.getPluginsDir();
+            if (!this.getFtpClient().existsDirectory(remote)) {
+                this.getFtpClient().createDirectories(remote);
+                return;
+            }
+        }
+
+        SystemUtils.createParent(target);
+        try {
+            Files.copy(path, target);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void clearCache() {
         SystemUtils.deleteDirectory(Paths.get(this.cacheDir));
     }
@@ -181,13 +214,13 @@ public class FtpTemplateStorage extends TemplateStorage {
         String path = group + "/" + template;
         Path cache = Paths.get(this.cacheDir + path);
         SystemUtils.deleteDirectory(cache);
-        this.addon.getFtpClient().downloadDirectory(this.addon.getTemplateDir() + path, cache.toString());
+        this.addon.getFtpClient().downloadDirectory(this.getTemplateDir() + path, cache.toString());
     }
 
     private Path updateCache0(String path) {
         Path cache = Paths.get(this.cacheDir + path);
         if (!Files.exists(cache)) {
-            this.addon.getFtpClient().downloadDirectory(this.addon.getTemplateDir() + path, cache.toString());
+            this.addon.getFtpClient().downloadDirectory(this.getTemplateDir() + path, cache.toString());
         }
         return cache;
     }

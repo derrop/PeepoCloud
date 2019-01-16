@@ -69,7 +69,7 @@ public class FtpTemplatesAddon extends NodeAddon {
                     .append("sftp.port", 22)
                     .append("sftp.username", "")
                     .append("sftp.password", "")
-                    .append("sftp.remoteTemplatesDirectory", "/home/peepocloud/templates");
+                    .append("sftp.remoteTemplatesDirectory", "/home/peepocloud/templates/");
             createConfig(config);
             System.out.println("&cYour FTP-ConfigFile was created, please fill it with your data (\"" + getConfigFile().toString() + "\")");
             return false;

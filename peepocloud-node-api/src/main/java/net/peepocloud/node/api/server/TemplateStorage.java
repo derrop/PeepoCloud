@@ -8,6 +8,7 @@ import net.peepocloud.lib.server.bungee.BungeeCordProxyInfo;
 import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
+import net.peepocloud.node.api.installableplugins.InstallablePlugin;
 
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -132,5 +133,13 @@ public abstract class TemplateStorage {
      * @param target the {@link Path} where the files should be copied to
      */
     public abstract void copyGlobal(Path target);
+
+    /**
+     * Copies the given {@link InstallablePlugin} to the given {@link Path}
+     *
+     * @param plugin the plugin to copy
+     * @param target the path to copy the jar of the plugin to
+     */
+    public abstract void copyInstallablePlugin(InstallablePlugin plugin, Path target);
 
 }

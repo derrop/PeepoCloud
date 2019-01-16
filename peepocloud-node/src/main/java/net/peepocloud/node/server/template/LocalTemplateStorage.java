@@ -9,6 +9,7 @@ import net.peepocloud.lib.server.bungee.BungeeGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftGroup;
 import net.peepocloud.lib.server.minecraft.MinecraftServerInfo;
 import net.peepocloud.lib.utility.SystemUtils;
+import net.peepocloud.node.api.installableplugins.InstallablePlugin;
 import net.peepocloud.node.api.server.TemplateStorage;
 
 import java.io.IOException;
@@ -148,6 +149,20 @@ public class LocalTemplateStorage extends TemplateStorage {
         }
 
         SystemUtils.copyDirectory(path, target.toString());
+    }
+
+    @Override
+    public void copyInstallablePlugin(InstallablePlugin plugin, Path target) {
+        Path path = Paths.get("files/local-plugins/" + plugin.getName());
+        if (!Files.exists(path))
+            return;
+
+        SystemUtils.createParent(target);
+        try {
+            Files.copy(path, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void create(String group, Template template) {
