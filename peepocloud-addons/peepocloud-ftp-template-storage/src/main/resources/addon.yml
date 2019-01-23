@@ -3,3 +3,8 @@ version: ${cloud.version}
 main: net.peepocloud.addons.templates.ftp.FtpTemplatesAddon
 author: derrupen & Panamo
 reloadType: NEVER
+libraries:
+  - groupId: com.jcraft
+    artifactId: jsch
+    version: 0.1.53
+    repository: default:central

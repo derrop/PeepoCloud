@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import net.peepocloud.node.api.libs.InstallableMavenLibrary;
+
+import java.util.Collection;
 
 @Getter
 @AllArgsConstructor
@@ -20,6 +23,7 @@ public class AddonConfig {
     private String fileName;
     private String website;
     private ReloadType reloadType;
+    private Collection<InstallableMavenLibrary> libraries;
 
     public static enum ReloadType {
         NEVER, ALWAYS

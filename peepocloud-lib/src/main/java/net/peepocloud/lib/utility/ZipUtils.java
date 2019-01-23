@@ -88,7 +88,10 @@ public class ZipUtils {
                             Files.createDirectories(path);
                         }
                     } else {
-                        Files.copy(zipInputStream, path, StandardCopyOption.REPLACE_EXISTING);
+                        try {
+                            Files.copy(zipInputStream, path, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (NoSuchFileException e) {
+                        }
                     }
                     zipInputStream.closeEntry();
                 } catch (Exception e) {

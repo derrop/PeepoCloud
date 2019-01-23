@@ -49,6 +49,7 @@ import net.peepocloud.node.api.command.CommandSender;
 import net.peepocloud.node.api.database.DatabaseManager;
 import net.peepocloud.node.api.event.DefaultEventManager;
 import net.peepocloud.node.api.installableplugins.InstallablePluginLoader;
+import net.peepocloud.node.api.libs.LibraryManager;
 import net.peepocloud.node.api.network.*;
 import net.peepocloud.node.api.restful.RestAPIProviderImpl;
 import net.peepocloud.node.api.server.CloudProcess;
@@ -166,6 +167,8 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     private NodePluginChannelMessageManager pluginChannelMessageManager = new NodePluginChannelMessageManager();
 
+    private LibraryManager libraryManager;
+
     private Map<String, MinecraftServerParticipant> serversOnThisNode = new HashMap<String, MinecraftServerParticipant>() {
         @Override
         public MinecraftServerParticipant put(String key, MinecraftServerParticipant value) {
@@ -234,11 +237,14 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
 
     private boolean running = true;
 
-    PeepoCloudNode() throws IOException {
+    PeepoCloudNode(LibraryManager libraryManager, ColoredLogger logger) throws IOException {
         Preconditions.checkArgument(instance == null, "instance is already defined");
         instance = this;
 
         PeepoCloudNodeAPI.setInstance(this);
+
+        this.libraryManager = libraryManager;
+        this.logger = logger;
 
         //create factories for those classes
         try {
@@ -259,9 +265,6 @@ public class PeepoCloudNode extends PeepoCloudNodeAPI {
         } catch (NoSuchFieldException | IllegalAccessException exception) {
             System.err.println("Failed to set default charset");
         }
-
-        ConsoleReader consoleReader = new ConsoleReader(System.in, System.out);
-        this.logger = new ColoredLogger(consoleReader);
 
         {
             try {

@@ -25,6 +25,7 @@ import net.peepocloud.node.api.event.EventManager;
 import net.peepocloud.node.api.installableplugins.InstallablePluginLoader;
 import net.peepocloud.node.api.languagesystem.Language;
 import net.peepocloud.node.api.languagesystem.LanguagesManager;
+import net.peepocloud.node.api.libs.LibraryManager;
 import net.peepocloud.node.api.network.*;
 import net.peepocloud.node.api.restful.RestAPIProvider;
 import net.peepocloud.node.api.server.TemplateStorage;
@@ -103,6 +104,12 @@ public abstract class PeepoCloudNodeAPI extends AbstractPeepoCloudAPI {
      * @return the {@link AddonManager} of this Node
      */
     public abstract AddonManager<NodeAddon> getNodeAddonManager();
+
+    /**
+     * Gets the {@link LibraryManager} for this Node instance containing all loaded libraries on this Node
+     * @return the {@link LibraryManager} of this Node
+     */
+    public abstract LibraryManager getLibraryManager();
 
     /**
      * Gets the {@link InstallablePluginLoader} instance

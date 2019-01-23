@@ -10,6 +10,8 @@ import net.md_5.bungee.config.YamlConfiguration;
 import net.peepocloud.node.PeepoCloudNode;
 import net.peepocloud.node.api.addon.AddonConfig;
 import net.peepocloud.node.api.addon.AddonManager;
+import net.peepocloud.node.api.libs.DefaultMavenRepositories;
+import net.peepocloud.node.api.libs.InstallableMavenLibrary;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,6 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 public class AddonManagerImpl<Addon extends net.peepocloud.node.api.addon.Addon> extends AddonManager<Addon> {
 
@@ -90,7 +93,21 @@ public class AddonManagerImpl<Addon extends net.peepocloud.node.api.addon.Addon>
                         configuration.getString("main"),
                         path.getFileName().toString(),
                         configuration.getString("website"),
-                        configuration.contains("reloadType") ? AddonConfig.ReloadType.valueOf(configuration.getString("reloadType")) : AddonConfig.ReloadType.ALWAYS
+                        configuration.contains("reloadType") ? AddonConfig.ReloadType.valueOf(configuration.getString("reloadType")) : AddonConfig.ReloadType.ALWAYS,
+                        configuration.contains("libraries") ? configuration.getList("libraries").stream()
+                                .map(o -> {
+                                    Configuration c = null;
+                                    if (o instanceof Configuration) {
+                                        c = (Configuration) o;
+                                    } else if (o instanceof Map) {
+                                        c = new Configuration();
+                                        c.self = (Map<String, Object>) o;
+                                    } else {
+                                        return null;
+                                    }
+                                    return new InstallableMavenLibrary(c.getString("groupId"), c.getString("artifactId"), c.getString("version"), DefaultMavenRepositories.parse(c.getString("repository")));
+                                })
+                                .collect(Collectors.toList()) : new ArrayList<>()
                 );
                 if (this.loadedAddons.containsKey(config.getName())) {
                     if (this.loadedAddons.get(config.getName()).getAddonConfig().getReloadType() == AddonConfig.ReloadType.ALWAYS)
@@ -101,6 +118,15 @@ public class AddonManagerImpl<Addon extends net.peepocloud.node.api.addon.Addon>
                 System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("addons.loadingAddon")
                         .replace("%name%", config.getName()).replace("%author%", config.getAuthor()).replace("%version%", config.getVersion()));
                 long start = System.nanoTime();
+                for (InstallableMavenLibrary library : config.getLibraries()) {
+                    if (PeepoCloudNode.getInstance().getLibraryManager().loadMavenLibraryOrDownload(library) == null) {
+                        System.out.println(PeepoCloudNode.getInstance().getLanguagesManager().getMessage("addons.failedLoadingAddonReasonLibraryNotFound")
+                                .replace("%name%", config.getName()).replace("%author%", config.getAuthor()).replace("%version%", config.getVersion())
+                                .replace("%time%", String.valueOf(System.nanoTime() - start))
+                                .replace("%lib%", library.getFullName()));
+                        return null;
+                    }
+                }
                 Addon addon = (Addon) addonLoader.loadAddon(config);
                 if (addon != null) {
                     addon.setConfigFile(Paths.get(path.getParent().toString(), config.getName() + "/config.yml"));

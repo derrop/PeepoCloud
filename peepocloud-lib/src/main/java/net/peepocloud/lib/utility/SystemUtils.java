@@ -237,6 +237,24 @@ public class SystemUtils {
         return -1;
     }
 
+    public static boolean downloadFileSynchronized(String url, Path path) {
+        try {
+            createParent(path);
+            URLConnection connection = new URL(url).openConnection();
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+            connection.setConnectTimeout(2000);
+            connection.connect();
+
+            try (InputStream inputStream = connection.getInputStream()) {
+                Files.copy(inputStream, path);
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static boolean isServerOffline(Exception e) {
         return (e instanceof ConnectException && (e.getMessage().equals("Connection refused: connect") || e.getMessage().equals("Connection timed out: connect"))) ||
                 (e instanceof SocketTimeoutException && (e.getMessage().equals("connect timed out")));
