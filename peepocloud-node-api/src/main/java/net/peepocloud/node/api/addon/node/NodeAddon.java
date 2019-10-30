@@ -7,8 +7,8 @@ import net.peepocloud.lib.network.packet.PacketManager;
 import net.peepocloud.node.api.PeepoCloudNodeAPI;
 import net.peepocloud.node.api.addon.Addon;
 import net.peepocloud.node.api.installableplugins.InstallablePlugin;
-import sun.misc.IOUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.file.Paths;
 
@@ -32,7 +32,13 @@ public class NodeAddon extends Addon {
         InstallablePlugin plugin = new InstallablePlugin(name, "memory");
         try {
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream(path);
-            PeepoCloudNodeAPI.getInstance().getPluginLoader().updatePluginToAllNodes(plugin, IOUtils.readNBytes(inputStream, inputStream.available()));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, len);
+            }
+            PeepoCloudNodeAPI.getInstance().getPluginLoader().updatePluginToAllNodes(plugin, byteArrayOutputStream.toByteArray());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
